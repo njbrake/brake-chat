@@ -471,9 +471,9 @@ async def update_user_by_id(
                 )
 
         if form_data.password:
-            hashed = get_password_hash(form_data.password)
-            log.debug(f"hashed: {hashed}")
-            Auths.update_user_password_by_id(user_id, hashed)
+            # Admin password reset - pass plaintext, old password not available
+            # This will generate a new encryption key, making old chats unreadable
+            Auths.update_user_password_by_id(user_id, form_data.password)
 
         Auths.update_email_by_id(user_id, form_data.email.lower())
         updated_user = Users.update_user_by_id(

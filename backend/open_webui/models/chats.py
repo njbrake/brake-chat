@@ -8,6 +8,8 @@ from open_webui.internal.db import Base, get_db
 from open_webui.models.tags import TagModel, Tag, Tags
 from open_webui.models.folders import Folders
 from open_webui.env import SRC_LOG_LEVELS
+from open_webui.utils.encryption import encrypt_data, decrypt_data
+from open_webui.utils.encryption_keys import get_user_encryption_key
 
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import BigInteger, Boolean, Column, String, Text, JSON, Index
@@ -123,19 +125,118 @@ class ChatTitleIdResponse(BaseModel):
 
 
 class ChatTable:
+    def _encrypt_chat_data(self, user_id: str, chat_dict: dict, title: str) -> tuple[dict, str]:
+        """
+        Encrypt chat data and title for storage.
+
+        Args:
+            user_id: User ID to get encryption key
+            chat_dict: Chat dictionary to encrypt
+            title: Chat title to encrypt
+
+        Returns:
+            Tuple of (encrypted_chat_wrapper, encrypted_title)
+            Chat wrapper is a dict: {"encrypted": true, "data": "base64_encrypted"}
+        """
+        encryption_key = get_user_encryption_key(user_id)
+        if not encryption_key:
+            # If encryption key not available, store unencrypted
+            # This handles cases where user hasn't logged in yet or key is missing
+            log.warning(f"Encryption key not available for user {user_id}, storing unencrypted")
+            return (chat_dict, title)
+
+        try:
+            # Encrypt chat JSON
+            chat_json = json.dumps(chat_dict)
+            encrypted_chat = encrypt_data(chat_json, encryption_key)
+
+            # Wrap in a dict to indicate it's encrypted
+            chat_wrapper = {
+                "encrypted": True,
+                "data": encrypted_chat
+            }
+
+            # Encrypt title
+            encrypted_title = encrypt_data(title, encryption_key)
+
+            return (chat_wrapper, encrypted_title)
+        except Exception as e:
+            log.error(f"Error encrypting chat data for user {user_id}: {e}")
+            # Fallback to unencrypted on error
+            return (chat_dict, title)
+
+    def _decrypt_chat_data(self, user_id: str, chat_data: dict, title_data: str) -> tuple[dict, str]:
+        """
+        Decrypt chat data and title after retrieval.
+
+        Args:
+            user_id: User ID to get encryption key
+            chat_data: Chat data (may be encrypted wrapper or plain dict)
+            title_data: Title data (may be encrypted string or plain string)
+
+        Returns:
+            Tuple of (chat_dict, title)
+        """
+        # Check if chat is encrypted (has the encrypted wrapper)
+        if isinstance(chat_data, dict) and chat_data.get("encrypted"):
+            encryption_key = get_user_encryption_key(user_id)
+            if not encryption_key:
+                log.warning(f"Cannot decrypt chat for user {user_id} - no encryption key")
+                return ({}, "Encrypted Chat (Key Missing)")
+
+            try:
+                # Decrypt chat JSON
+                encrypted_chat = chat_data.get("data", "")
+                chat_json = decrypt_data(encrypted_chat, encryption_key)
+                chat_dict = json.loads(chat_json)
+
+                # Try to decrypt title - check if it looks encrypted (base64)
+                try:
+                    title = decrypt_data(title_data, encryption_key)
+                except:
+                    # If title decryption fails, it might be unencrypted
+                    title = title_data
+
+                return (chat_dict, title)
+            except Exception as e:
+                log.error(f"Error decrypting chat data for user {user_id}: {e}")
+                return ({}, "Encrypted Chat (Decryption Error)")
+        else:
+            # Unencrypted data (backward compatibility)
+            return (chat_data, title_data)
+
+    def _decrypt_chat_model(self, chat_model: ChatModel) -> ChatModel:
+        """
+        Decrypt a ChatModel's data in place.
+
+        Args:
+            chat_model: The ChatModel to decrypt
+
+        Returns:
+            The decrypted ChatModel
+        """
+        chat_model.chat, chat_model.title = self._decrypt_chat_data(
+            chat_model.user_id, chat_model.chat, chat_model.title
+        )
+        return chat_model
+
     def insert_new_chat(self, user_id: str, form_data: ChatForm) -> Optional[ChatModel]:
         with get_db() as db:
             id = str(uuid.uuid4())
+
+            title = form_data.chat.get("title", "New Chat")
+
+            # Encrypt chat data and title before storing
+            encrypted_chat, encrypted_title = self._encrypt_chat_data(
+                user_id, form_data.chat, title
+            )
+
             chat = ChatModel(
                 **{
                     "id": id,
                     "user_id": user_id,
-                    "title": (
-                        form_data.chat["title"]
-                        if "title" in form_data.chat
-                        else "New Chat"
-                    ),
-                    "chat": form_data.chat,
+                    "title": encrypted_title,
+                    "chat": encrypted_chat,
                     "folder_id": form_data.folder_id,
                     "created_at": int(time.time()),
                     "updated_at": int(time.time()),
@@ -146,23 +247,35 @@ class ChatTable:
             db.add(result)
             db.commit()
             db.refresh(result)
-            return ChatModel.model_validate(result) if result else None
+
+            # Decrypt before returning to caller
+            if result:
+                chat_model = ChatModel.model_validate(result)
+                chat_model.chat, chat_model.title = self._decrypt_chat_data(
+                    user_id, chat_model.chat, chat_model.title
+                )
+                return chat_model
+            return None
 
     def import_chat(
         self, user_id: str, form_data: ChatImportForm
     ) -> Optional[ChatModel]:
         with get_db() as db:
             id = str(uuid.uuid4())
+
+            title = form_data.chat.get("title", "New Chat")
+
+            # Encrypt chat data and title before storing
+            encrypted_chat, encrypted_title = self._encrypt_chat_data(
+                user_id, form_data.chat, title
+            )
+
             chat = ChatModel(
                 **{
                     "id": id,
                     "user_id": user_id,
-                    "title": (
-                        form_data.chat["title"]
-                        if "title" in form_data.chat
-                        else "New Chat"
-                    ),
-                    "chat": form_data.chat,
+                    "title": encrypted_title,
+                    "chat": encrypted_chat,
                     "meta": form_data.meta,
                     "pinned": form_data.pinned,
                     "folder_id": form_data.folder_id,
@@ -183,19 +296,42 @@ class ChatTable:
             db.add(result)
             db.commit()
             db.refresh(result)
-            return ChatModel.model_validate(result) if result else None
+
+            # Decrypt before returning
+            if result:
+                chat_model = ChatModel.model_validate(result)
+                chat_model.chat, chat_model.title = self._decrypt_chat_data(
+                    user_id, chat_model.chat, chat_model.title
+                )
+                return chat_model
+            return None
 
     def update_chat_by_id(self, id: str, chat: dict) -> Optional[ChatModel]:
         try:
             with get_db() as db:
                 chat_item = db.get(Chat, id)
-                chat_item.chat = chat
-                chat_item.title = chat["title"] if "title" in chat else "New Chat"
+                if not chat_item:
+                    return None
+
+                title = chat.get("title", "New Chat")
+
+                # Encrypt chat data and title before storing
+                encrypted_chat, encrypted_title = self._encrypt_chat_data(
+                    chat_item.user_id, chat, title
+                )
+
+                chat_item.chat = encrypted_chat
+                chat_item.title = encrypted_title
                 chat_item.updated_at = int(time.time())
                 db.commit()
                 db.refresh(chat_item)
 
-                return ChatModel.model_validate(chat_item)
+                # Decrypt before returning
+                chat_model = ChatModel.model_validate(chat_item)
+                chat_model.chat, chat_model.title = self._decrypt_chat_data(
+                    chat_item.user_id, chat_model.chat, chat_model.title
+                )
+                return chat_model
         except Exception:
             return None
 
@@ -495,7 +631,7 @@ class ChatTable:
                 query = query.limit(limit)
 
             all_chats = query.all()
-            return [ChatModel.model_validate(chat) for chat in all_chats]
+            return [self._decrypt_chat_model(ChatModel.model_validate(chat)) for chat in all_chats]
 
     def get_chat_title_id_list_by_user_id(
         self,
@@ -527,18 +663,32 @@ class ChatTable:
 
             all_chats = query.all()
 
+            # Decrypt titles
+            encryption_key = get_user_encryption_key(user_id)
+
             # result has to be destructured from sqlalchemy `row` and mapped to a dict since the `ChatModel`is not the returned dataclass.
-            return [
-                ChatTitleIdResponse.model_validate(
-                    {
-                        "id": chat[0],
-                        "title": chat[1],
-                        "updated_at": chat[2],
-                        "created_at": chat[3],
-                    }
+            results = []
+            for chat in all_chats:
+                title = chat[1]
+                # Try to decrypt title if encryption key is available
+                if encryption_key and title:
+                    try:
+                        title = decrypt_data(title, encryption_key)
+                    except:
+                        # If decryption fails, use as-is (might be unencrypted)
+                        pass
+
+                results.append(
+                    ChatTitleIdResponse.model_validate(
+                        {
+                            "id": chat[0],
+                            "title": title,
+                            "updated_at": chat[2],
+                            "created_at": chat[3],
+                        }
+                    )
                 )
-                for chat in all_chats
-            ]
+            return results
 
     def get_chat_list_by_chat_ids(
         self, chat_ids: list[str], skip: int = 0, limit: int = 50
@@ -557,7 +707,10 @@ class ChatTable:
         try:
             with get_db() as db:
                 chat = db.get(Chat, id)
-                return ChatModel.model_validate(chat)
+                if chat:
+                    chat_model = ChatModel.model_validate(chat)
+                    return self._decrypt_chat_model(chat_model)
+                return None
         except Exception:
             return None
 
@@ -579,7 +732,10 @@ class ChatTable:
         try:
             with get_db() as db:
                 chat = db.query(Chat).filter_by(id=id, user_id=user_id).first()
-                return ChatModel.model_validate(chat)
+                if chat:
+                    chat_model = ChatModel.model_validate(chat)
+                    return self._decrypt_chat_model(chat_model)
+                return None
         except Exception:
             return None
 
@@ -599,7 +755,7 @@ class ChatTable:
                 .filter_by(user_id=user_id)
                 .order_by(Chat.updated_at.desc())
             )
-            return [ChatModel.model_validate(chat) for chat in all_chats]
+            return [self._decrypt_chat_model(ChatModel.model_validate(chat)) for chat in all_chats]
 
     def get_pinned_chats_by_user_id(self, user_id: str) -> list[ChatModel]:
         with get_db() as db:

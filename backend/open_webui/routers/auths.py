@@ -172,8 +172,10 @@ async def update_password(
         user = Auths.authenticate_user(session_user.email, form_data.password)
 
         if user:
-            hashed = get_password_hash(form_data.new_password)
-            return Auths.update_user_password_by_id(user.id, hashed)
+            # Pass plaintext passwords so encryption key can be re-encrypted
+            return Auths.update_user_password_by_id(
+                user.id, form_data.new_password, form_data.password
+            )
         else:
             raise HTTPException(400, detail=ERROR_MESSAGES.INVALID_PASSWORD)
     else:
@@ -599,10 +601,10 @@ async def signup(request: Request, response: Response, form_data: SignupForm):
                 detail=ERROR_MESSAGES.PASSWORD_TOO_LONG,
             )
 
-        hashed = get_password_hash(form_data.password)
+        # Pass plaintext password - insert_new_auth will handle encryption key generation and hashing
         user = Auths.insert_new_auth(
             form_data.email.lower(),
-            hashed,
+            form_data.password,
             form_data.name,
             form_data.profile_image_url,
             role,
@@ -755,10 +757,10 @@ async def add_user(form_data: AddUserForm, user=Depends(get_admin_user)):
         raise HTTPException(400, detail=ERROR_MESSAGES.EMAIL_TAKEN)
 
     try:
-        hashed = get_password_hash(form_data.password)
+        # Pass plaintext password - insert_new_auth will handle encryption key generation and hashing
         user = Auths.insert_new_auth(
             form_data.email.lower(),
-            hashed,
+            form_data.password,
             form_data.name,
             form_data.profile_image_url,
             form_data.role,
