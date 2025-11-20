@@ -53,8 +53,7 @@
 		getPromptVariables,
 		processDetails,
 		removeAllDetails,
-		getCodeBlockContents,
-		compactMessagesInHistory
+		getCodeBlockContents
 	} from '$lib/utils';
 	import { AudioQueue } from '$lib/utils/audio';
 
@@ -66,8 +65,7 @@
 		getPinnedChatList,
 		getTagsById,
 		updateChatById,
-		updateChatFolderIdById,
-		compactChatMessages
+		updateChatFolderIdById
 	} from '$lib/apis/chats';
 	import { generateOpenAIChatCompletion } from '$lib/apis/openai';
 	import { processWeb, processWebSearch, processYoutubeVideo } from '$lib/apis/retrieval';
@@ -1560,63 +1558,8 @@
 	// Chat functions
 	//////////////////////////
 
-	const handleCompact = async () => {
-		if (!$chatId || !history || !history.currentId) {
-			toast.error($i18n.t('No messages to compact'));
-			return;
-		}
-
-		const messages = createMessagesList(history, history.currentId);
-
-		if (messages.length === 0) {
-			toast.error($i18n.t('No messages to compact'));
-			return;
-		}
-
-		const messagesToCompact = messages;
-		const messageIds = messagesToCompact.map(msg => msg.id);
-
-		if (messageIds.length === 0) {
-			toast.error($i18n.t('No messages to compact'));
-			return;
-		}
-
-		try {
-			toast.info($i18n.t('Compacting messages...'));
-
-			const model = selectedModels[0] || $models[0]?.id;
-			const result = await compactChatMessages(
-				localStorage.token,
-				$chatId,
-				messageIds,
-				model
-			);
-
-			if (result && result.summary) {
-				const newHistory = compactMessagesInHistory(history, messageIds, result.summary);
-				history = newHistory;
-
-				await updateChatById(localStorage.token, $chatId, {
-					history: newHistory
-				});
-
-				toast.success($i18n.t('Messages compacted successfully'));
-			} else {
-				toast.error($i18n.t('Failed to compact messages'));
-			}
-		} catch (error) {
-			console.error('Compaction error:', error);
-			toast.error($i18n.t('Error compacting messages: {{error}}', { error: error.message || 'Unknown error' }));
-		}
-	};
-
 	const submitPrompt = async (userPrompt, { _raw = false } = {}) => {
 		console.log('submitPrompt', userPrompt, $chatId);
-
-		if (userPrompt.trim() === '/compact') {
-			await handleCompact();
-			return;
-		}
 
 		const _selectedModels = selectedModels.map((modelId) =>
 			$models.map((m) => m.id).includes(modelId) ? modelId : ''

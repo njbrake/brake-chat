@@ -1200,69 +1200,6 @@ export const createMessagesList = (history, messageId) => {
 	}
 };
 
-export const compactMessagesInHistory = (history, messageIdsToCompact: string[], summary: string) => {
-	const newHistory = JSON.parse(JSON.stringify(history));
-
-	if (messageIdsToCompact.length === 0) {
-		return newHistory;
-	}
-
-	const sortedMessages = messageIdsToCompact
-		.map(id => newHistory.messages[id])
-		.filter(msg => msg !== undefined)
-		.sort((a, b) => a.timestamp - b.timestamp);
-
-	if (sortedMessages.length === 0) {
-		return newHistory;
-	}
-
-	const firstMessage = sortedMessages[0];
-	const lastMessage = sortedMessages[sortedMessages.length - 1];
-
-	const compactedMessageId = `compacted-${Date.now()}`;
-	const compactedMessage = {
-		id: compactedMessageId,
-		parentId: firstMessage.parentId,
-		childrenIds: lastMessage.childrenIds || [],
-		role: 'system',
-		content: `**[Compacted Summary]**\n\n${summary}`,
-		timestamp: firstMessage.timestamp,
-		done: true,
-		compacted: true,
-		originalMessageIds: messageIdsToCompact
-	};
-
-	newHistory.messages[compactedMessageId] = compactedMessage;
-
-	if (firstMessage.parentId && newHistory.messages[firstMessage.parentId]) {
-		const parentMessage = newHistory.messages[firstMessage.parentId];
-		parentMessage.childrenIds = parentMessage.childrenIds.filter(
-			id => !messageIdsToCompact.includes(id)
-		);
-		parentMessage.childrenIds.push(compactedMessageId);
-	}
-
-	for (const childId of compactedMessage.childrenIds) {
-		if (newHistory.messages[childId]) {
-			newHistory.messages[childId].parentId = compactedMessageId;
-		}
-	}
-
-	for (const msgId of messageIdsToCompact) {
-		delete newHistory.messages[msgId];
-	}
-
-	if (messageIdsToCompact.includes(newHistory.currentId)) {
-		let currentMessage = compactedMessage;
-		while (currentMessage.childrenIds && currentMessage.childrenIds.length > 0) {
-			currentMessage = newHistory.messages[currentMessage.childrenIds[0]];
-		}
-		newHistory.currentId = currentMessage.id;
-	}
-
-	return newHistory;
-};
-
 export const formatFileSize = (size) => {
 	if (size == null) return 'Unknown size';
 	if (typeof size !== 'number' || size < 0) return 'Invalid size';
