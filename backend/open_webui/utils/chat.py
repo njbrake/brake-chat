@@ -311,7 +311,8 @@ async def chat_completed(request: Request, form_data: dict, user: Any):
     try:
         data = await process_pipeline_outlet_filter(request, data, user, models)
     except Exception as e:
-        return Exception(f"Error: {e}")
+        log.exception(f"Error processing pipeline outlet filter: {e}")
+        raise
 
     metadata = {
         "chat_id": data["chat_id"],
@@ -347,7 +348,8 @@ async def chat_completed(request: Request, form_data: dict, user: Any):
         )
         return result
     except Exception as e:
-        return Exception(f"Error: {e}")
+        log.exception(f"Error processing outlet filter functions: {e}")
+        raise
 
 
 async def chat_action(request: Request, action_id: str, form_data: dict, user: Any):
@@ -403,6 +405,7 @@ async def chat_action(request: Request, action_id: str, form_data: dict, user: A
     if hasattr(function_module, "action"):
         try:
             action = function_module.action
+            log.info(f"Executing chat action: {action_id}")
 
             # Get the signature of the function
             sig = inspect.signature(action)
@@ -442,7 +445,10 @@ async def chat_action(request: Request, action_id: str, form_data: dict, user: A
             else:
                 data = action(**params)
 
+            log.debug(f"Chat action {action_id} completed successfully")
+
         except Exception as e:
-            return Exception(f"Error: {e}")
+            log.exception(f"Error executing action {action_id}: {e}")
+            raise
 
     return data
