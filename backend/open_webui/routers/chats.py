@@ -933,25 +933,25 @@ async def delete_all_tags_by_id(id: str, user=Depends(get_verified_user)):
 
 
 ############################
-# CompressChatMessages
+# CompactChatMessages
 ############################
 
 
-class CompressForm(BaseModel):
+class CompactForm(BaseModel):
     message_ids: list[str]
     model: Optional[str] = None
 
 
-class CompressResponse(BaseModel):
+class CompactResponse(BaseModel):
     summary: str
-    compressed_message_ids: list[str]
+    compacted_message_ids: list[str]
 
 
-@router.post("/{id}/compress", response_model=CompressResponse)
-async def compress_chat_messages(
+@router.post("/{id}/compact", response_model=CompactResponse)
+async def compact_chat_messages(
     request: Request,
     id: str,
-    form_data: CompressForm,
+    form_data: CompactForm,
     user=Depends(get_verified_user),
 ):
     from open_webui.utils.chat import generate_chat_completion
@@ -964,28 +964,28 @@ async def compress_chat_messages(
         )
 
     messages_map = chat.chat.get("history", {}).get("messages", {})
-    messages_to_compress = []
+    messages_to_compact = []
 
     for msg_id in form_data.message_ids:
         if msg_id in messages_map:
             msg = messages_map[msg_id]
-            messages_to_compress.append(
+            messages_to_compact.append(
                 {"role": msg.get("role"), "content": msg.get("content")}
             )
 
-    if not messages_to_compress:
+    if not messages_to_compact:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ERROR_MESSAGES.DEFAULT("No valid messages to compress"),
+            detail=ERROR_MESSAGES.DEFAULT("No valid messages to compact"),
         )
 
     system_prompt = """You are a conversation summarizer. Your task is to create a concise but comprehensive summary of the following conversation that preserves all important context, key points, and relevant details. The summary will replace the original messages in the chat history, so ensure it captures everything important."""
 
-    compress_messages = [
+    compact_messages = [
         {"role": "system", "content": system_prompt},
         {
             "role": "user",
-            "content": f"Please summarize the following conversation:\n\n{json.dumps(messages_to_compress, indent=2)}",
+            "content": f"Please summarize the following conversation:\n\n{json.dumps(messages_to_compact, indent=2)}",
         },
     ]
 
@@ -997,12 +997,12 @@ async def compress_chat_messages(
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=ERROR_MESSAGES.DEFAULT("No model available for compression"),
+                detail=ERROR_MESSAGES.DEFAULT("No model available for compaction"),
             )
 
     completion_form = {
         "model": model_id,
-        "messages": compress_messages,
+        "messages": compact_messages,
         "stream": False,
     }
 
@@ -1016,8 +1016,8 @@ async def compress_chat_messages(
         else:
             summary = ""
 
-        return CompressResponse(
-            summary=summary, compressed_message_ids=form_data.message_ids
+        return CompactResponse(
+            summary=summary, compacted_message_ids=form_data.message_ids
         )
     except Exception as e:
         log.exception(e)

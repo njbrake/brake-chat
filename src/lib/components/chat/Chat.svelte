@@ -54,7 +54,7 @@
 		processDetails,
 		removeAllDetails,
 		getCodeBlockContents,
-		compressMessagesInHistory
+		compactMessagesInHistory
 	} from '$lib/utils';
 	import { AudioQueue } from '$lib/utils/audio';
 
@@ -67,7 +67,7 @@
 		getTagsById,
 		updateChatById,
 		updateChatFolderIdById,
-		compressChatMessages
+		compactChatMessages
 	} from '$lib/apis/chats';
 	import { generateOpenAIChatCompletion } from '$lib/apis/openai';
 	import { processWeb, processWebSearch, processYoutubeVideo } from '$lib/apis/retrieval';
@@ -1560,32 +1560,32 @@
 	// Chat functions
 	//////////////////////////
 
-	const handleCompress = async (count: number) => {
+	const handleCompact = async () => {
 		if (!$chatId || !history || !history.currentId) {
-			toast.error($i18n.t('No messages to compress'));
+			toast.error($i18n.t('No messages to compact'));
 			return;
 		}
 
 		const messages = createMessagesList(history, history.currentId);
 
-		if (messages.length <= 1) {
-			toast.error($i18n.t('Not enough messages to compress'));
+		if (messages.length === 0) {
+			toast.error($i18n.t('No messages to compact'));
 			return;
 		}
 
-		const messagesToCompress = messages.slice(0, Math.min(count, messages.length - 1));
-		const messageIds = messagesToCompress.map(msg => msg.id);
+		const messagesToCompact = messages;
+		const messageIds = messagesToCompact.map(msg => msg.id);
 
 		if (messageIds.length === 0) {
-			toast.error($i18n.t('No messages to compress'));
+			toast.error($i18n.t('No messages to compact'));
 			return;
 		}
 
 		try {
-			toast.info($i18n.t('Compressing messages...'));
+			toast.info($i18n.t('Compacting messages...'));
 
 			const model = selectedModels[0] || $models[0]?.id;
-			const result = await compressChatMessages(
+			const result = await compactChatMessages(
 				localStorage.token,
 				$chatId,
 				messageIds,
@@ -1593,33 +1593,29 @@
 			);
 
 			if (result && result.summary) {
-				const newHistory = compressMessagesInHistory(history, messageIds, result.summary);
+				const newHistory = compactMessagesInHistory(history, messageIds, result.summary);
 				history = newHistory;
 
 				await updateChatById(localStorage.token, $chatId, {
 					history: newHistory
 				});
 
-				toast.success($i18n.t('Messages compressed successfully'));
+				toast.success($i18n.t('Messages compacted successfully'));
 			} else {
-				toast.error($i18n.t('Failed to compress messages'));
+				toast.error($i18n.t('Failed to compact messages'));
 			}
 		} catch (error) {
-			console.error('Compression error:', error);
-			toast.error($i18n.t('Error compressing messages: {{error}}', { error: error.message || 'Unknown error' }));
+			console.error('Compaction error:', error);
+			toast.error($i18n.t('Error compacting messages: {{error}}', { error: error.message || 'Unknown error' }));
 		}
 	};
 
 	const submitPrompt = async (userPrompt, { _raw = false } = {}) => {
 		console.log('submitPrompt', userPrompt, $chatId);
 
-		if (userPrompt.trim().startsWith('/compress')) {
-			const match = userPrompt.trim().match(/^\/compress\s*(\d+)?/);
-			if (match) {
-				const count = parseInt(match[1]) || 10;
-				await handleCompress(count);
-				return;
-			}
+		if (userPrompt.trim() === '/compact') {
+			await handleCompact();
+			return;
 		}
 
 		const _selectedModels = selectedModels.map((modelId) =>

@@ -1180,7 +1180,7 @@ export const archiveAllChats = async (token: string) => {
 	return res;
 };
 
-export const compressChatMessages = async (
+export const compactChatMessages = async (
 	token: string,
 	chatId: string,
 	messageIds: string[],
@@ -1188,7 +1188,7 @@ export const compressChatMessages = async (
 ) => {
 	let error = null;
 
-	const res = await fetch(`${WEBUI_API_BASE_URL}/chats/${chatId}/compress`, {
+	const res = await fetch(`${WEBUI_API_BASE_URL}/chats/${chatId}/compact`, {
 		method: 'POST',
 		headers: {
 			Accept: 'application/json',

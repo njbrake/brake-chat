@@ -1200,14 +1200,14 @@ export const createMessagesList = (history, messageId) => {
 	}
 };
 
-export const compressMessagesInHistory = (history, messageIdsToCompress: string[], summary: string) => {
+export const compactMessagesInHistory = (history, messageIdsToCompact: string[], summary: string) => {
 	const newHistory = JSON.parse(JSON.stringify(history));
 
-	if (messageIdsToCompress.length === 0) {
+	if (messageIdsToCompact.length === 0) {
 		return newHistory;
 	}
 
-	const sortedMessages = messageIdsToCompress
+	const sortedMessages = messageIdsToCompact
 		.map(id => newHistory.messages[id])
 		.filter(msg => msg !== undefined)
 		.sort((a, b) => a.timestamp - b.timestamp);
@@ -1219,41 +1219,41 @@ export const compressMessagesInHistory = (history, messageIdsToCompress: string[
 	const firstMessage = sortedMessages[0];
 	const lastMessage = sortedMessages[sortedMessages.length - 1];
 
-	const compressedMessageId = `compressed-${Date.now()}`;
-	const compressedMessage = {
-		id: compressedMessageId,
+	const compactedMessageId = `compacted-${Date.now()}`;
+	const compactedMessage = {
+		id: compactedMessageId,
 		parentId: firstMessage.parentId,
 		childrenIds: lastMessage.childrenIds || [],
 		role: 'system',
-		content: `**[Compressed Summary]**\n\n${summary}`,
+		content: `**[Compacted Summary]**\n\n${summary}`,
 		timestamp: firstMessage.timestamp,
 		done: true,
-		compressed: true,
-		originalMessageIds: messageIdsToCompress
+		compacted: true,
+		originalMessageIds: messageIdsToCompact
 	};
 
-	newHistory.messages[compressedMessageId] = compressedMessage;
+	newHistory.messages[compactedMessageId] = compactedMessage;
 
 	if (firstMessage.parentId && newHistory.messages[firstMessage.parentId]) {
 		const parentMessage = newHistory.messages[firstMessage.parentId];
 		parentMessage.childrenIds = parentMessage.childrenIds.filter(
-			id => !messageIdsToCompress.includes(id)
+			id => !messageIdsToCompact.includes(id)
 		);
-		parentMessage.childrenIds.push(compressedMessageId);
+		parentMessage.childrenIds.push(compactedMessageId);
 	}
 
-	for (const childId of compressedMessage.childrenIds) {
+	for (const childId of compactedMessage.childrenIds) {
 		if (newHistory.messages[childId]) {
-			newHistory.messages[childId].parentId = compressedMessageId;
+			newHistory.messages[childId].parentId = compactedMessageId;
 		}
 	}
 
-	for (const msgId of messageIdsToCompress) {
+	for (const msgId of messageIdsToCompact) {
 		delete newHistory.messages[msgId];
 	}
 
-	if (messageIdsToCompress.includes(newHistory.currentId)) {
-		let currentMessage = compressedMessage;
+	if (messageIdsToCompact.includes(newHistory.currentId)) {
+		let currentMessage = compactedMessage;
 		while (currentMessage.childrenIds && currentMessage.childrenIds.length > 0) {
 			currentMessage = newHistory.messages[currentMessage.childrenIds[0]];
 		}
