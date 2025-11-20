@@ -70,13 +70,24 @@ class Action:
         if not messages:
             return {"error": "No messages to compact"}
 
-        # Emit status update to UI
+        # Show toast notification at bottom of screen
+        if __event_emitter__:
+            await __event_emitter__({
+                "type": "notification",
+                "data": {
+                    "type": "info",
+                    "content": f"Compacting {len(messages)} messages..."
+                }
+            })
+
+        # Emit status update to message (top of message content)
         if __event_emitter__:
             await __event_emitter__({
                 "type": "status",
                 "data": {
                     "description": f"Compacting {len(messages)} messages...",
-                    "done": False
+                    "done": False,
+                    "action": "compact"
                 }
             })
 
@@ -101,11 +112,16 @@ class Action:
         if __event_call__:
             try:
                 result = await __event_call__({
-                    "type": "completion",
+                    "type": "request:chat:completion",
                     "data": {
-                        "model": model_id,
-                        "messages": compact_messages,
-                        "stream": False
+                        "form_data": {
+                            "model": model_id,
+                            "messages": compact_messages,
+                            "stream": False
+                        },
+                        "model": __model__,
+                        "session_id": body.get("session_id"),
+                        "channel": None
                     }
                 })
 
@@ -117,6 +133,14 @@ class Action:
                         summary = message.get("content", "")
 
                 if not summary:
+                    if __event_emitter__:
+                        await __event_emitter__({
+                            "type": "notification",
+                            "data": {
+                                "type": "error",
+                                "content": "Failed to generate summary"
+                            }
+                        })
                     return {"error": "Failed to generate summary"}
 
             except Exception as e:
@@ -126,6 +150,13 @@ class Action:
                         "data": {
                             "description": f"Error: {str(e)}",
                             "done": True
+                        }
+                    })
+                    await __event_emitter__({
+                        "type": "notification",
+                        "data": {
+                            "type": "error",
+                            "content": f"Failed to generate summary: {str(e)}"
                         }
                     })
                 return {"error": f"Failed to generate summary: {str(e)}"}
@@ -150,7 +181,16 @@ class Action:
                 "type": "status",
                 "data": {
                     "description": "Messages compacted successfully",
-                    "done": True
+                    "done": True,
+                    "action": "compact"
+                }
+            })
+            # Show success toast at bottom of screen
+            await __event_emitter__({
+                "type": "notification",
+                "data": {
+                    "type": "success",
+                    "content": "Messages compacted successfully"
                 }
             })
 
