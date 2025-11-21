@@ -5,6 +5,7 @@ Revises: a5c220713937
 Create Date: 2025-11-20 15:28:43.681952
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -16,8 +17,8 @@ import open_webui.internal.db
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'ca9f34c0bfb4'
-down_revision: Union[str, None] = 'a5c220713937'
+revision: str = "ca9f34c0bfb4"
+down_revision: Union[str, None] = "a5c220713937"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -51,9 +52,7 @@ def upgrade() -> None:
     ).first()
 
     if not admin_user:
-        admin_user = conn.execute(
-            select(user_table.c.id).limit(1)
-        ).first()
+        admin_user = conn.execute(select(user_table.c.id).limit(1)).first()
 
     if not admin_user:
         print("No users found, skipping chat_compactor function creation")
@@ -86,8 +85,8 @@ def upgrade() -> None:
             "title": "Chat Compactor",
             "author": "Open WebUI",
             "version": "1.0.0",
-            "type": "action"
-        }
+            "type": "action",
+        },
     }
 
     current_time = int(time.time())
@@ -118,8 +117,6 @@ def downgrade() -> None:
     )
 
     conn = op.get_bind()
-    conn.execute(
-        function_table.delete().where(function_table.c.id == "chat_compactor")
-    )
+    conn.execute(function_table.delete().where(function_table.c.id == "chat_compactor"))
 
     print("chat_compactor function removed")
