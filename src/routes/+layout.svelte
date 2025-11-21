@@ -33,17 +33,17 @@
 	import { page } from '$app/stores';
 	import { beforeNavigate } from '$app/navigation';
 
-async function unregisterServiceWorker(message = 'for version update') {
-	if ('serviceWorker' in navigator) {
-		try {
-			const registrations = await navigator.serviceWorker.getRegistrations();
-			await Promise.all(registrations.map((r) => r.unregister()));
-			console.log(`Service workers unregistered ${message}`);
-		} catch (error) {
-			console.error('Error unregistering service workers:', error);
+	async function unregisterServiceWorker(message = 'for version update') {
+		if ('serviceWorker' in navigator) {
+			try {
+				const registrations = await navigator.serviceWorker.getRegistrations();
+				await Promise.all(registrations.map((r) => r.unregister()));
+				console.log(`Service workers unregistered ${message}`);
+			} catch (error) {
+				console.error('Error unregistering service workers:', error);
+			}
 		}
 	}
-}
 	import { updated } from '$app/state';
 
 	import i18n, { initI18n, getLanguages, changeLanguage } from '$lib/i18n';
@@ -65,12 +65,12 @@ async function unregisterServiceWorker(message = 'for version update') {
 	import Spinner from '$lib/components/common/Spinner.svelte';
 
 	// handle frontend updates (https://svelte.dev/docs/kit/configuration#version)
-beforeNavigate(async ({ willUnload, to }) => {
-	if (updated.current && !willUnload && to?.url) {
-		await unregisterServiceWorker();
-		location.href = to.url.href;
-	}
-});
+	beforeNavigate(async ({ willUnload, to }) => {
+		if (updated.current && !willUnload && to?.url) {
+			await unregisterServiceWorker();
+			location.href = to.url.href;
+		}
+	});
 
 	setContext('i18n', i18n);
 
