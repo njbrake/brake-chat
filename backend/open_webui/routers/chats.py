@@ -818,6 +818,10 @@ class ChatFolderIdForm(BaseModel):
     folder_id: Optional[str] = None
 
 
+class CompactChatForm(BaseModel):
+    model: Optional[str] = None
+
+
 @router.post("/{id}/folder", response_model=Optional[ChatResponse])
 async def update_chat_folder_id_by_id(
     id: str, form_data: ChatFolderIdForm, user=Depends(get_verified_user)
@@ -929,4 +933,137 @@ async def delete_all_tags_by_id(id: str, user=Depends(get_verified_user)):
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail=ERROR_MESSAGES.NOT_FOUND
+        )
+
+
+############################
+# CompactChatById
+############################
+
+
+@router.post("/{id}/compact", response_model=Optional[ChatResponse])
+async def compact_chat_by_id(
+    request: Request, id: str, form_data: CompactChatForm, user=Depends(get_verified_user)
+):
+    """
+    Compact all messages in a chat into a single summary message.
+    This reduces token usage by replacing the chat history with a concise summary.
+    """
+    chat = Chats.get_chat_by_id_and_user_id(id, user.id)
+    if not chat:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=ERROR_MESSAGES.NOT_FOUND
+        )
+
+    if not request.app.state.MODELS:
+        from open_webui.utils.models import get_all_models
+        await get_all_models(request, user=user)
+
+    history = chat.chat.get("history", {})
+    messages = history.get("messages", {})
+
+    if not messages:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ERROR_MESSAGES.DEFAULT("No messages to compact"),
+        )
+
+    messages_list = [
+        {"role": msg.get("role"), "content": msg.get("content")}
+        for msg in messages.values()
+        if msg.get("role") and msg.get("content")
+    ]
+
+    model_id = form_data.model or chat.chat.get("models", [None])[0]
+    if not model_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=ERROR_MESSAGES.DEFAULT("No model specified"),
+        )
+
+    system_prompt = "You are a conversation summarizer. Your task is to create a concise but comprehensive summary of the following conversation that preserves all important context, key points, and relevant details. The summary will replace the original messages in the chat history, so ensure it captures everything important."
+
+    compact_messages = [
+        {"role": "system", "content": system_prompt},
+        {
+            "role": "user",
+            "content": f"Please summarize the following conversation:\n\n{json.dumps(messages_list, indent=2)}",
+        },
+    ]
+
+    try:
+        from open_webui.routers.openai import generate_chat_completion
+        from open_webui.models.users import UserModel
+
+        user_obj = UserModel(**user.model_dump())
+
+        result = await generate_chat_completion(
+            request=request,
+            form_data={
+                "model": model_id,
+                "messages": compact_messages,
+                "stream": False,
+            },
+            user=user_obj,
+            bypass_filter=True,
+        )
+
+        if not isinstance(result, dict):
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=ERROR_MESSAGES.DEFAULT(f"Unexpected response type: {type(result)}"),
+            )
+
+        choices = result.get("choices", [])
+        if not choices:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=ERROR_MESSAGES.DEFAULT("LLM returned no response"),
+            )
+
+        message = choices[0].get("message", {})
+        summary = message.get("content", "")
+
+        if not summary:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=ERROR_MESSAGES.DEFAULT("LLM returned empty summary"),
+            )
+
+        compacted_message_id = f"compacted-{int(time.time() * 1000)}"
+        compacted_message = {
+            "id": compacted_message_id,
+            "role": "system",
+            "content": f"**[Compacted Summary]**\n\n{summary}",
+            "timestamp": int(time.time()),
+            "done": True,
+            "parentId": None,
+            "childrenIds": [],
+            "metadata": {
+                "compacted": True,
+                "originalMessageCount": len(messages),
+                "compactedAt": int(time.time()),
+            },
+        }
+
+        updated_chat = {
+            **chat.chat,
+            "history": {
+                "messages": {compacted_message_id: compacted_message},
+                "currentId": compacted_message_id,
+            },
+        }
+
+        chat = Chats.update_chat_by_id(id, updated_chat)
+        log.info(f"Chat {id} compacted successfully ({len(messages)} messages -> 1 summary)")
+
+        return ChatResponse(**chat.model_dump())
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        log.exception(f"Error compacting chat: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=ERROR_MESSAGES.DEFAULT(f"Failed to compact chat: {str(e)}"),
         )

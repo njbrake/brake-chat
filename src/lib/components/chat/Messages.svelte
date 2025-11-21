@@ -13,7 +13,7 @@
 	const dispatch = createEventDispatcher();
 
 	import { toast } from 'svelte-sonner';
-	import { getChatList, updateChatById } from '$lib/apis/chats';
+	import { getChatList, updateChatById, compactChatById } from '$lib/apis/chats';
 	import { copyToClipboard, extractCurlyBraceWords } from '$lib/utils';
 
 	import Message from './Messages/Message.svelte';
@@ -110,6 +110,34 @@
 
 			currentChatPage.set(1);
 			await chats.set(await getChatList(localStorage.token, $currentChatPage));
+		}
+	};
+
+	const compactChat = async () => {
+		if ($temporaryChatEnabled) {
+			toast.error($i18n.t('Cannot compact temporary chat'));
+			return;
+		}
+
+		try {
+			toast.info($i18n.t('Compacting chat...'));
+
+			const res = await compactChatById(localStorage.token, chatId);
+
+			if (res) {
+				history = res.chat.history;
+				await tick();
+
+				currentChatPage.set(1);
+				await chats.set(await getChatList(localStorage.token, $currentChatPage));
+
+				toast.success($i18n.t('Chat compacted successfully'));
+			} else {
+				toast.error($i18n.t('Failed to compact chat'));
+			}
+		} catch (error) {
+			console.error('Error compacting chat:', error);
+			toast.error($i18n.t('Failed to compact chat: {error}', { error: error.detail || error.message || 'Unknown error' }));
 		}
 	};
 
@@ -436,6 +464,7 @@
 								{showPreviousMessage}
 								{showNextMessage}
 								{updateChat}
+								{compactChat}
 								{editMessage}
 								{deleteMessage}
 								{rateMessage}

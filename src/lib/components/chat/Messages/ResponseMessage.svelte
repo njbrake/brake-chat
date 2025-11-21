@@ -134,6 +134,7 @@
 	export let showNextMessage: Function;
 
 	export let updateChat: Function;
+	export let compactChat: Function;
 	export let editMessage: Function;
 	export let saveMessage: Function;
 	export let rateMessage: Function;
@@ -154,6 +155,7 @@
 	let citationsElement: HTMLDivElement;
 	let buttonsContainerElement: HTMLDivElement;
 	let showDeleteConfirm = false;
+	let showCompactConfirm = false;
 
 	let model = null;
 	$: model = $models.find((m) => m.id === message.model);
@@ -568,6 +570,16 @@
 	title={$i18n.t('Delete message?')}
 	on:confirm={() => {
 		deleteMessageHandler();
+	}}
+/>
+
+<DeleteConfirmDialog
+	bind:show={showCompactConfirm}
+	title={$i18n.t('Compact chat?')}
+	message={$i18n.t('This will compact the entire chat history into a single summary. This action cannot be undone.')}
+	confirmLabel={$i18n.t('Compact')}
+	on:confirm={() => {
+		compactChat();
 	}}
 />
 
@@ -1411,6 +1423,36 @@
 											</Tooltip>
 										{/if}
 									{/if}
+
+									<Tooltip content={$i18n.t('Compact chat')} placement="bottom">
+										<button
+											type="button"
+											aria-label={$i18n.t('Compact chat')}
+											id="compact-response-button"
+											class="{isLastMessage || ($settings?.highContrastMode ?? false)
+												? 'visible'
+												: 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
+											on:click={() => {
+												showCompactConfirm = true;
+											}}
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="2"
+												stroke="currentColor"
+												aria-hidden="true"
+												class="w-4 h-4"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													d="M6 12L18 12M6 6L18 6M6 18L18 18"
+												/>
+											</svg>
+										</button>
+									</Tooltip>
 
 									{#if isLastMessage}
 										{#each model?.actions ?? [] as action}

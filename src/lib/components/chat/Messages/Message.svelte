@@ -30,6 +30,7 @@
 	export let editMessage;
 	export let saveMessage;
 	export let deleteMessage;
+	export let compactChat;
 	export let rateMessage;
 	export let actionMessage;
 	export let submitMessage;
@@ -88,6 +89,7 @@
 				{showPreviousMessage}
 				{showNextMessage}
 				{updateChat}
+				{compactChat}
 				{editMessage}
 				{saveMessage}
 				{rateMessage}
@@ -114,6 +116,7 @@
 				{showPreviousMessage}
 				{showNextMessage}
 				{updateChat}
+				{compactChat}
 				{editMessage}
 				{saveMessage}
 				{rateMessage}
@@ -136,6 +139,7 @@
 				isLastMessage={messageId === history?.currentId}
 				{setInputText}
 				{updateChat}
+				{compactChat}
 				{editMessage}
 				{saveMessage}
 				{rateMessage}
