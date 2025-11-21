@@ -1240,15 +1240,53 @@
 		});
 
 		if (res !== null && res.messages) {
-			// Update chat history with the new messages
-			for (const message of res.messages) {
-				history.messages[message.id] = {
-					...history.messages[message.id],
-					...(history.messages[message.id].content !== message.content
-						? { originalContent: history.messages[message.id].content }
-						: {}),
-					...message
-				};
+			// Handle compact action - remove old messages and replace with summary
+			if (res.compacted_message_ids && res.compacted_message_ids.length > 0) {
+				const compactedIds = new Set(res.compacted_message_ids);
+				const firstCompactedId = res.compacted_message_ids[0];
+				const lastCompactedId = res.compacted_message_ids[res.compacted_message_ids.length - 1];
+
+				// Find parent of first compacted message
+				const firstMessage = history.messages[firstCompactedId];
+				const parentId = firstMessage?.parentId || null;
+
+				// Find child of last compacted message (if any)
+				let childId = null;
+				for (const [id, msg] of Object.entries(history.messages)) {
+					if (msg.parentId === lastCompactedId) {
+						childId = id;
+						break;
+					}
+				}
+
+				// Remove all compacted messages
+				for (const id of res.compacted_message_ids) {
+					delete history.messages[id];
+				}
+
+				// Add new compacted message with proper parent/child links
+				for (const message of res.messages) {
+					history.messages[message.id] = {
+						...message,
+						parentId: parentId
+					};
+
+					// Update child's parent if exists
+					if (childId && history.messages[childId]) {
+						history.messages[childId].parentId = message.id;
+					}
+				}
+			} else {
+				// Update chat history with the new messages (normal action)
+				for (const message of res.messages) {
+					history.messages[message.id] = {
+						...history.messages[message.id],
+						...(history.messages[message.id].content !== message.content
+							? { originalContent: history.messages[message.id].content }
+							: {}),
+						...message
+					};
+				}
 			}
 		}
 
