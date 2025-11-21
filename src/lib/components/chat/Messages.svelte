@@ -137,7 +137,11 @@
 			}
 		} catch (error) {
 			console.error('Error compacting chat:', error);
-			toast.error($i18n.t('Failed to compact chat: {error}', { error: error.detail || error.message || 'Unknown error' }));
+			toast.error(
+				$i18n.t('Failed to compact chat: {error}', {
+					error: error.detail || error.message || 'Unknown error'
+				})
+			);
 		}
 	};
 

@@ -576,7 +576,9 @@
 <DeleteConfirmDialog
 	bind:show={showCompactConfirm}
 	title={$i18n.t('Compact chat?')}
-	message={$i18n.t('This will compact the entire chat history into a single summary. This action cannot be undone.')}
+	message={$i18n.t(
+		'This will compact the entire chat history into a single summary. This action cannot be undone.'
+	)}
 	confirmLabel={$i18n.t('Compact')}
 	on:confirm={() => {
 		compactChat();

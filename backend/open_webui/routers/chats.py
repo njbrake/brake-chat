@@ -943,7 +943,10 @@ async def delete_all_tags_by_id(id: str, user=Depends(get_verified_user)):
 
 @router.post("/{id}/compact", response_model=Optional[ChatResponse])
 async def compact_chat_by_id(
-    request: Request, id: str, form_data: CompactChatForm, user=Depends(get_verified_user)
+    request: Request,
+    id: str,
+    form_data: CompactChatForm,
+    user=Depends(get_verified_user),
 ):
     """
     Compact all messages in a chat into a single summary message.
@@ -957,6 +960,7 @@ async def compact_chat_by_id(
 
     if not request.app.state.MODELS:
         from open_webui.utils.models import get_all_models
+
         await get_all_models(request, user=user)
 
     history = chat.chat.get("history", {})
@@ -1011,7 +1015,9 @@ async def compact_chat_by_id(
         if not isinstance(result, dict):
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=ERROR_MESSAGES.DEFAULT(f"Unexpected response type: {type(result)}"),
+                detail=ERROR_MESSAGES.DEFAULT(
+                    f"Unexpected response type: {type(result)}"
+                ),
             )
 
         choices = result.get("choices", [])
@@ -1055,7 +1061,9 @@ async def compact_chat_by_id(
         }
 
         chat = Chats.update_chat_by_id(id, updated_chat)
-        log.info(f"Chat {id} compacted successfully ({len(messages)} messages -> 1 summary)")
+        log.info(
+            f"Chat {id} compacted successfully ({len(messages)} messages -> 1 summary)"
+        )
 
         return ChatResponse(**chat.model_dump())
 
