@@ -30,6 +30,7 @@
 	export let editMessage;
 	export let saveMessage;
 	export let deleteMessage;
+	export let compactChat;
 	export let rateMessage;
 	export let actionMessage;
 	export let submitMessage;
@@ -49,7 +50,9 @@
 	role="listitem"
 	class="flex flex-col justify-between px-5 mb-3 w-full {($settings?.widescreenMode ?? null)
 		? 'max-w-full'
-		: 'max-w-5xl'} mx-auto rounded-lg group"
+		: 'max-w-5xl'} mx-auto rounded-lg group {history.messages[messageId]?.compacted
+		? 'opacity-80'
+		: ''}"
 >
 	{#if history.messages[messageId]}
 		{#if history.messages[messageId].role === 'user'}
@@ -73,6 +76,33 @@
 				{editCodeBlock}
 				{topPadding}
 			/>
+		{:else if history.messages[messageId].role === 'system' && history.messages[messageId]?.compacted}
+			<ResponseMessage
+				{chatId}
+				{history}
+				{messageId}
+				{selectedModels}
+				isLastMessage={messageId === history.currentId}
+				siblings={history.messages[history.messages[messageId].parentId]?.childrenIds ?? []}
+				{setInputText}
+				{gotoMessage}
+				{showPreviousMessage}
+				{showNextMessage}
+				{updateChat}
+				{compactChat}
+				{editMessage}
+				{saveMessage}
+				{rateMessage}
+				{actionMessage}
+				{submitMessage}
+				{deleteMessage}
+				{continueResponse}
+				{regenerateResponse}
+				{addMessages}
+				{readOnly}
+				{editCodeBlock}
+				{topPadding}
+			/>
 		{:else if (history.messages[history.messages[messageId].parentId]?.models?.length ?? 1) === 1}
 			<ResponseMessage
 				{chatId}
@@ -86,6 +116,7 @@
 				{showPreviousMessage}
 				{showNextMessage}
 				{updateChat}
+				{compactChat}
 				{editMessage}
 				{saveMessage}
 				{rateMessage}
@@ -108,6 +139,7 @@
 				isLastMessage={messageId === history?.currentId}
 				{setInputText}
 				{updateChat}
+				{compactChat}
 				{editMessage}
 				{saveMessage}
 				{rateMessage}
