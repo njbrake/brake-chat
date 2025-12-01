@@ -1640,6 +1640,11 @@ async def chat_completion(
                                 f"[DB_LOAD] Loaded {len(stored_messages_dict)} stored messages from database"
                             )
 
+                            # Get currentId from history to reconstruct message chain
+                            current_id = history.get("currentId")
+                            print(f"[DB_LOAD] Current message ID: {current_id}")
+
+                            # Build ID-based map for fast lookup
                             message_map = {}
                             for msg_id, stored_msg in stored_messages_dict.items():
                                 msg_role = stored_msg.get("role", "unknown")
@@ -1674,26 +1679,57 @@ async def chat_completion(
                                 f"\n[DB_LOAD] Built map with {len(message_map)} messages containing content_blocks"
                             )
 
-                            for msg in form_data["messages"]:
+                            # Build ordered list using get_message_list (follows parentId chain)
+                            stored_messages_list = get_message_list(
+                                stored_messages_dict, current_id
+                            )
+                            print(
+                                f"[DB_LOAD] Built ordered list with {len(stored_messages_list)} messages using get_message_list"
+                            )
+
+                            # Match form_data messages with stored messages
+                            # Strategy: Try ID match first, then fall back to position-based matching
+                            for idx, msg in enumerate(form_data["messages"]):
                                 msg_id = msg.get("id")
                                 msg_role = msg.get("role", "unknown")
-                                if msg_id:
+                                msg_content = msg.get("content", "")
+
+                                if msg_id and msg_id in message_map:
+                                    # ID-based match (preferred)
+                                    msg["content_blocks"] = message_map[msg_id]
                                     print(
-                                        f"[DB_LOAD] Checking form_data message {msg_id} (role={msg_role})"
+                                        f"[DB_LOAD] ✓ ID match for message {idx} (id={msg_id}, role={msg_role})"
                                     )
-                                    if msg_id in message_map:
-                                        msg["content_blocks"] = message_map[msg_id]
-                                        print(
-                                            f"[DB_LOAD]   → ✓ Merged content_blocks into message"
-                                        )
+                                else:
+                                    # Position-based match using ordered stored_messages_list
+                                    if idx < len(stored_messages_list):
+                                        stored_msg = stored_messages_list[idx]
+                                        stored_id = stored_msg.get("id")
+                                        stored_role = stored_msg.get("role", "unknown")
+                                        stored_content = stored_msg.get("content", "")
+
+                                        # Verify roles match (basic sanity check)
+                                        if msg_role == stored_role:
+                                            # Check if this stored message has content_blocks
+                                            if stored_id and stored_id in message_map:
+                                                msg["content_blocks"] = message_map[
+                                                    stored_id
+                                                ]
+                                                print(
+                                                    f"[DB_LOAD] ✓ Position match for message {idx} (role={msg_role}, matched with stored msg {stored_id})"
+                                                )
+                                            else:
+                                                print(
+                                                    f"[DB_LOAD] Position {idx}: matched stored msg {stored_id} but no content_blocks"
+                                                )
+                                        else:
+                                            print(
+                                                f"[DB_LOAD] ✗ Position {idx}: role mismatch (form={msg_role}, stored={stored_role})"
+                                            )
                                     else:
                                         print(
-                                            f"[DB_LOAD]   → ✗ No content_blocks in map for this message"
+                                            f"[DB_LOAD] ✗ Message {idx} (role={msg_role}) beyond stored messages list (len={len(stored_messages_list)})"
                                         )
-                                else:
-                                    print(
-                                        f"[DB_LOAD] Message has no ID (role={msg_role}), skipping"
-                                    )
                         else:
                             print(f"[DB_LOAD] Chat or chat.chat is None")
                     else:
