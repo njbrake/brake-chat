@@ -319,7 +319,9 @@ class ChatTable:
             existing_message = history["messages"][message_id]
             print(f"\n[UPSERT] Updating existing message {message_id}")
             print(f"[UPSERT]   Existing keys: {list(existing_message.keys())}")
-            print(f"[UPSERT]   Has existing content_blocks: {'content_blocks' in existing_message}")
+            print(
+                f"[UPSERT]   Has existing content_blocks: {'content_blocks' in existing_message}"
+            )
             print(f"[UPSERT]   New message keys: {list(message.keys())}")
             print(f"[UPSERT]   Has new content_blocks: {'content_blocks' in message}")
 
@@ -332,7 +334,9 @@ class ChatTable:
                 **existing_message,
                 **message,
             }
-            print(f"[UPSERT]   Final has content_blocks: {'content_blocks' in history['messages'][message_id]}")
+            print(
+                f"[UPSERT]   Final has content_blocks: {'content_blocks' in history['messages'][message_id]}"
+            )
         else:
             print(f"\n[UPSERT] Creating new message {message_id}")
             print(f"[UPSERT]   Message keys: {list(message.keys())}")
