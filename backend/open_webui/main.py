@@ -1620,7 +1620,10 @@ async def chat_completion(
     async def process_chat(request, form_data, user, metadata, model):
         try:
             if "messages" in form_data:
-                from open_webui.utils.misc import reconstruct_messages_with_tool_calls
+                from open_webui.utils.misc import (
+                    reconstruct_messages_with_tool_calls,
+                    get_message_list,
+                )
 
                 print(
                     f"[TOOL_CALL_DEBUG] Starting message reconstruction for {len(form_data['messages'])} messages"
