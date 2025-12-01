@@ -1622,28 +1622,80 @@ async def chat_completion(
             if "messages" in form_data:
                 from open_webui.utils.misc import reconstruct_messages_with_tool_calls
 
-                log.debug(
-                    f"Messages before reconstruction: {len(form_data['messages'])} messages"
+                print(
+                    f"[TOOL_CALL_DEBUG] Starting message reconstruction for {len(form_data['messages'])} messages"
                 )
-                for i, msg in enumerate(form_data["messages"]):
-                    if msg.get("role") == "assistant":
-                        has_content_blocks = "content_blocks" in msg
-                        log.debug(
-                            f"  Message {i} (assistant): has_content_blocks={has_content_blocks}"
-                        )
-                        if has_content_blocks:
-                            log.debug(f"    content_blocks: {msg['content_blocks']}")
+                print(f"[TOOL_CALL_DEBUG] Chat ID: {metadata.get('chat_id')}")
 
+                if metadata.get("chat_id"):
+                    chat_id = metadata.get("chat_id")
+                    if not chat_id.startswith("local:"):
+                        print(
+                            f"[TOOL_CALL_DEBUG] Loading chat from database: {chat_id}"
+                        )
+                        chat = Chats.get_chat_by_id_and_user_id(chat_id, user.id)
+                        if chat and chat.chat:
+                            stored_messages = chat.chat.get("messages", [])
+                            print(
+                                f"[TOOL_CALL_DEBUG] Loaded {len(stored_messages)} stored messages from database"
+                            )
+
+                            message_map = {}
+                            for stored_msg in stored_messages:
+                                msg_id = stored_msg.get("id")
+                                if msg_id and "content_blocks" in stored_msg:
+                                    message_map[msg_id] = stored_msg.get(
+                                        "content_blocks"
+                                    )
+                                    print(
+                                        f"[TOOL_CALL_DEBUG]   Found content_blocks for message {msg_id}"
+                                    )
+
+                            print(
+                                f"[TOOL_CALL_DEBUG] Built map with {len(message_map)} messages containing content_blocks"
+                            )
+
+                            for msg in form_data["messages"]:
+                                msg_id = msg.get("id")
+                                if msg_id:
+                                    print(
+                                        f"[TOOL_CALL_DEBUG]   Checking message {msg_id}"
+                                    )
+                                    if msg_id in message_map:
+                                        msg["content_blocks"] = message_map[msg_id]
+                                        print(
+                                            f"[TOOL_CALL_DEBUG]     ✓ Merged content_blocks into message {msg_id}"
+                                        )
+                                    else:
+                                        print(
+                                            f"[TOOL_CALL_DEBUG]     ✗ No content_blocks found for message {msg_id}"
+                                        )
+                                else:
+                                    print(
+                                        f"[TOOL_CALL_DEBUG]   Message has no ID, skipping"
+                                    )
+                        else:
+                            print(f"[TOOL_CALL_DEBUG] Chat or chat.chat is None")
+                    else:
+                        print(f"[TOOL_CALL_DEBUG] Local chat, skipping database load")
+                else:
+                    print(f"[TOOL_CALL_DEBUG] No chat_id in metadata")
+
+                original_count = len(form_data["messages"])
                 form_data["messages"] = reconstruct_messages_with_tool_calls(
                     form_data["messages"]
                 )
+                new_count = len(form_data["messages"])
 
-                log.debug(
-                    f"Messages after reconstruction: {len(form_data['messages'])} messages"
+                print(
+                    f"[TOOL_CALL_DEBUG] Reconstruction complete: {original_count} -> {new_count} messages"
                 )
                 for i, msg in enumerate(form_data["messages"]):
-                    log.debug(
-                        f"  Message {i}: role={msg.get('role')}, has_tool_calls={'tool_calls' in msg}"
+                    role = msg.get("role")
+                    has_tool_calls = "tool_calls" in msg
+                    tool_call_id = msg.get("tool_call_id")
+                    print(
+                        f"[TOOL_CALL_DEBUG]   Message {i}: role={role}, has_tool_calls={has_tool_calls}, tool_call_id={tool_call_id}"
                     )
 
             form_data, metadata, events = await process_chat_payload(
