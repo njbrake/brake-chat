@@ -316,8 +316,13 @@ class ChatTable:
         history = chat.get("history", {})
 
         if message_id in history.get("messages", {}):
+            existing_message = history["messages"][message_id]
+
+            if "content_blocks" in existing_message and "content_blocks" not in message:
+                message["content_blocks"] = existing_message["content_blocks"]
+
             history["messages"][message_id] = {
-                **history["messages"][message_id],
+                **existing_message,
                 **message,
             }
         else:

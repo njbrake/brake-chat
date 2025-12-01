@@ -449,6 +449,24 @@ async def update_chat_by_id(
     chat = Chats.get_chat_by_id_and_user_id(id, user.id)
     if chat:
         updated_chat = {**chat.chat, **form_data.chat}
+
+        if "history" in chat.chat and "history" in form_data.chat:
+            existing_messages = chat.chat.get("history", {}).get("messages", {})
+            new_messages = form_data.chat.get("history", {}).get("messages", {})
+
+            for msg_id, new_msg in new_messages.items():
+                if msg_id in existing_messages:
+                    existing_msg = existing_messages[msg_id]
+                    if (
+                        "content_blocks" in existing_msg
+                        and "content_blocks" not in new_msg
+                    ):
+                        new_msg["content_blocks"] = existing_msg["content_blocks"]
+
+            if "history" not in updated_chat:
+                updated_chat["history"] = {}
+            updated_chat["history"]["messages"] = new_messages
+
         chat = Chats.update_chat_by_id(id, updated_chat)
         return ChatResponse(**chat.model_dump())
     else:

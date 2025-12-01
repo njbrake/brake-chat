@@ -1619,6 +1619,43 @@ async def chat_completion(
 
     async def process_chat(request, form_data, user, metadata, model):
         try:
+            if "messages" in form_data:
+                from open_webui.utils.misc import (
+                    reconstruct_messages_with_tool_calls,
+                    get_message_list,
+                )
+
+                if metadata.get("chat_id"):
+                    chat_id = metadata.get("chat_id")
+                    if not chat_id.startswith("local:"):
+                        chat = Chats.get_chat_by_id_and_user_id(chat_id, user.id)
+                        if chat and chat.chat:
+                            history = chat.chat.get("history", {})
+                            stored_messages_dict = history.get("messages", {})
+                            current_id = history.get("currentId")
+
+                            stored_messages_list = get_message_list(
+                                stored_messages_dict, current_id
+                            )
+
+                            for idx, msg in enumerate(form_data["messages"]):
+                                if idx < len(stored_messages_list):
+                                    stored_msg = stored_messages_list[idx]
+                                    msg_role = msg.get("role", "unknown")
+                                    stored_role = stored_msg.get("role", "unknown")
+
+                                    if (
+                                        msg_role == stored_role
+                                        and "content_blocks" in stored_msg
+                                    ):
+                                        msg["content_blocks"] = stored_msg[
+                                            "content_blocks"
+                                        ]
+
+                form_data["messages"] = reconstruct_messages_with_tool_calls(
+                    form_data["messages"]
+                )
+
             form_data, metadata, events = await process_chat_payload(
                 request, form_data, user, metadata, model
             )
