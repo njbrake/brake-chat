@@ -1622,9 +1622,29 @@ async def chat_completion(
             if "messages" in form_data:
                 from open_webui.utils.misc import reconstruct_messages_with_tool_calls
 
+                log.debug(
+                    f"Messages before reconstruction: {len(form_data['messages'])} messages"
+                )
+                for i, msg in enumerate(form_data["messages"]):
+                    if msg.get("role") == "assistant":
+                        has_content_blocks = "content_blocks" in msg
+                        log.debug(
+                            f"  Message {i} (assistant): has_content_blocks={has_content_blocks}"
+                        )
+                        if has_content_blocks:
+                            log.debug(f"    content_blocks: {msg['content_blocks']}")
+
                 form_data["messages"] = reconstruct_messages_with_tool_calls(
                     form_data["messages"]
                 )
+
+                log.debug(
+                    f"Messages after reconstruction: {len(form_data['messages'])} messages"
+                )
+                for i, msg in enumerate(form_data["messages"]):
+                    log.debug(
+                        f"  Message {i}: role={msg.get('role')}, has_tool_calls={'tool_calls' in msg}"
+                    )
 
             form_data, metadata, events = await process_chat_payload(
                 request, form_data, user, metadata, model
