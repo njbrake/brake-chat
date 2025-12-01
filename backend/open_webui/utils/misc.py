@@ -119,27 +119,49 @@ def serialize_content_blocks_for_reconstruction(blocks, raw=False):
 
 
 def reconstruct_messages_with_tool_calls(messages: list[dict]) -> list[dict]:
+    print(f"\n[RECONSTRUCT] Starting reconstruction with {len(messages)} messages")
     reconstructed = []
 
-    for message in messages:
+    for msg_idx, message in enumerate(messages):
+        msg_id = message.get("id", "unknown")
+        role = message.get("role")
+        print(
+            f"\n[RECONSTRUCT] Processing message {msg_idx} (id={msg_id}, role={role})"
+        )
+
         if message.get("role") != "assistant" or "content_blocks" not in message:
+            print(f"[RECONSTRUCT]   → Skipping (not assistant or no content_blocks)")
             reconstructed.append(message)
             continue
 
         content_blocks = message.get("content_blocks", [])
+        print(f"[RECONSTRUCT]   → Has content_blocks: {len(content_blocks)} blocks")
 
         if not isinstance(content_blocks, list) or len(content_blocks) == 0:
+            print(f"[RECONSTRUCT]   → Skipping (empty or invalid content_blocks)")
             reconstructed.append(message)
             continue
 
         has_tool_calls = False
         temp_blocks = []
 
-        for block in content_blocks:
+        for block_idx, block in enumerate(content_blocks):
             if not isinstance(block, dict):
+                print(f"[RECONSTRUCT]     Block {block_idx}: Not a dict, skipping")
                 continue
 
-            if block.get("type") == "tool_calls":
+            block_type = block.get("type")
+            print(f"[RECONSTRUCT]     Block {block_idx}: type={block_type}")
+
+            if block_type == "tool_calls":
+                tool_calls = block.get("content", [])
+                results = block.get("results", [])
+                print(
+                    f"[RECONSTRUCT]       → Found tool_calls block: {len(tool_calls)} calls, {len(results)} results"
+                )
+                print(f"[RECONSTRUCT]       → tool_calls content: {tool_calls}")
+                print(f"[RECONSTRUCT]       → results: {results}")
+
                 assistant_msg = {
                     "role": "assistant",
                     "content": (
@@ -147,36 +169,60 @@ def reconstruct_messages_with_tool_calls(messages: list[dict]) -> list[dict]:
                         if temp_blocks
                         else ""
                     ),
-                    "tool_calls": block.get("content", []),
+                    "tool_calls": tool_calls,
                 }
+                print(
+                    f"[RECONSTRUCT]       → Creating assistant message with {len(tool_calls)} tool_calls"
+                )
                 reconstructed.append(assistant_msg)
                 has_tool_calls = True
 
-                results = block.get("results", [])
-                for result in results:
+                for res_idx, result in enumerate(results):
                     if isinstance(result, dict) and "tool_call_id" in result:
                         tool_msg = {
                             "role": "tool",
                             "tool_call_id": result["tool_call_id"],
                             "content": result.get("content", "") or "",
                         }
+                        print(
+                            f"[RECONSTRUCT]       → Creating tool message for tool_call_id={result['tool_call_id']}"
+                        )
                         reconstructed.append(tool_msg)
+                    else:
+                        print(
+                            f"[RECONSTRUCT]       → Skipping result {res_idx}: invalid format or no tool_call_id"
+                        )
 
                 temp_blocks = []
             else:
                 temp_blocks.append(block)
 
         if not has_tool_calls:
+            print(f"[RECONSTRUCT]   → No tool_calls found, keeping original message")
             reconstructed.append(message)
         elif temp_blocks:
             content = serialize_content_blocks_for_reconstruction(temp_blocks)
             if content:
+                print(
+                    f"[RECONSTRUCT]   → Adding remaining content as assistant message"
+                )
                 reconstructed.append(
                     {
                         "role": "assistant",
                         "content": content,
                     }
                 )
+
+    print(
+        f"\n[RECONSTRUCT] Reconstruction complete: {len(messages)} → {len(reconstructed)} messages"
+    )
+    for idx, msg in enumerate(reconstructed):
+        role = msg.get("role")
+        has_tool_calls = "tool_calls" in msg
+        tool_call_id = msg.get("tool_call_id")
+        print(
+            f"[RECONSTRUCT]   Result {idx}: role={role}, has_tool_calls={has_tool_calls}, tool_call_id={tool_call_id}"
+        )
 
     return reconstructed
 

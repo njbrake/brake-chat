@@ -1630,57 +1630,78 @@ async def chat_completion(
                 if metadata.get("chat_id"):
                     chat_id = metadata.get("chat_id")
                     if not chat_id.startswith("local:"):
-                        print(
-                            f"[TOOL_CALL_DEBUG] Loading chat from database: {chat_id}"
-                        )
+                        print(f"\n[DB_LOAD] Loading chat from database: {chat_id}")
                         chat = Chats.get_chat_by_id_and_user_id(chat_id, user.id)
                         if chat and chat.chat:
                             # Messages are stored in history.messages as a dict keyed by message_id
                             history = chat.chat.get("history", {})
                             stored_messages_dict = history.get("messages", {})
                             print(
-                                f"[TOOL_CALL_DEBUG] Loaded {len(stored_messages_dict)} stored messages from database"
+                                f"[DB_LOAD] Loaded {len(stored_messages_dict)} stored messages from database"
                             )
 
                             message_map = {}
                             for msg_id, stored_msg in stored_messages_dict.items():
+                                msg_role = stored_msg.get("role", "unknown")
+                                print(
+                                    f"\n[DB_LOAD] Stored message {msg_id} (role={msg_role}):"
+                                )
+                                print(f"[DB_LOAD]   → keys: {list(stored_msg.keys())}")
                                 if "content_blocks" in stored_msg:
-                                    message_map[msg_id] = stored_msg.get(
-                                        "content_blocks"
-                                    )
+                                    cb = stored_msg.get("content_blocks")
+                                    message_map[msg_id] = cb
                                     print(
-                                        f"[TOOL_CALL_DEBUG]   Found content_blocks for message {msg_id}"
+                                        f"[DB_LOAD]   → ✓ Found content_blocks, count={len(cb) if isinstance(cb, list) else 'N/A'}"
                                     )
+                                    if isinstance(cb, list):
+                                        for idx, block in enumerate(cb):
+                                            if isinstance(block, dict):
+                                                block_type = block.get("type")
+                                                print(
+                                                    f"[DB_LOAD]     Block {idx}: type={block_type}"
+                                                )
+                                                if block_type == "tool_calls":
+                                                    print(
+                                                        f"[DB_LOAD]       → content: {block.get('content')}"
+                                                    )
+                                                    print(
+                                                        f"[DB_LOAD]       → results: {block.get('results')}"
+                                                    )
+                                else:
+                                    print(f"[DB_LOAD]   → ✗ No content_blocks field")
 
                             print(
-                                f"[TOOL_CALL_DEBUG] Built map with {len(message_map)} messages containing content_blocks"
+                                f"\n[DB_LOAD] Built map with {len(message_map)} messages containing content_blocks"
                             )
 
                             for msg in form_data["messages"]:
                                 msg_id = msg.get("id")
+                                msg_role = msg.get("role", "unknown")
                                 if msg_id:
                                     print(
-                                        f"[TOOL_CALL_DEBUG]   Checking message {msg_id}"
+                                        f"[DB_LOAD] Checking form_data message {msg_id} (role={msg_role})"
                                     )
                                     if msg_id in message_map:
                                         msg["content_blocks"] = message_map[msg_id]
                                         print(
-                                            f"[TOOL_CALL_DEBUG]     ✓ Merged content_blocks into message {msg_id}"
+                                            f"[DB_LOAD]   → ✓ Merged content_blocks into message"
                                         )
                                     else:
                                         print(
-                                            f"[TOOL_CALL_DEBUG]     ✗ No content_blocks found for message {msg_id}"
+                                            f"[DB_LOAD]   → ✗ No content_blocks in map for this message"
                                         )
                                 else:
                                     print(
-                                        f"[TOOL_CALL_DEBUG]   Message has no ID, skipping"
+                                        f"[DB_LOAD] Message has no ID (role={msg_role}), skipping"
                                     )
                         else:
-                            print(f"[TOOL_CALL_DEBUG] Chat or chat.chat is None")
+                            print(f"[DB_LOAD] Chat or chat.chat is None")
                     else:
-                        print(f"[TOOL_CALL_DEBUG] Local chat, skipping database load")
+                        print(
+                            f"[DB_LOAD] Local chat (starts with 'local:'), skipping database load"
+                        )
                 else:
-                    print(f"[TOOL_CALL_DEBUG] No chat_id in metadata")
+                    print(f"[DB_LOAD] No chat_id in metadata")
 
                 original_count = len(form_data["messages"])
                 form_data["messages"] = reconstruct_messages_with_tool_calls(
