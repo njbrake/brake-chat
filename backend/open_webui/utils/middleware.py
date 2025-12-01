@@ -2751,6 +2751,7 @@ async def process_chat_response(
                                                     "content": serialize_content_blocks(
                                                         content_blocks
                                                     ),
+                                                    "content_blocks": content_blocks,
                                                 },
                                             )
                                         else:
@@ -2758,6 +2759,7 @@ async def process_chat_response(
                                                 "content": serialize_content_blocks(
                                                     content_blocks
                                                 ),
+                                                "content_blocks": content_blocks,
                                             }
 
                                 if delta:
@@ -2839,6 +2841,7 @@ async def process_chat_response(
                             "type": "chat:completion",
                             "data": {
                                 "content": serialize_content_blocks(content_blocks),
+                                "content_blocks": content_blocks,
                             },
                         }
                     )
@@ -2981,6 +2984,7 @@ async def process_chat_response(
                             "type": "chat:completion",
                             "data": {
                                 "content": serialize_content_blocks(content_blocks),
+                                "content_blocks": content_blocks,
                             },
                         }
                     )
@@ -3026,6 +3030,7 @@ async def process_chat_response(
                                 "type": "chat:completion",
                                 "data": {
                                     "content": serialize_content_blocks(content_blocks),
+                                    "content_blocks": content_blocks,
                                 },
                             }
                         )

@@ -100,6 +100,87 @@ def get_message_list(messages_map, message_id):
     return message_list
 
 
+def serialize_content_blocks_for_reconstruction(blocks, raw=False):
+    if not blocks:
+        return ""
+
+    content = ""
+    for block in blocks:
+        if isinstance(block, dict):
+            block_type = block.get("type", "text")
+            block_content = str(block.get("content", "")).strip()
+
+            if block_type == "text":
+                content = f"{content}{block_content}\n"
+            elif not raw:
+                content = f"{content}{block_type}: {block_content}\n"
+
+    return content.strip()
+
+
+def reconstruct_messages_with_tool_calls(messages: list[dict]) -> list[dict]:
+    reconstructed = []
+
+    for message in messages:
+        if message.get("role") != "assistant" or "content_blocks" not in message:
+            reconstructed.append(message)
+            continue
+
+        content_blocks = message.get("content_blocks", [])
+
+        if not isinstance(content_blocks, list) or len(content_blocks) == 0:
+            reconstructed.append(message)
+            continue
+
+        has_tool_calls = False
+        temp_blocks = []
+
+        for block in content_blocks:
+            if not isinstance(block, dict):
+                continue
+
+            if block.get("type") == "tool_calls":
+                assistant_msg = {
+                    "role": "assistant",
+                    "content": (
+                        serialize_content_blocks_for_reconstruction(temp_blocks)
+                        if temp_blocks
+                        else ""
+                    ),
+                    "tool_calls": block.get("content", []),
+                }
+                reconstructed.append(assistant_msg)
+                has_tool_calls = True
+
+                results = block.get("results", [])
+                for result in results:
+                    if isinstance(result, dict) and "tool_call_id" in result:
+                        tool_msg = {
+                            "role": "tool",
+                            "tool_call_id": result["tool_call_id"],
+                            "content": result.get("content", "") or "",
+                        }
+                        reconstructed.append(tool_msg)
+
+                temp_blocks = []
+            else:
+                temp_blocks.append(block)
+
+        if not has_tool_calls:
+            reconstructed.append(message)
+        elif temp_blocks:
+            content = serialize_content_blocks_for_reconstruction(temp_blocks)
+            if content:
+                reconstructed.append(
+                    {
+                        "role": "assistant",
+                        "content": content,
+                    }
+                )
+
+    return reconstructed
+
+
 def get_messages_content(messages: list[dict]) -> str:
     return "\n".join(
         [
