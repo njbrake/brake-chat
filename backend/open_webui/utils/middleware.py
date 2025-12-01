@@ -3205,6 +3205,15 @@ async def process_chat_response(
 
                 if not ENABLE_REALTIME_CHAT_SAVE:
                     # Save message in the database
+                    print(
+                        f"[TOOL_CALL_DEBUG] FINAL SAVE: chat_id={metadata['chat_id']}, message_id={metadata['message_id']}"
+                    )
+                    print(
+                        f"[TOOL_CALL_DEBUG] FINAL SAVE: content_blocks={content_blocks}"
+                    )
+                    print(
+                        f"[TOOL_CALL_DEBUG] FINAL SAVE: type(content_blocks)={type(content_blocks)}, len={len(content_blocks) if content_blocks else 0}"
+                    )
                     Chats.upsert_message_to_chat_by_id_and_message_id(
                         metadata["chat_id"],
                         metadata["message_id"],
@@ -3213,6 +3222,7 @@ async def process_chat_response(
                             "content_blocks": content_blocks,
                         },
                     )
+                    print(f"[TOOL_CALL_DEBUG] FINAL SAVE: Database save completed")
 
                 # Send a webhook notification if the user is not active
                 if not get_active_status_by_user_id(user.id):
@@ -3244,6 +3254,12 @@ async def process_chat_response(
 
                 if not ENABLE_REALTIME_CHAT_SAVE:
                     # Save message in the database
+                    print(
+                        f"[TOOL_CALL_DEBUG] CANCEL SAVE: chat_id={metadata['chat_id']}, message_id={metadata['message_id']}"
+                    )
+                    print(
+                        f"[TOOL_CALL_DEBUG] CANCEL SAVE: content_blocks={content_blocks}"
+                    )
                     Chats.upsert_message_to_chat_by_id_and_message_id(
                         metadata["chat_id"],
                         metadata["message_id"],
@@ -3252,6 +3268,7 @@ async def process_chat_response(
                             "content_blocks": content_blocks,
                         },
                     )
+                    print(f"[TOOL_CALL_DEBUG] CANCEL SAVE: Database save completed")
 
             if response.background is not None:
                 await response.background()
