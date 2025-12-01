@@ -317,30 +317,15 @@ class ChatTable:
 
         if message_id in history.get("messages", {}):
             existing_message = history["messages"][message_id]
-            print(f"\n[UPSERT] Updating existing message {message_id}")
-            print(f"[UPSERT]   Existing keys: {list(existing_message.keys())}")
-            print(
-                f"[UPSERT]   Has existing content_blocks: {'content_blocks' in existing_message}"
-            )
-            print(f"[UPSERT]   New message keys: {list(message.keys())}")
-            print(f"[UPSERT]   Has new content_blocks: {'content_blocks' in message}")
 
-            # Preserve content_blocks if they exist in the original but not in the update
             if "content_blocks" in existing_message and "content_blocks" not in message:
-                print(f"[UPSERT]   → Preserving existing content_blocks")
                 message["content_blocks"] = existing_message["content_blocks"]
 
             history["messages"][message_id] = {
                 **existing_message,
                 **message,
             }
-            print(
-                f"[UPSERT]   Final has content_blocks: {'content_blocks' in history['messages'][message_id]}"
-            )
         else:
-            print(f"\n[UPSERT] Creating new message {message_id}")
-            print(f"[UPSERT]   Message keys: {list(message.keys())}")
-            print(f"[UPSERT]   Has content_blocks: {'content_blocks' in message}")
             history["messages"][message_id] = message
 
         history["currentId"] = message_id

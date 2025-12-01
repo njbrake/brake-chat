@@ -1625,139 +1625,36 @@ async def chat_completion(
                     get_message_list,
                 )
 
-                print(
-                    f"[TOOL_CALL_DEBUG] Starting message reconstruction for {len(form_data['messages'])} messages"
-                )
-                print(f"[TOOL_CALL_DEBUG] Chat ID: {metadata.get('chat_id')}")
-
                 if metadata.get("chat_id"):
                     chat_id = metadata.get("chat_id")
                     if not chat_id.startswith("local:"):
-                        print(f"\n[DB_LOAD] Loading chat from database: {chat_id}")
                         chat = Chats.get_chat_by_id_and_user_id(chat_id, user.id)
                         if chat and chat.chat:
-                            # Messages are stored in history.messages as a dict keyed by message_id
                             history = chat.chat.get("history", {})
                             stored_messages_dict = history.get("messages", {})
-                            print(
-                                f"[DB_LOAD] Loaded {len(stored_messages_dict)} stored messages from database"
-                            )
-
-                            # Get currentId from history to reconstruct message chain
                             current_id = history.get("currentId")
-                            print(f"[DB_LOAD] Current message ID: {current_id}")
 
-                            # Build ID-based map for fast lookup
-                            message_map = {}
-                            for msg_id, stored_msg in stored_messages_dict.items():
-                                msg_role = stored_msg.get("role", "unknown")
-                                print(
-                                    f"\n[DB_LOAD] Stored message {msg_id} (role={msg_role}):"
-                                )
-                                print(f"[DB_LOAD]   → keys: {list(stored_msg.keys())}")
-                                if "content_blocks" in stored_msg:
-                                    cb = stored_msg.get("content_blocks")
-                                    message_map[msg_id] = cb
-                                    print(
-                                        f"[DB_LOAD]   → ✓ Found content_blocks, count={len(cb) if isinstance(cb, list) else 'N/A'}"
-                                    )
-                                    if isinstance(cb, list):
-                                        for idx, block in enumerate(cb):
-                                            if isinstance(block, dict):
-                                                block_type = block.get("type")
-                                                print(
-                                                    f"[DB_LOAD]     Block {idx}: type={block_type}"
-                                                )
-                                                if block_type == "tool_calls":
-                                                    print(
-                                                        f"[DB_LOAD]       → content: {block.get('content')}"
-                                                    )
-                                                    print(
-                                                        f"[DB_LOAD]       → results: {block.get('results')}"
-                                                    )
-                                else:
-                                    print(f"[DB_LOAD]   → ✗ No content_blocks field")
-
-                            print(
-                                f"\n[DB_LOAD] Built map with {len(message_map)} messages containing content_blocks"
-                            )
-
-                            # Build ordered list using get_message_list (follows parentId chain)
                             stored_messages_list = get_message_list(
                                 stored_messages_dict, current_id
                             )
-                            print(
-                                f"[DB_LOAD] Built ordered list with {len(stored_messages_list)} messages using get_message_list"
-                            )
 
-                            # Match form_data messages with stored messages
-                            # Strategy: Try ID match first, then fall back to position-based matching
                             for idx, msg in enumerate(form_data["messages"]):
-                                msg_id = msg.get("id")
-                                msg_role = msg.get("role", "unknown")
-                                msg_content = msg.get("content", "")
+                                if idx < len(stored_messages_list):
+                                    stored_msg = stored_messages_list[idx]
+                                    msg_role = msg.get("role", "unknown")
+                                    stored_role = stored_msg.get("role", "unknown")
 
-                                if msg_id and msg_id in message_map:
-                                    # ID-based match (preferred)
-                                    msg["content_blocks"] = message_map[msg_id]
-                                    print(
-                                        f"[DB_LOAD] ✓ ID match for message {idx} (id={msg_id}, role={msg_role})"
-                                    )
-                                else:
-                                    # Position-based match using ordered stored_messages_list
-                                    if idx < len(stored_messages_list):
-                                        stored_msg = stored_messages_list[idx]
-                                        stored_id = stored_msg.get("id")
-                                        stored_role = stored_msg.get("role", "unknown")
-                                        stored_content = stored_msg.get("content", "")
+                                    if (
+                                        msg_role == stored_role
+                                        and "content_blocks" in stored_msg
+                                    ):
+                                        msg["content_blocks"] = stored_msg[
+                                            "content_blocks"
+                                        ]
 
-                                        # Verify roles match (basic sanity check)
-                                        if msg_role == stored_role:
-                                            # Check if this stored message has content_blocks
-                                            if stored_id and stored_id in message_map:
-                                                msg["content_blocks"] = message_map[
-                                                    stored_id
-                                                ]
-                                                print(
-                                                    f"[DB_LOAD] ✓ Position match for message {idx} (role={msg_role}, matched with stored msg {stored_id})"
-                                                )
-                                            else:
-                                                print(
-                                                    f"[DB_LOAD] Position {idx}: matched stored msg {stored_id} but no content_blocks"
-                                                )
-                                        else:
-                                            print(
-                                                f"[DB_LOAD] ✗ Position {idx}: role mismatch (form={msg_role}, stored={stored_role})"
-                                            )
-                                    else:
-                                        print(
-                                            f"[DB_LOAD] ✗ Message {idx} (role={msg_role}) beyond stored messages list (len={len(stored_messages_list)})"
-                                        )
-                        else:
-                            print(f"[DB_LOAD] Chat or chat.chat is None")
-                    else:
-                        print(
-                            f"[DB_LOAD] Local chat (starts with 'local:'), skipping database load"
-                        )
-                else:
-                    print(f"[DB_LOAD] No chat_id in metadata")
-
-                original_count = len(form_data["messages"])
                 form_data["messages"] = reconstruct_messages_with_tool_calls(
                     form_data["messages"]
                 )
-                new_count = len(form_data["messages"])
-
-                print(
-                    f"[TOOL_CALL_DEBUG] Reconstruction complete: {original_count} -> {new_count} messages"
-                )
-                for i, msg in enumerate(form_data["messages"]):
-                    role = msg.get("role")
-                    has_tool_calls = "tool_calls" in msg
-                    tool_call_id = msg.get("tool_call_id")
-                    print(
-                        f"[TOOL_CALL_DEBUG]   Message {i}: role={role}, has_tool_calls={has_tool_calls}, tool_call_id={tool_call_id}"
-                    )
 
             form_data, metadata, events = await process_chat_payload(
                 request, form_data, user, metadata, model

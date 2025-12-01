@@ -2829,22 +2829,12 @@ async def process_chat_response(
 
                     response_tool_calls = tool_calls.pop(0)
 
-                    tool_calls_block = {
-                        "type": "tool_calls",
-                        "content": response_tool_calls,
-                    }
-                    print(f"\n[MIDDLEWARE] Creating tool_calls block:")
-                    print(
-                        f"[MIDDLEWARE]   → tool_calls_block type: {tool_calls_block.get('type')}"
+                    content_blocks.append(
+                        {
+                            "type": "tool_calls",
+                            "content": response_tool_calls,
+                        }
                     )
-                    print(
-                        f"[MIDDLEWARE]   → tool_calls_block content: {tool_calls_block.get('content')}"
-                    )
-                    print(
-                        f"[MIDDLEWARE]   → Number of tool calls: {len(response_tool_calls) if isinstance(response_tool_calls, list) else 'N/A'}"
-                    )
-
-                    content_blocks.append(tool_calls_block)
 
                     await event_emitter(
                         {
@@ -2982,13 +2972,6 @@ async def process_chat_response(
                         )
 
                     content_blocks[-1]["results"] = results
-                    print(f"\n[MIDDLEWARE] Added results to tool_calls block:")
-                    print(f"[MIDDLEWARE]   → Number of results: {len(results)}")
-                    print(f"[MIDDLEWARE]   → Results: {results}")
-                    print(
-                        f"[MIDDLEWARE]   → Tool calls block now: {content_blocks[-1]}"
-                    )
-
                     content_blocks.append(
                         {
                             "type": "text",
@@ -3221,37 +3204,14 @@ async def process_chat_response(
                 }
 
                 if not ENABLE_REALTIME_CHAT_SAVE:
-                    # Save message in the database
-                    print(
-                        f"\n[FINAL_SAVE] chat_id={metadata['chat_id']}, message_id={metadata['message_id']}"
-                    )
-                    print(
-                        f"[FINAL_SAVE] content_blocks type={type(content_blocks)}, len={len(content_blocks) if content_blocks else 0}"
-                    )
-                    print(f"[FINAL_SAVE] Full content_blocks structure:")
-                    for idx, block in enumerate(
-                        content_blocks if content_blocks else []
-                    ):
-                        block_type = (
-                            block.get("type") if isinstance(block, dict) else "N/A"
-                        )
-                        print(f"[FINAL_SAVE]   Block {idx}: type={block_type}")
-                        if block_type == "tool_calls":
-                            print(f"[FINAL_SAVE]     → content: {block.get('content')}")
-                            print(f"[FINAL_SAVE]     → results: {block.get('results')}")
-
-                    save_data = {
-                        "content": serialize_content_blocks(content_blocks),
-                        "content_blocks": content_blocks,
-                    }
-                    print(f"[FINAL_SAVE] Saving to database: {save_data.keys()}")
-
                     Chats.upsert_message_to_chat_by_id_and_message_id(
                         metadata["chat_id"],
                         metadata["message_id"],
-                        save_data,
+                        {
+                            "content": serialize_content_blocks(content_blocks),
+                            "content_blocks": content_blocks,
+                        },
                     )
-                    print(f"[FINAL_SAVE] Database save completed")
 
                 # Send a webhook notification if the user is not active
                 if not get_active_status_by_user_id(user.id):
@@ -3282,13 +3242,6 @@ async def process_chat_response(
                 await event_emitter({"type": "chat:tasks:cancel"})
 
                 if not ENABLE_REALTIME_CHAT_SAVE:
-                    # Save message in the database
-                    print(
-                        f"[TOOL_CALL_DEBUG] CANCEL SAVE: chat_id={metadata['chat_id']}, message_id={metadata['message_id']}"
-                    )
-                    print(
-                        f"[TOOL_CALL_DEBUG] CANCEL SAVE: content_blocks={content_blocks}"
-                    )
                     Chats.upsert_message_to_chat_by_id_and_message_id(
                         metadata["chat_id"],
                         metadata["message_id"],
@@ -3297,7 +3250,6 @@ async def process_chat_response(
                             "content_blocks": content_blocks,
                         },
                     )
-                    print(f"[TOOL_CALL_DEBUG] CANCEL SAVE: Database save completed")
 
             if response.background is not None:
                 await response.background()

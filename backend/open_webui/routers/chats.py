@@ -448,19 +448,12 @@ async def update_chat_by_id(
 ):
     chat = Chats.get_chat_by_id_and_user_id(id, user.id)
     if chat:
-        print(f"\n[CHAT_UPDATE] Updating chat {id}")
-
         updated_chat = {**chat.chat, **form_data.chat}
 
-        # Preserve content_blocks in messages
         if "history" in chat.chat and "history" in form_data.chat:
             existing_messages = chat.chat.get("history", {}).get("messages", {})
             new_messages = form_data.chat.get("history", {}).get("messages", {})
 
-            print(f"[CHAT_UPDATE] Existing messages: {len(existing_messages)}")
-            print(f"[CHAT_UPDATE] New messages: {len(new_messages)}")
-
-            # Preserve content_blocks from existing messages
             for msg_id, new_msg in new_messages.items():
                 if msg_id in existing_messages:
                     existing_msg = existing_messages[msg_id]
@@ -468,12 +461,8 @@ async def update_chat_by_id(
                         "content_blocks" in existing_msg
                         and "content_blocks" not in new_msg
                     ):
-                        print(
-                            f"[CHAT_UPDATE]   → Preserving content_blocks for message {msg_id}"
-                        )
                         new_msg["content_blocks"] = existing_msg["content_blocks"]
 
-            # Update the messages in the updated_chat
             if "history" not in updated_chat:
                 updated_chat["history"] = {}
             updated_chat["history"]["messages"] = new_messages
