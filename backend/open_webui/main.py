@@ -1635,15 +1635,16 @@ async def chat_completion(
                         )
                         chat = Chats.get_chat_by_id_and_user_id(chat_id, user.id)
                         if chat and chat.chat:
-                            stored_messages = chat.chat.get("messages", [])
+                            # Messages are stored in history.messages as a dict keyed by message_id
+                            history = chat.chat.get("history", {})
+                            stored_messages_dict = history.get("messages", {})
                             print(
-                                f"[TOOL_CALL_DEBUG] Loaded {len(stored_messages)} stored messages from database"
+                                f"[TOOL_CALL_DEBUG] Loaded {len(stored_messages_dict)} stored messages from database"
                             )
 
                             message_map = {}
-                            for stored_msg in stored_messages:
-                                msg_id = stored_msg.get("id")
-                                if msg_id and "content_blocks" in stored_msg:
+                            for msg_id, stored_msg in stored_messages_dict.items():
+                                if "content_blocks" in stored_msg:
                                     message_map[msg_id] = stored_msg.get(
                                         "content_blocks"
                                     )
