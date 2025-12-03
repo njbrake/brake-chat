@@ -558,10 +558,10 @@ async def chat_memory_handler(
                     )
 
                 user_context += f"{doc_idx + 1}. [{created_at_date}] {doc}\n"
-
-    form_data["messages"] = add_or_update_system_message(
-        f"User Context:\n{user_context}\n", form_data["messages"], append=True
-    )
+    if user_context.strip() != "":
+        form_data["messages"] = add_or_update_system_message(
+            f"User Context:\n{user_context}\n", form_data["messages"], append=True
+        )
 
     return form_data
 
