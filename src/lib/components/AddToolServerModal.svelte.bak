@@ -168,10 +168,6 @@
 			if (res) {
 				toast.success($i18n.t('Connection successful'));
 				console.debug('Connection successful', res);
-
-			verifiedSpecs = res?.specs || null;
-			verificationOpenApiInfo = res?.openapi?.info || res?.info || null;
-			showVerifiedTools = verifiedSpecs && verifiedSpecs.length > 0;
 			}
 		}
 	};
@@ -349,10 +345,6 @@
 		enable = true;
 		functionNameFilterList = [];
 		accessControl = null;
-
-		verifiedSpecs = null;
-		verificationOpenApiInfo = null;
-		showVerifiedTools = false;
 	};
 
 	const init = () => {
@@ -382,12 +374,6 @@
 
 	$: if (show) {
 		init();
-	}
-
-	$: if (url || type) {
-		verifiedSpecs = null;
-		verificationOpenApiInfo = null;
-		showVerifiedTools = false;
 	}
 
 	onMount(() => {
@@ -834,151 +820,6 @@
 									/>
 								</div>
 							</div>
-
-							{#if showVerifiedTools && verifiedSpecs && verifiedSpecs.length > 0}
-								<div class="flex flex-col w-full mt-3">
-									<div class="flex justify-between items-center mb-1">
-										<label
-											class={`text-xs ${($settings?.highContrastMode ?? false) ? 'text-gray-800 dark:text-gray-100' : 'text-gray-500'}`}
-										>
-											{$i18n.t('Available Tools')} ({verifiedSpecs.length})
-										</label>
-
-										<button
-											type="button"
-											class="text-xs underline dark:text-gray-500 dark:hover:text-gray-200 text-gray-700 hover:text-gray-900 transition"
-											on:click={() => {
-												showVerifiedTools = false;
-											}}
-										>
-											{$i18n.t('Hide')}
-										</button>
-									</div>
-
-									<div
-										class="border border-gray-100 dark:border-gray-800 rounded-lg max-h-[300px] overflow-y-auto"
-									>
-										{#if verificationOpenApiInfo}
-											<div
-												class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800"
-											>
-												<div class="text-xs font-medium text-gray-800 dark:text-gray-100">
-													{verificationOpenApiInfo.title}
-													{#if verificationOpenApiInfo.version}
-														<span class="text-gray-500">v{verificationOpenApiInfo.version}</span>
-													{/if}
-												</div>
-												{#if verificationOpenApiInfo.description}
-													<div class="text-xs text-gray-500 mt-0.5">
-														{verificationOpenApiInfo.description}
-													</div>
-												{/if}
-											</div>
-										{/if}
-
-										<div class="divide-y divide-gray-100 dark:divide-gray-800">
-											{#each verifiedSpecs as spec, idx}
-												<div class="px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition">
-													<Collapsible buttonClassName="w-full text-left" chevron={true} open={idx < 5}>
-														<div class="flex items-start justify-between gap-2">
-															<div class="flex-1 min-w-0">
-																<div class="flex items-center gap-2">
-																	<div
-																		class="font-mono text-xs font-medium text-gray-900 dark:text-gray-100"
-																	>
-																		{spec.name}
-																	</div>
-
-																	<button
-																		type="button"
-																		class="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-																		on:click={(e) => {
-																			e.stopPropagation();
-
-																			if (!functionNameFilterList.includes(spec.name)) {
-																				functionNameFilterList = [
-																					...functionNameFilterList,
-																					spec.name
-																				];
-																			}
-
-																			toast.success($i18n.t('Added to filter list'));
-																		}}
-																		title={$i18n.t('Add to filter list')}
-																	>
-																		{$i18n.t('Add')}
-																	</button>
-																</div>
-
-																{#if spec.description}
-																	<div class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-																		{spec.description}
-																	</div>
-																{/if}
-															</div>
-														</div>
-
-														<div slot="content" class="mt-2">
-															{#if spec.parameters && spec.parameters.properties}
-																<div class="text-xs">
-																	<div
-																		class="font-medium text-gray-700 dark:text-gray-300 mb-1"
-																	>
-																		{$i18n.t('Parameters')}:
-																	</div>
-
-																	<div class="space-y-1 pl-2">
-																		{#each Object.entries(spec.parameters.properties) as [paramName, paramDef]}
-																			<div class="flex items-start gap-2">
-																				<div
-																					class="font-mono text-xs text-gray-800 dark:text-gray-200"
-																				>
-																					{paramName}
-																					{#if spec.parameters.required?.includes(paramName)}
-																						<span class="text-red-500">*</span>
-																					{/if}
-																				</div>
-
-																				<div class="text-xs text-gray-500">
-																					({paramDef.type || 'any'})
-																				</div>
-
-																				{#if paramDef.description}
-																					<div
-																						class="text-xs text-gray-600 dark:text-gray-400 flex-1"
-																					>
-																						- {paramDef.description}
-																					</div>
-																				{/if}
-																			</div>
-																		{/each}
-																	</div>
-																</div>
-															{:else}
-																<div class="text-xs text-gray-500 italic">
-																	{$i18n.t('No parameters')}
-																</div>
-															{/if}
-														</div>
-													</Collapsible>
-												</div>
-											{/each}
-										</div>
-									</div>
-
-									<div class="text-xs text-gray-500 mt-1">
-										{$i18n.t('Click "Add" to include a tool in the filter list above')}
-									</div>
-								</div>
-							{:else if showVerifiedTools && verifiedSpecs && verifiedSpecs.length === 0}
-								<div class="flex flex-col w-full mt-3">
-									<div
-										class="text-xs text-gray-500 bg-gray-50 dark:bg-gray-900 rounded-lg px-3 py-2"
-									>
-										{$i18n.t('No tools found in this server')}
-									</div>
-								</div>
-							{/if}
 
 							<hr class=" border-gray-100 dark:border-gray-700/10 my-2.5 w-full" />
 
