@@ -150,15 +150,18 @@ async def get_tools(
                     )
 
                     specs = tool_server_data.get("specs", [])
-                    function_name_filter_value = (
-                        tool_server_connection.get("config", {})
-                        .get("function_name_filter_list", "")
-                    )
+                    function_name_filter_value = tool_server_connection.get(
+                        "config", {}
+                    ).get("function_name_filter_list", "")
                     # Handle both string (legacy) and list (current) formats
                     if isinstance(function_name_filter_value, list):
                         function_name_filter_list = function_name_filter_value
                     elif isinstance(function_name_filter_value, str):
-                        function_name_filter_list = function_name_filter_value.split(",") if function_name_filter_value else []
+                        function_name_filter_list = (
+                            function_name_filter_value.split(",")
+                            if function_name_filter_value
+                            else []
+                        )
                     else:
                         function_name_filter_list = []
 

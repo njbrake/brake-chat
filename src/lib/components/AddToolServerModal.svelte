@@ -169,9 +169,9 @@
 				toast.success($i18n.t('Connection successful'));
 				console.debug('Connection successful', res);
 
-			verifiedSpecs = res?.specs || null;
-			verificationOpenApiInfo = res?.openapi?.info || res?.info || null;
-			showVerifiedTools = verifiedSpecs && verifiedSpecs.length > 0;
+				verifiedSpecs = res?.specs || null;
+				verificationOpenApiInfo = res?.openapi?.info || res?.info || null;
+				showVerifiedTools = verifiedSpecs && verifiedSpecs.length > 0;
 			}
 		}
 	};
@@ -878,8 +878,14 @@
 
 										<div class="divide-y divide-gray-100 dark:divide-gray-800">
 											{#each verifiedSpecs as spec, idx}
-												<div class="px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition">
-													<Collapsible buttonClassName="w-full text-left" chevron={true} open={idx < 5}>
+												<div
+													class="px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition"
+												>
+													<Collapsible
+														buttonClassName="w-full text-left"
+														chevron={true}
+														open={idx < 5}
+													>
 														<div class="flex items-start justify-between gap-2">
 															<div class="flex-1 min-w-0">
 																<div class="flex items-center gap-2">
@@ -921,9 +927,7 @@
 														<div slot="content" class="mt-2">
 															{#if spec.parameters && spec.parameters.properties}
 																<div class="text-xs">
-																	<div
-																		class="font-medium text-gray-700 dark:text-gray-300 mb-1"
-																	>
+																	<div class="font-medium text-gray-700 dark:text-gray-300 mb-1">
 																		{$i18n.t('Parameters')}:
 																	</div>
 
