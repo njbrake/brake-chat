@@ -843,53 +843,7 @@ ENABLE_DIRECT_CONNECTIONS = PersistentConfig(
     os.environ.get("ENABLE_DIRECT_CONNECTIONS", "False").lower() == "true",
 )
 
-####################################
-# OLLAMA_BASE_URL
-####################################
-
-ENABLE_OLLAMA_API = PersistentConfig(
-    "ENABLE_OLLAMA_API",
-    "ollama.enable",
-    os.environ.get("ENABLE_OLLAMA_API", "True").lower() == "true",
-)
-
-OLLAMA_API_BASE_URL = os.environ.get("OLLAMA_API_BASE_URL", "http://localhost:11434/api")
-
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "")
-if OLLAMA_BASE_URL:
-    # Remove trailing slash
-    OLLAMA_BASE_URL = OLLAMA_BASE_URL.removesuffix("/")
-
-
 K8S_FLAG = os.environ.get("K8S_FLAG", "")
-USE_OLLAMA_DOCKER = os.environ.get("USE_OLLAMA_DOCKER", "false")
-
-if OLLAMA_BASE_URL == "" and OLLAMA_API_BASE_URL != "":
-    OLLAMA_BASE_URL = OLLAMA_API_BASE_URL.removesuffix("/api")
-
-if ENV == "prod":
-    if OLLAMA_BASE_URL == "/ollama" and not K8S_FLAG:
-        if USE_OLLAMA_DOCKER.lower() == "true":
-            # if you use all-in-one docker container (Open WebUI + Ollama)
-            # with the docker build arg USE_OLLAMA=true (--build-arg="USE_OLLAMA=true") this only works with http://localhost:11434
-            OLLAMA_BASE_URL = "http://localhost:11434"
-        else:
-            OLLAMA_BASE_URL = "http://host.docker.internal:11434"
-    elif K8S_FLAG:
-        OLLAMA_BASE_URL = "http://ollama-service.open-webui.svc.cluster.local:11434"
-
-
-OLLAMA_BASE_URLS = os.environ.get("OLLAMA_BASE_URLS", "")
-OLLAMA_BASE_URLS = OLLAMA_BASE_URLS if OLLAMA_BASE_URLS != "" else OLLAMA_BASE_URL
-
-OLLAMA_BASE_URLS = [url.strip() for url in OLLAMA_BASE_URLS.split(";")]
-OLLAMA_BASE_URLS = PersistentConfig("OLLAMA_BASE_URLS", "ollama.base_urls", OLLAMA_BASE_URLS)
-
-OLLAMA_API_CONFIGS = PersistentConfig(
-    "OLLAMA_API_CONFIGS",
-    "ollama.api_configs",
-    {},
-)
 
 ####################################
 # OPENAI_API
@@ -2381,18 +2335,6 @@ RAG_AZURE_OPENAI_API_VERSION = PersistentConfig(
     os.getenv("RAG_AZURE_OPENAI_API_VERSION", ""),
 )
 
-RAG_OLLAMA_BASE_URL = PersistentConfig(
-    "RAG_OLLAMA_BASE_URL",
-    "rag.ollama.url",
-    os.getenv("RAG_OLLAMA_BASE_URL", OLLAMA_BASE_URL),
-)
-
-RAG_OLLAMA_API_KEY = PersistentConfig(
-    "RAG_OLLAMA_API_KEY",
-    "rag.ollama.key",
-    os.getenv("RAG_OLLAMA_API_KEY", ""),
-)
-
 
 ENABLE_RAG_LOCAL_WEB_FETCH = os.getenv("ENABLE_RAG_LOCAL_WEB_FETCH", "False").lower() == "true"
 
@@ -2688,12 +2630,6 @@ SOUGOU_API_SK = PersistentConfig(
     "SOUGOU_API_SK",
     "rag.web.search.sougou_api_sk",
     os.getenv("SOUGOU_API_SK", ""),
-)
-
-OLLAMA_CLOUD_WEB_SEARCH_API_KEY = PersistentConfig(
-    "OLLAMA_CLOUD_WEB_SEARCH_API_KEY",
-    "rag.web.search.ollama_cloud_web_search_api_key",
-    os.getenv("OLLAMA_CLOUD_WEB_SEARCH_API_KEY", ""),
 )
 
 PLAYWRIGHT_WS_URL = PersistentConfig(

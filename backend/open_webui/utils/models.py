@@ -14,7 +14,7 @@ from open_webui.models.functions import Functions
 from open_webui.models.groups import Groups
 from open_webui.models.models import Models
 from open_webui.models.users import UserModel
-from open_webui.routers import ollama, openai
+from open_webui.routers import openai
 from open_webui.utils.access_control import has_access
 from open_webui.utils.plugin import (
     get_function_module_from_cache,
@@ -23,23 +23,6 @@ from open_webui.utils.plugin import (
 logging.basicConfig(stream=sys.stdout, level=GLOBAL_LOG_LEVEL)
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["MAIN"])
-
-
-async def fetch_ollama_models(request: Request, user: UserModel = None):
-    raw_ollama_models = await ollama.get_all_models(request, user=user)
-    return [
-        {
-            "id": model["model"],
-            "name": model["name"],
-            "object": "model",
-            "created": int(time.time()),
-            "owned_by": "ollama",
-            "ollama": model,
-            "connection_type": model.get("connection_type", "local"),
-            "tags": model.get("tags", []),
-        }
-        for model in raw_ollama_models["models"]
-    ]
 
 
 async def fetch_openai_models(request: Request, user: UserModel = None):
@@ -53,16 +36,11 @@ async def get_all_base_models(request: Request, user: UserModel = None):
         if request.app.state.config.ENABLE_OPENAI_API
         else asyncio.sleep(0, result=[])
     )
-    ollama_task = (
-        fetch_ollama_models(request, user)
-        if request.app.state.config.ENABLE_OLLAMA_API
-        else asyncio.sleep(0, result=[])
-    )
     function_task = get_function_models(request)
 
-    openai_models, ollama_models, function_models = await asyncio.gather(openai_task, ollama_task, function_task)
+    openai_models, function_models = await asyncio.gather(openai_task, function_task)
 
-    return function_models + openai_models + ollama_models
+    return function_models + openai_models
 
 
 async def get_all_models(request, refresh: bool = False, user: UserModel = None):

@@ -73,7 +73,6 @@ usage() {
     echo "  --enable-gpu[count=COUNT]  Enable GPU support with the specified count."
     echo "  --enable-api[port=PORT]    Enable API and expose it on the specified port."
     echo "  --webui[port=PORT]         Set the port for the web user interface."
-    echo "  --data[folder=PATH]        Bind mount for ollama data folder (by default will create the 'ollama' volume)."
     echo "  --playwright               Enable Playwright support for web scraping."
     echo "  --build                    Build the docker image before running the compose project."
     echo "  --drop                     Drop the compose project."
@@ -85,13 +84,11 @@ usage() {
     echo "  $0 --enable-gpu[count=1]"
     echo "  $0 --enable-gpu[count=all]"
     echo "  $0 --enable-api[port=11435]"
-    echo "  $0 --enable-gpu[count=1] --enable-api[port=12345] --webui[port=3000]"
-    echo "  $0 --enable-gpu[count=1] --enable-api[port=12345] --webui[port=3000] --data[folder=./ollama-data]"
-    echo "  $0 --enable-gpu[count=1] --enable-api[port=12345] --webui[port=3000] --data[folder=./ollama-data] --build"
+    echo "  $0 --webui[port=3000]"
+    echo "  $0 --webui[port=3000] --playwright"
+    echo "  $0 --webui[port=3000] --playwright --build"
     echo ""
-    echo "This script configures and runs a docker-compose setup with optional GPU support, API exposure, and web UI configuration."
-    echo "About the gpu to use, the script automatically detects it using the "lspci" command."
-    echo "In this case the gpu detected is: $(get_gpu_driver)"
+    echo "This script configures and runs a docker-compose setup with optional Playwright support and web UI configuration."
 }
 
 # Default values
@@ -126,10 +123,6 @@ while [[ $# -gt 0 ]]; do
         --webui*)
             value=$(extract_value "$key")
             webui_port=${value:-3000}
-            ;;
-        --data*)
-            value=$(extract_value "$key")
-            data_dir=${value:-"./ollama-data"}
             ;;
         --playwright)
             enable_playwright=true
@@ -171,21 +164,8 @@ else
                 exit 1
             fi
             echo "Enabling GPU with $gpu_count GPUs"
-            # Add your GPU allocation logic here
-            export OLLAMA_GPU_DRIVER=$(get_gpu_driver)
-            export OLLAMA_GPU_COUNT=$gpu_count # Set OLLAMA_GPU_COUNT environment variable
         fi
         DEFAULT_COMPOSE_COMMAND+=" -f docker-compose.gpu.yaml"
-    fi
-    if [[ $enable_api == true ]]; then
-        DEFAULT_COMPOSE_COMMAND+=" -f docker-compose.api.yaml"
-        if [[ -n $api_port ]]; then
-            export OLLAMA_WEBAPI_PORT=$api_port # Set OLLAMA_WEBAPI_PORT environment variable
-        fi
-    fi
-    if [[ -n $data_dir ]]; then
-        DEFAULT_COMPOSE_COMMAND+=" -f docker-compose.data.yaml"
-        export OLLAMA_DATA_DIR=$data_dir # Set OLLAMA_DATA_DIR environment variable
     fi
     if [[ $enable_playwright == true ]]; then
         DEFAULT_COMPOSE_COMMAND+=" -f docker-compose.playwright.yaml"
@@ -204,10 +184,6 @@ fi
 # Recap of environment variables
 echo
 echo -e "${WHITE}${BOLD}Current Setup:${NC}"
-echo -e "   ${GREEN}${BOLD}GPU Driver:${NC} ${OLLAMA_GPU_DRIVER:-Not Enabled}"
-echo -e "   ${GREEN}${BOLD}GPU Count:${NC} ${OLLAMA_GPU_COUNT:-Not Enabled}"
-echo -e "   ${GREEN}${BOLD}WebAPI Port:${NC} ${OLLAMA_WEBAPI_PORT:-Not Enabled}"
-echo -e "   ${GREEN}${BOLD}Data Folder:${NC} ${data_dir:-Using ollama volume}"
 echo -e "   ${GREEN}${BOLD}WebUI Port:${NC} $webui_port"
 echo -e "   ${GREEN}${BOLD}Playwright:${NC} ${enable_playwright:-false}"
 echo
