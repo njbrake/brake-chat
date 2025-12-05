@@ -33,8 +33,6 @@ from open_webui.config import (
     PLAYWRIGHT_WS_URL,
     PLAYWRIGHT_TIMEOUT,
     WEB_LOADER_ENGINE,
-    FIRECRAWL_API_BASE_URL,
-    FIRECRAWL_API_KEY,
     TAVILY_API_KEY,
     TAVILY_EXTRACT_DEPTH,
     EXTERNAL_WEB_LOADER_URL,
@@ -178,144 +176,6 @@ class URLProcessingMixin:
             raise ValueError(f"SSL certificate verification failed for {url}")
         self._sync_wait_for_rate_limit()
         return True
-
-
-class SafeFireCrawlLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
-    def __init__(
-        self,
-        web_paths,
-        verify_ssl: bool = True,
-        trust_env: bool = False,
-        requests_per_second: Optional[float] = None,
-        continue_on_failure: bool = True,
-        api_key: Optional[str] = None,
-        api_url: Optional[str] = None,
-        mode: Literal["crawl", "scrape", "map"] = "scrape",
-        proxy: Optional[Dict[str, str]] = None,
-        params: Optional[Dict] = None,
-    ):
-        """Concurrent document loader for FireCrawl operations.
-
-        Executes multiple FireCrawlLoader instances concurrently using thread pooling
-        to improve bulk processing efficiency.
-        Args:
-            web_paths: List of URLs/paths to process.
-            verify_ssl: If True, verify SSL certificates.
-            trust_env: If True, use proxy settings from environment variables.
-            requests_per_second: Number of requests per second to limit to.
-            continue_on_failure (bool): If True, continue loading other URLs on failure.
-            api_key: API key for FireCrawl service. Defaults to None
-                (uses FIRE_CRAWL_API_KEY environment variable if not provided).
-            api_url: Base URL for FireCrawl API. Defaults to official API endpoint.
-            mode: Operation mode selection:
-                - 'crawl': Website crawling mode
-                - 'scrape': Direct page scraping (default)
-                - 'map': Site map generation
-            proxy: Proxy override settings for the FireCrawl API.
-            params: The parameters to pass to the Firecrawl API.
-                For more details, visit: https://docs.firecrawl.dev/sdks/python#batch-scrape
-        """
-        proxy_server = proxy.get("server") if proxy else None
-        if trust_env and not proxy_server:
-            env_proxies = urllib.request.getproxies()
-            env_proxy_server = env_proxies.get("https") or env_proxies.get("http")
-            if env_proxy_server:
-                if proxy:
-                    proxy["server"] = env_proxy_server
-                else:
-                    proxy = {"server": env_proxy_server}
-        self.web_paths = web_paths
-        self.verify_ssl = verify_ssl
-        self.requests_per_second = requests_per_second
-        self.last_request_time = None
-        self.trust_env = trust_env
-        self.continue_on_failure = continue_on_failure
-        self.api_key = api_key
-        self.api_url = api_url
-        self.mode = mode
-        self.params = params or {}
-
-    def lazy_load(self) -> Iterator[Document]:
-        """Load documents using FireCrawl batch_scrape."""
-        log.debug(
-            "Starting FireCrawl batch scrape for %d URLs, mode: %s, params: %s",
-            len(self.web_paths),
-            self.mode,
-            self.params,
-        )
-        try:
-            from firecrawl import FirecrawlApp
-
-            firecrawl = FirecrawlApp(api_key=self.api_key, api_url=self.api_url)
-            result = firecrawl.batch_scrape(
-                self.web_paths,
-                formats=["markdown"],
-                skip_tls_verification=not self.verify_ssl,
-                ignore_invalid_urls=True,
-                remove_base64_images=True,
-                max_age=300000,  # 5 minutes https://docs.firecrawl.dev/features/fast-scraping#common-maxage-values
-                wait_timeout=len(self.web_paths) * 3,
-                **self.params,
-            )
-
-            if result.status != "completed":
-                raise RuntimeError(
-                    f"FireCrawl batch scrape did not complete successfully. result: {result}"
-                )
-
-            for data in result.data:
-                metadata = data.metadata or {}
-                yield Document(
-                    page_content=data.markdown or "",
-                    metadata={"source": metadata.url or metadata.source_url or ""},
-                )
-
-        except Exception as e:
-            if self.continue_on_failure:
-                log.exception(f"Error extracting content from URLs: {e}")
-            else:
-                raise e
-
-    async def alazy_load(self):
-        """Async version of lazy_load."""
-        log.debug(
-            "Starting FireCrawl batch scrape for %d URLs, mode: %s, params: %s",
-            len(self.web_paths),
-            self.mode,
-            self.params,
-        )
-        try:
-            from firecrawl import FirecrawlApp
-
-            firecrawl = FirecrawlApp(api_key=self.api_key, api_url=self.api_url)
-            result = firecrawl.batch_scrape(
-                self.web_paths,
-                formats=["markdown"],
-                skip_tls_verification=not self.verify_ssl,
-                ignore_invalid_urls=True,
-                remove_base64_images=True,
-                max_age=300000,  # 5 minutes https://docs.firecrawl.dev/features/fast-scraping#common-maxage-values
-                wait_timeout=len(self.web_paths) * 3,
-                **self.params,
-            )
-
-            if result.status != "completed":
-                raise RuntimeError(
-                    f"FireCrawl batch scrape did not complete successfully. result: {result}"
-                )
-
-            for data in result.data:
-                metadata = data.metadata or {}
-                yield Document(
-                    page_content=data.markdown or "",
-                    metadata={"source": metadata.url or metadata.source_url or ""},
-                )
-
-        except Exception as e:
-            if self.continue_on_failure:
-                log.exception(f"Error extracting content from URLs: {e}")
-            else:
-                raise e
 
 
 class SafeTavilyLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
@@ -679,11 +539,6 @@ def get_web_loader(
         web_loader_args["playwright_timeout"] = PLAYWRIGHT_TIMEOUT.value
         if PLAYWRIGHT_WS_URL.value:
             web_loader_args["playwright_ws_url"] = PLAYWRIGHT_WS_URL.value
-
-    if WEB_LOADER_ENGINE.value == "firecrawl":
-        WebLoaderClass = SafeFireCrawlLoader
-        web_loader_args["api_key"] = FIRECRAWL_API_KEY.value
-        web_loader_args["api_url"] = FIRECRAWL_API_BASE_URL.value
 
     if WEB_LOADER_ENGINE.value == "tavily":
         WebLoaderClass = SafeTavilyLoader
