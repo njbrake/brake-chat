@@ -158,8 +158,6 @@ from open_webui.config import (
     ENABLE_NOTES,
     # WebUI (OAuth)
     ENABLE_OAUTH_ROLE_MANAGEMENT,
-    # Ollama
-    ENABLE_OLLAMA_API,
     ENABLE_ONEDRIVE_BUSINESS,
     ENABLE_ONEDRIVE_INTEGRATION,
     ENABLE_ONEDRIVE_PERSONAL,
@@ -250,9 +248,6 @@ from open_webui.config import (
     OAUTH_PROVIDERS,
     OAUTH_ROLES_CLAIM,
     OAUTH_USERNAME_CLAIM,
-    OLLAMA_API_CONFIGS,
-    OLLAMA_BASE_URLS,
-    OLLAMA_CLOUD_WEB_SEARCH_API_KEY,
     ONEDRIVE_CLIENT_ID_BUSINESS,
     ONEDRIVE_CLIENT_ID_PERSONAL,
     ONEDRIVE_SHAREPOINT_TENANT_ID,
@@ -284,8 +279,6 @@ from open_webui.config import (
     RAG_FILE_MAX_SIZE,
     RAG_FULL_CONTEXT,
     RAG_HYBRID_BM25_WEIGHT,
-    RAG_OLLAMA_API_KEY,
-    RAG_OLLAMA_BASE_URL,
     RAG_OPENAI_API_BASE_URL,
     RAG_OPENAI_API_KEY,
     RAG_RELEVANCE_THRESHOLD,
@@ -409,7 +402,6 @@ from open_webui.routers import (
     memories,
     models,
     notes,
-    ollama,
     openai,
     pipelines,
     prompts,
@@ -619,19 +611,6 @@ if ENABLE_OTEL:
 
     setup_opentelemetry(app=app, db_engine=engine)
 
-
-########################################
-#
-# OLLAMA
-#
-########################################
-
-
-app.state.config.ENABLE_OLLAMA_API = ENABLE_OLLAMA_API
-app.state.config.OLLAMA_BASE_URLS = OLLAMA_BASE_URLS
-app.state.config.OLLAMA_API_CONFIGS = OLLAMA_API_CONFIGS
-
-app.state.OLLAMA_MODELS = {}
 
 ########################################
 #
@@ -850,9 +829,6 @@ app.state.config.RAG_AZURE_OPENAI_BASE_URL = RAG_AZURE_OPENAI_BASE_URL
 app.state.config.RAG_AZURE_OPENAI_API_KEY = RAG_AZURE_OPENAI_API_KEY
 app.state.config.RAG_AZURE_OPENAI_API_VERSION = RAG_AZURE_OPENAI_API_VERSION
 
-app.state.config.RAG_OLLAMA_BASE_URL = RAG_OLLAMA_BASE_URL
-app.state.config.RAG_OLLAMA_API_KEY = RAG_OLLAMA_API_KEY
-
 app.state.config.PDF_EXTRACT_IMAGES = PDF_EXTRACT_IMAGES
 
 app.state.config.YOUTUBE_LOADER_LANGUAGE = YOUTUBE_LOADER_LANGUAGE
@@ -875,7 +851,6 @@ app.state.config.BYPASS_WEB_SEARCH_WEB_LOADER = BYPASS_WEB_SEARCH_WEB_LOADER
 app.state.config.ENABLE_GOOGLE_DRIVE_INTEGRATION = ENABLE_GOOGLE_DRIVE_INTEGRATION
 app.state.config.ENABLE_ONEDRIVE_INTEGRATION = ENABLE_ONEDRIVE_INTEGRATION
 
-app.state.config.OLLAMA_CLOUD_WEB_SEARCH_API_KEY = OLLAMA_CLOUD_WEB_SEARCH_API_KEY
 app.state.config.SEARXNG_QUERY_URL = SEARXNG_QUERY_URL
 app.state.config.YACY_QUERY_URL = YACY_QUERY_URL
 app.state.config.YACY_USERNAME = YACY_USERNAME
@@ -949,20 +924,12 @@ app.state.EMBEDDING_FUNCTION = get_embedding_function(
     url=(
         app.state.config.RAG_OPENAI_API_BASE_URL
         if app.state.config.RAG_EMBEDDING_ENGINE == "openai"
-        else (
-            app.state.config.RAG_OLLAMA_BASE_URL
-            if app.state.config.RAG_EMBEDDING_ENGINE == "ollama"
-            else app.state.config.RAG_AZURE_OPENAI_BASE_URL
-        )
+        else app.state.config.RAG_AZURE_OPENAI_BASE_URL
     ),
     key=(
         app.state.config.RAG_OPENAI_API_KEY
         if app.state.config.RAG_EMBEDDING_ENGINE == "openai"
-        else (
-            app.state.config.RAG_OLLAMA_API_KEY
-            if app.state.config.RAG_EMBEDDING_ENGINE == "ollama"
-            else app.state.config.RAG_AZURE_OPENAI_API_KEY
-        )
+        else app.state.config.RAG_AZURE_OPENAI_API_KEY
     ),
     embedding_batch_size=app.state.config.RAG_EMBEDDING_BATCH_SIZE,
     azure_api_version=(
@@ -1273,7 +1240,6 @@ app.add_middleware(
 app.mount("/ws", socket_app)
 
 
-app.include_router(ollama.router, prefix="/ollama", tags=["ollama"])
 app.include_router(openai.router, prefix="/openai", tags=["openai"])
 
 
@@ -1398,7 +1364,7 @@ async def embeddings(request: Request, form_data: dict, user=Depends(get_verifie
 
     This handler:
       - Performs user/model checks and dispatches to the correct backend.
-      - Supports OpenAI, Ollama, arena models, pipelines, and any compatible provider.
+      - Supports OpenAI, arena models, pipelines, and any compatible provider.
 
     Args:
         request (Request): Request context.
