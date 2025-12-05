@@ -360,6 +360,9 @@
 	onMount(async () => {
 		await showSidebar.set(!$mobile ? localStorage.sidebar === 'true' : false);
 
+		// Initialize data regardless of sidebar visibility
+		await Promise.all([initChannels(), initChatList()]);
+
 		unsubscribers = [
 			mobile.subscribe((value) => {
 				if ($showSidebar && value) {
@@ -389,11 +392,6 @@
 					} else {
 						navElement.style['-webkit-app-region'] = 'drag';
 					}
-				}
-
-				if (value) {
-					await initChannels();
-					await initChatList();
 				}
 			})
 		];
