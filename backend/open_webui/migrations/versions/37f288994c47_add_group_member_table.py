@@ -6,20 +6,19 @@ Create Date: 2025-11-17 03:45:25.123939
 
 """
 
-import uuid
-import time
 import json
-from typing import Sequence, Union
+import time
+import uuid
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "37f288994c47"
-down_revision: Union[str, None] = "a5c220713937"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = "a5c220713937"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -54,9 +53,7 @@ def upgrade() -> None:
         sa.Column("user_ids", sa.JSON()),  # JSON stored as text in SQLite + PG
     )
 
-    results = connection.execute(
-        sa.select(group_table.c.id, group_table.c.user_ids)
-    ).fetchall()
+    results = connection.execute(sa.select(group_table.c.id, group_table.c.user_ids)).fetchall()
 
     print(results)
 
@@ -130,17 +127,11 @@ def downgrade():
     results = connection.execute(sa.select(group_table.c.id)).fetchall()
 
     for (group_id,) in results:
-        members = connection.execute(
-            sa.select(gm_table.c.user_id).where(gm_table.c.group_id == group_id)
-        ).fetchall()
+        members = connection.execute(sa.select(gm_table.c.user_id).where(gm_table.c.group_id == group_id)).fetchall()
 
         member_ids = [m[0] for m in members]
 
-        connection.execute(
-            group_table.update()
-            .where(group_table.c.id == group_id)
-            .values(user_ids=member_ids)
-        )
+        connection.execute(group_table.update().where(group_table.c.id == group_id).values(user_ids=member_ids))
 
     # Drop the new table
     op.drop_table("group_member")

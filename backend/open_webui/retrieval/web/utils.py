@@ -4,42 +4,35 @@ import socket
 import ssl
 import urllib.parse
 import urllib.request
+from collections.abc import AsyncIterator, Iterator, Sequence
 from datetime import datetime, time, timedelta
 from typing import (
     Any,
-    AsyncIterator,
-    Dict,
-    Iterator,
-    List,
-    Optional,
-    Sequence,
-    Union,
     Literal,
 )
 
-from fastapi.concurrency import run_in_threadpool
 import aiohttp
 import certifi
 import validators
+from fastapi.concurrency import run_in_threadpool
 from langchain_community.document_loaders import PlaywrightURLLoader, WebBaseLoader
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_core.documents import Document
-
-from open_webui.retrieval.loaders.tavily import TavilyLoader
-from open_webui.retrieval.loaders.external_web import ExternalWebLoader
-from open_webui.constants import ERROR_MESSAGES
 from open_webui.config import (
     ENABLE_RAG_LOCAL_WEB_FETCH,
-    PLAYWRIGHT_WS_URL,
+    EXTERNAL_WEB_LOADER_API_KEY,
+    EXTERNAL_WEB_LOADER_URL,
     PLAYWRIGHT_TIMEOUT,
-    WEB_LOADER_ENGINE,
+    PLAYWRIGHT_WS_URL,
     TAVILY_API_KEY,
     TAVILY_EXTRACT_DEPTH,
-    EXTERNAL_WEB_LOADER_URL,
-    EXTERNAL_WEB_LOADER_API_KEY,
     WEB_FETCH_FILTER_LIST,
+    WEB_LOADER_ENGINE,
 )
+from open_webui.constants import ERROR_MESSAGES
 from open_webui.env import SRC_LOG_LEVELS
+from open_webui.retrieval.loaders.external_web import ExternalWebLoader
+from open_webui.retrieval.loaders.tavily import TavilyLoader
 from open_webui.utils.misc import is_string_allowed
 
 log = logging.getLogger(__name__)
@@ -57,7 +50,7 @@ def resolve_hostname(hostname):
     return ipv4_addresses, ipv6_addresses
 
 
-def validate_url(url: Union[str, Sequence[str]]):
+def validate_url(url: str | Sequence[str]):
     if isinstance(url, str):
         if isinstance(validators.url(url), validators.ValidationError):
             raise ValueError(ERROR_MESSAGES.INVALID_URL)
@@ -66,9 +59,7 @@ def validate_url(url: Union[str, Sequence[str]]):
 
         # Protocol validation - only allow http/https
         if parsed_url.scheme not in ["http", "https"]:
-            log.warning(
-                f"Blocked non-HTTP(S) protocol: {parsed_url.scheme} in URL: {url}"
-            )
+            log.warning(f"Blocked non-HTTP(S) protocol: {parsed_url.scheme} in URL: {url}")
             raise ValueError(ERROR_MESSAGES.INVALID_URL)
 
         # Blocklist check using unified filtering logic
@@ -91,10 +82,9 @@ def validate_url(url: Union[str, Sequence[str]]):
                 if validators.ipv6(ip, private=True):
                     raise ValueError(ERROR_MESSAGES.INVALID_URL)
         return True
-    elif isinstance(url, Sequence):
+    if isinstance(url, Sequence):
         return all(validate_url(u) for u in url)
-    else:
-        return False
+    return False
 
 
 def safe_validate_urls(url: Sequence[str]) -> Sequence[str]:
@@ -104,7 +94,7 @@ def safe_validate_urls(url: Sequence[str]) -> Sequence[str]:
             if validate_url(u):
                 valid_urls.append(u)
         except Exception as e:
-            log.debug(f"Invalid URL {u}: {str(e)}")
+            log.debug(f"Invalid URL {u}: {e!s}")
             continue
     return valid_urls
 
@@ -134,7 +124,7 @@ def verify_ssl_cert(url: str) -> bool:
     except ssl.SSLError:
         return False
     except Exception as e:
-        log.warning(f"SSL verification failed for {url}: {str(e)}")
+        log.warning(f"SSL verification failed for {url}: {e!s}")
         return False
 
 
@@ -181,14 +171,14 @@ class URLProcessingMixin:
 class SafeTavilyLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
     def __init__(
         self,
-        web_paths: Union[str, List[str]],
+        web_paths: str | list[str],
         api_key: str,
         extract_depth: Literal["basic", "advanced"] = "basic",
         continue_on_failure: bool = True,
-        requests_per_second: Optional[float] = None,
+        requests_per_second: float | None = None,
         verify_ssl: bool = True,
         trust_env: bool = False,
-        proxy: Optional[Dict[str, str]] = None,
+        proxy: dict[str, str] | None = None,
     ):
         """Initialize SafeTavilyLoader with rate limiting and SSL verification support.
 
@@ -201,6 +191,7 @@ class SafeTavilyLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
             verify_ssl: If True, verify SSL certificates.
             trust_env: If True, use proxy settings from environment variables.
             proxy: Optional proxy configuration.
+
         """
         # Initialize proxy configuration if using environment variables
         proxy_server = proxy.get("server") if proxy else None
@@ -234,7 +225,7 @@ class SafeTavilyLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
                 self._safe_process_url_sync(url)
                 valid_urls.append(url)
             except Exception as e:
-                log.warning(f"SSL verification failed for {url}: {str(e)}")
+                log.warning(f"SSL verification failed for {url}: {e!s}")
                 if not self.continue_on_failure:
                     raise e
         if not valid_urls:
@@ -264,7 +255,7 @@ class SafeTavilyLoader(BaseLoader, RateLimitMixin, URLProcessingMixin):
                 await self._safe_process_url(url)
                 valid_urls.append(url)
             except Exception as e:
-                log.warning(f"SSL verification failed for {url}: {str(e)}")
+                log.warning(f"SSL verification failed for {url}: {e!s}")
                 if not self.continue_on_failure:
                     raise e
 
@@ -303,23 +294,23 @@ class SafePlaywrightURLLoader(PlaywrightURLLoader, RateLimitMixin, URLProcessing
         proxy (dict): Proxy override settings for the Playwright session.
         playwright_ws_url (Optional[str]): WebSocket endpoint URI for remote browser connection.
         playwright_timeout (Optional[int]): Maximum operation time in milliseconds.
+
     """
 
     def __init__(
         self,
-        web_paths: List[str],
+        web_paths: list[str],
         verify_ssl: bool = True,
         trust_env: bool = False,
-        requests_per_second: Optional[float] = None,
+        requests_per_second: float | None = None,
         continue_on_failure: bool = True,
         headless: bool = True,
-        remove_selectors: Optional[List[str]] = None,
-        proxy: Optional[Dict[str, str]] = None,
-        playwright_ws_url: Optional[str] = None,
-        playwright_timeout: Optional[int] = 10000,
+        remove_selectors: list[str] | None = None,
+        proxy: dict[str, str] | None = None,
+        playwright_ws_url: str | None = None,
+        playwright_timeout: int | None = 10000,
     ):
         """Initialize with additional safety parameters and remote browser support."""
-
         proxy_server = proxy.get("server") if proxy else None
         if trust_env and not proxy_server:
             env_proxies = urllib.request.getproxies()
@@ -383,9 +374,7 @@ class SafePlaywrightURLLoader(PlaywrightURLLoader, RateLimitMixin, URLProcessing
             if self.playwright_ws_url:
                 browser = await p.chromium.connect(self.playwright_ws_url)
             else:
-                browser = await p.chromium.launch(
-                    headless=self.headless, proxy=self.proxy
-                )
+                browser = await p.chromium.launch(headless=self.headless, proxy=self.proxy)
 
             for url in self.urls:
                 try:
@@ -418,13 +407,11 @@ class SafeWebBaseLoader(WebBaseLoader):
         super().__init__(*args, **kwargs)
         self.trust_env = trust_env
 
-    async def _fetch(
-        self, url: str, retries: int = 3, cooldown: int = 2, backoff: float = 1.5
-    ) -> str:
+    async def _fetch(self, url: str, retries: int = 3, cooldown: int = 2, backoff: float = 1.5) -> str:
         async with aiohttp.ClientSession(trust_env=self.trust_env) as session:
             for i in range(retries):
                 try:
-                    kwargs: Dict = dict(
+                    kwargs: dict = dict(
                         headers=self.session.headers,
                         cookies=self.session.cookies.get_dict(),
                     )
@@ -442,17 +429,11 @@ class SafeWebBaseLoader(WebBaseLoader):
                 except aiohttp.ClientConnectionError as e:
                     if i == retries - 1:
                         raise
-                    else:
-                        log.warning(
-                            f"Error fetching {url} with attempt "
-                            f"{i + 1}/{retries}: {e}. Retrying..."
-                        )
-                        await asyncio.sleep(cooldown * backoff**i)
+                    log.warning(f"Error fetching {url} with attempt {i + 1}/{retries}: {e}. Retrying...")
+                    await asyncio.sleep(cooldown * backoff**i)
         raise ValueError("retry count exceeded")
 
-    def _unpack_fetch_results(
-        self, results: Any, urls: List[str], parser: Union[str, None] = None
-    ) -> List[Any]:
+    def _unpack_fetch_results(self, results: Any, urls: list[str], parser: str | None = None) -> list[Any]:
         """Unpack fetch results into BeautifulSoup objects."""
         from bs4 import BeautifulSoup
 
@@ -468,9 +449,7 @@ class SafeWebBaseLoader(WebBaseLoader):
             final_results.append(BeautifulSoup(result, parser, **self.bs_kwargs))
         return final_results
 
-    async def ascrape_all(
-        self, urls: List[str], parser: Union[str, None] = None
-    ) -> List[Any]:
+    async def ascrape_all(self, urls: list[str], parser: str | None = None) -> list[Any]:
         """Async fetch all urls, then return soups for all results."""
         results = await self.fetch_all(urls)
         return self._unpack_fetch_results(results, urls, parser=parser)
@@ -499,25 +478,22 @@ class SafeWebBaseLoader(WebBaseLoader):
             if title := soup.find("title"):
                 metadata["title"] = title.get_text()
             if description := soup.find("meta", attrs={"name": "description"}):
-                metadata["description"] = description.get(
-                    "content", "No description found."
-                )
+                metadata["description"] = description.get("content", "No description found.")
             if html := soup.find("html"):
                 metadata["language"] = html.get("lang", "No language found.")
             yield Document(page_content=text, metadata=metadata)
 
-    async def aload(self) -> list[Document]:
+    async def aload(self) -> list[Document]:  # type: ignore[override]
         """Load data into Document objects."""
         return [document async for document in self.alazy_load()]
 
 
 def get_web_loader(
-    urls: Union[str, Sequence[str]],
+    urls: str | Sequence[str],
     verify_ssl: bool = True,
     requests_per_second: int = 2,
     trust_env: bool = False,
 ):
-    # Check if the URLs are valid
     safe_urls = safe_validate_urls([urls] if isinstance(urls, str) else urls)
 
     if not safe_urls:
@@ -532,6 +508,7 @@ def get_web_loader(
         "trust_env": trust_env,
     }
 
+    WebLoaderClass: type[BaseLoader] | None = None
     if WEB_LOADER_ENGINE.value == "" or WEB_LOADER_ENGINE.value == "safe_web":
         WebLoaderClass = SafeWebBaseLoader
     if WEB_LOADER_ENGINE.value == "playwright":
@@ -560,8 +537,7 @@ def get_web_loader(
         )
 
         return web_loader
-    else:
-        raise ValueError(
-            f"Invalid WEB_LOADER_ENGINE: {WEB_LOADER_ENGINE.value}. "
-            "Please set it to 'safe_web', 'playwright', 'firecrawl', or 'tavily'."
-        )
+    raise ValueError(
+        f"Invalid WEB_LOADER_ENGINE: {WEB_LOADER_ENGINE.value}. "
+        "Please set it to 'safe_web', 'playwright', 'firecrawl', or 'tavily'."
+    )

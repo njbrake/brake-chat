@@ -1,49 +1,39 @@
-import logging
-from typing import Optional
 import base64
 import io
-
+import logging
+from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import Response, StreamingResponse, FileResponse
-from pydantic import BaseModel
-
-
+from fastapi.responses import FileResponse, Response, StreamingResponse
+from open_webui.constants import ERROR_MESSAGES
+from open_webui.env import SRC_LOG_LEVELS, STATIC_DIR
 from open_webui.models.auths import Auths
-from open_webui.models.oauth_sessions import OAuthSessions
-
-from open_webui.models.groups import Groups
 from open_webui.models.chats import Chats
+from open_webui.models.groups import Groups
+from open_webui.models.oauth_sessions import OAuthSessions
 from open_webui.models.users import (
-    UserModel,
-    UserGroupIdsModel,
     UserGroupIdsListResponse,
-    UserInfoListResponse,
+    UserGroupIdsModel,
     UserIdNameListResponse,
-    UserRoleUpdateForm,
+    UserInfoListResponse,
+    UserModel,
     Users,
     UserSettings,
     UserUpdateForm,
 )
-
-
 from open_webui.socket.main import (
     get_active_status_by_user_id,
     get_active_user_ids,
     get_user_active_status,
 )
-from open_webui.constants import ERROR_MESSAGES
-from open_webui.env import SRC_LOG_LEVELS, STATIC_DIR
-
-
+from open_webui.utils.access_control import get_permissions, has_permission
 from open_webui.utils.auth import (
     get_admin_user,
     get_password_hash,
     get_verified_user,
     validate_password,
 )
-from open_webui.utils.access_control import get_permissions, has_permission
-
+from pydantic import BaseModel
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["MODELS"])
@@ -60,9 +50,7 @@ router = APIRouter()
 async def get_active_users(
     user=Depends(get_verified_user),
 ):
-    """
-    Get a list of active users.
-    """
+    """Get a list of active users."""
     return {
         "user_ids": get_active_user_ids(),
     }
@@ -78,10 +66,10 @@ PAGE_ITEM_COUNT = 30
 
 @router.get("/", response_model=UserGroupIdsListResponse)
 async def get_users(
-    query: Optional[str] = None,
-    order_by: Optional[str] = None,
-    direction: Optional[str] = None,
-    page: Optional[int] = 1,
+    query: str | None = None,
+    order_by: str | None = None,
+    direction: str | None = None,
+    page: int | None = 1,
     user=Depends(get_admin_user),
 ):
     limit = PAGE_ITEM_COUNT
@@ -107,9 +95,7 @@ async def get_users(
             UserGroupIdsModel(
                 **{
                     **user.model_dump(),
-                    "group_ids": [
-                        group.id for group in Groups.get_groups_by_member_id(user.id)
-                    ],
+                    "group_ids": [group.id for group in Groups.get_groups_by_member_id(user.id)],
                 }
             )
             for user in users
@@ -127,7 +113,7 @@ async def get_all_users(
 
 @router.get("/search", response_model=UserIdNameListResponse)
 async def search_users(
-    query: Optional[str] = None,
+    query: str | None = None,
     user=Depends(get_verified_user),
 ):
     limit = PAGE_ITEM_COUNT
@@ -159,9 +145,7 @@ async def get_user_groups(user=Depends(get_verified_user)):
 
 @router.get("/permissions")
 async def get_user_permissisions(request: Request, user=Depends(get_verified_user)):
-    user_permissions = get_permissions(
-        user.id, request.app.state.config.USER_PERMISSIONS
-    )
+    user_permissions = get_permissions(user.id, request.app.state.config.USER_PERMISSIONS)
 
     return user_permissions
 
@@ -236,25 +220,15 @@ class UserPermissions(BaseModel):
 @router.get("/default/permissions", response_model=UserPermissions)
 async def get_default_user_permissions(request: Request, user=Depends(get_admin_user)):
     return {
-        "workspace": WorkspacePermissions(
-            **request.app.state.config.USER_PERMISSIONS.get("workspace", {})
-        ),
-        "sharing": SharingPermissions(
-            **request.app.state.config.USER_PERMISSIONS.get("sharing", {})
-        ),
-        "chat": ChatPermissions(
-            **request.app.state.config.USER_PERMISSIONS.get("chat", {})
-        ),
-        "features": FeaturesPermissions(
-            **request.app.state.config.USER_PERMISSIONS.get("features", {})
-        ),
+        "workspace": WorkspacePermissions(**request.app.state.config.USER_PERMISSIONS.get("workspace", {})),
+        "sharing": SharingPermissions(**request.app.state.config.USER_PERMISSIONS.get("sharing", {})),
+        "chat": ChatPermissions(**request.app.state.config.USER_PERMISSIONS.get("chat", {})),
+        "features": FeaturesPermissions(**request.app.state.config.USER_PERMISSIONS.get("features", {})),
     }
 
 
 @router.post("/default/permissions")
-async def update_default_user_permissions(
-    request: Request, form_data: UserPermissions, user=Depends(get_admin_user)
-):
+async def update_default_user_permissions(request: Request, form_data: UserPermissions, user=Depends(get_admin_user)):
     request.app.state.config.USER_PERMISSIONS = form_data.model_dump()
     return request.app.state.config.USER_PERMISSIONS
 
@@ -269,11 +243,10 @@ async def get_user_settings_by_session_user(user=Depends(get_verified_user)):
     user = Users.get_user_by_id(user.id)
     if user:
         return user.settings
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ERROR_MESSAGES.USER_NOT_FOUND,
-        )
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=ERROR_MESSAGES.USER_NOT_FOUND,
+    )
 
 
 ############################
@@ -301,11 +274,10 @@ async def update_user_settings_by_session_user(
     user = Users.update_user_settings_by_id(user.id, updated_user_settings)
     if user:
         return user.settings
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ERROR_MESSAGES.USER_NOT_FOUND,
-        )
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=ERROR_MESSAGES.USER_NOT_FOUND,
+    )
 
 
 ############################
@@ -318,11 +290,10 @@ async def get_user_info_by_session_user(user=Depends(get_verified_user)):
     user = Users.get_user_by_id(user.id)
     if user:
         return user.info
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ERROR_MESSAGES.USER_NOT_FOUND,
-        )
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=ERROR_MESSAGES.USER_NOT_FOUND,
+    )
 
 
 ############################
@@ -331,9 +302,7 @@ async def get_user_info_by_session_user(user=Depends(get_verified_user)):
 
 
 @router.post("/user/info/update", response_model=Optional[dict])
-async def update_user_info_by_session_user(
-    form_data: dict, user=Depends(get_verified_user)
-):
+async def update_user_info_by_session_user(form_data: dict, user=Depends(get_verified_user)):
     user = Users.get_user_by_id(user.id)
     if user:
         if user.info is None:
@@ -342,16 +311,14 @@ async def update_user_info_by_session_user(
         user = Users.update_user_by_id(user.id, {"info": {**user.info, **form_data}})
         if user:
             return user.info
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=ERROR_MESSAGES.USER_NOT_FOUND,
-            )
-    else:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=ERROR_MESSAGES.USER_NOT_FOUND,
         )
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=ERROR_MESSAGES.USER_NOT_FOUND,
+    )
 
 
 ############################
@@ -362,7 +329,7 @@ async def update_user_info_by_session_user(
 class UserResponse(BaseModel):
     name: str
     profile_image_url: str
-    active: Optional[bool] = None
+    active: bool | None = None
 
 
 @router.get("/{user_id}", response_model=UserResponse)
@@ -384,17 +351,14 @@ async def get_user_by_id(user_id: str, user=Depends(get_verified_user)):
 
     if user:
         return UserResponse(
-            **{
-                "name": user.name,
-                "profile_image_url": user.profile_image_url,
-                "active": get_active_status_by_user_id(user_id),
-            }
+            name=user.name,
+            profile_image_url=user.profile_image_url,
+            active=get_active_status_by_user_id(user_id),
         )
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ERROR_MESSAGES.USER_NOT_FOUND,
-        )
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=ERROR_MESSAGES.USER_NOT_FOUND,
+    )
 
 
 @router.get("/{user_id}/oauth/sessions")
@@ -402,11 +366,10 @@ async def get_user_oauth_sessions_by_id(user_id: str, user=Depends(get_admin_use
     sessions = OAuthSessions.get_sessions_by_user_id(user_id)
     if sessions and len(sessions) > 0:
         return sessions
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ERROR_MESSAGES.USER_NOT_FOUND,
-        )
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=ERROR_MESSAGES.USER_NOT_FOUND,
+    )
 
 
 ############################
@@ -425,7 +388,7 @@ async def get_user_profile_image_by_id(user_id: str, user=Depends(get_verified_u
                     status_code=status.HTTP_302_FOUND,
                     headers={"Location": user.profile_image_url},
                 )
-            elif user.profile_image_url.startswith("data:image"):
+            if user.profile_image_url.startswith("data:image"):
                 try:
                     header, base64_data = user.profile_image_url.split(",", 1)
                     image_data = base64.b64decode(base64_data)
@@ -436,14 +399,13 @@ async def get_user_profile_image_by_id(user_id: str, user=Depends(get_verified_u
                         media_type="image/png",
                         headers={"Content-Disposition": "inline; filename=image.png"},
                     )
-                except Exception as e:
+                except Exception:
                     pass
         return FileResponse(f"{STATIC_DIR}/user.png")
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ERROR_MESSAGES.USER_NOT_FOUND,
-        )
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail=ERROR_MESSAGES.USER_NOT_FOUND,
+    )
 
 
 ############################

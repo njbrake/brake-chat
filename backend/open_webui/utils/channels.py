@@ -11,13 +11,13 @@ def extract_mentions(message: str, triggerChar: str = "@"):
 
 
 def replace_mentions(message: str, triggerChar: str = "@", use_label: bool = True):
-    """
-    Replace mentions in the message with either their label (after the pipe `|`)
+    """Replace mentions in the message with either their label (after the pipe `|`)
     or their id if no label exists.
 
     Example:
       "<@M:gpt-4.1|GPT-4>" -> "GPT-4"   (if use_label=True)
       "<@M:gpt-4.1|GPT-4>" -> "gpt-4.1" (if use_label=False)
+
     """
     # Escape triggerChar
     triggerChar = re.escape(triggerChar)

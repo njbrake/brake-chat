@@ -2,32 +2,26 @@ import asyncio
 import json
 import logging
 import uuid
-from typing import Optional
 
 import aiohttp
 import websockets
-from pydantic import BaseModel
-
 from open_webui.env import SRC_LOG_LEVELS
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 logger.setLevel(SRC_LOG_LEVELS["MAIN"])
 
 
 class ResultModel(BaseModel):
-    """
-    Execute Code Result Model
-    """
+    """Execute Code Result Model"""
 
-    stdout: Optional[str] = ""
-    stderr: Optional[str] = ""
-    result: Optional[str] = ""
+    stdout: str | None = ""
+    stderr: str | None = ""
+    result: str | None = ""
 
 
 class JupyterCodeExecuter:
-    """
-    Execute code in jupyter notebook
-    """
+    """Execute code in jupyter notebook"""
 
     def __init__(
         self,
@@ -37,8 +31,7 @@ class JupyterCodeExecuter:
         password: str = "",
         timeout: int = 60,
     ):
-        """
-        :param base_url: Jupyter server URL (e.g., "http://localhost:8888")
+        """:param base_url: Jupyter server URL (e.g., "http://localhost:8888")
         :param code: Code to execute
         :param token: Jupyter authentication token (optional)
         :param password: Jupyter password (optional)
@@ -62,9 +55,7 @@ class JupyterCodeExecuter:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.kernel_id:
             try:
-                async with self.session.delete(
-                    f"api/kernels/{self.kernel_id}", params=self.params
-                ) as response:
+                async with self.session.delete(f"api/kernels/{self.kernel_id}", params=self.params) as response:
                     response.raise_for_status()
             except Exception as err:
                 logger.exception("close kernel failed, %s", err)
@@ -115,12 +106,7 @@ class JupyterCodeExecuter:
         ws_headers = {}
         if self.password and not self.token:
             ws_headers = {
-                "Cookie": "; ".join(
-                    [
-                        f"{cookie.key}={cookie.value}"
-                        for cookie in self.session.cookie_jar
-                    ]
-                ),
+                "Cookie": "; ".join([f"{cookie.key}={cookie.value}" for cookie in self.session.cookie_jar]),
                 **self.session.headers,
             }
         return websocket_url, ws_headers
@@ -129,9 +115,7 @@ class JupyterCodeExecuter:
         # initialize ws
         websocket_url, ws_headers = self.init_ws()
         # execute
-        async with websockets.connect(
-            websocket_url, additional_headers=ws_headers
-        ) as ws:
+        async with websockets.connect(websocket_url, additional_headers=ws_headers) as ws:
             await self.execute_in_jupyter(ws)
 
     async def execute_in_jupyter(self, ws) -> None:
@@ -192,7 +176,7 @@ class JupyterCodeExecuter:
                         if message_data["content"]["execution_state"] == "idle":
                             break
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 stderr += "\nExecution timed out."
                 break
         self.result.stdout = stdout.strip()
@@ -203,8 +187,6 @@ class JupyterCodeExecuter:
 async def execute_code_jupyter(
     base_url: str, code: str, token: str = "", password: str = "", timeout: int = 60
 ) -> dict:
-    async with JupyterCodeExecuter(
-        base_url, code, token, password, timeout
-    ) as executor:
+    async with JupyterCodeExecuter(base_url, code, token, password, timeout) as executor:
         result = await executor.run()
         return result.model_dump()

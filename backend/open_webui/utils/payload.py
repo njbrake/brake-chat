@@ -1,19 +1,19 @@
-from open_webui.utils.task import prompt_template, prompt_variables_template
+import json
+from collections.abc import Callable
+
 from open_webui.utils.misc import (
-    deep_update,
     add_or_update_system_message,
+    deep_update,
     replace_system_message_content,
 )
-
-from typing import Callable, Optional
-import json
+from open_webui.utils.task import prompt_template, prompt_variables_template
 
 
 # inplace function: form_data is modified
 def apply_system_prompt_to_body(
-    system: Optional[str],
+    system: str | None,
     form_data: dict,
-    metadata: Optional[dict] = None,
+    metadata: dict | None = None,
     user=None,
     replace: bool = False,
 ) -> dict:
@@ -30,21 +30,15 @@ def apply_system_prompt_to_body(
     system = prompt_template(system, user)
 
     if replace:
-        form_data["messages"] = replace_system_message_content(
-            system, form_data.get("messages", [])
-        )
+        form_data["messages"] = replace_system_message_content(system, form_data.get("messages", []))
     else:
-        form_data["messages"] = add_or_update_system_message(
-            system, form_data.get("messages", [])
-        )
+        form_data["messages"] = add_or_update_system_message(system, form_data.get("messages", []))
 
     return form_data
 
 
 # inplace function: form_data is modified
-def apply_model_params_to_body(
-    params: dict, form_data: dict, mappings: dict[str, Callable]
-) -> dict:
+def apply_model_params_to_body(params: dict, form_data: dict, mappings: dict[str, Callable]) -> dict:
     if not params:
         return form_data
 
@@ -61,14 +55,14 @@ def apply_model_params_to_body(
 
 
 def remove_open_webui_params(params: dict) -> dict:
-    """
-    Removes OpenWebUI specific parameters from the provided dictionary.
+    """Removes OpenWebUI specific parameters from the provided dictionary.
 
     Args:
         params (dict): The dictionary containing parameters.
 
     Returns:
         dict: The modified dictionary with OpenWebUI parameters removed.
+
     """
     open_webui_params = {
         "stream_response": bool,
@@ -175,12 +169,10 @@ def apply_model_params_to_body_ollama(params: dict, form_data: dict) -> dict:
     }
 
     def parse_json(value: str) -> dict:
-        """
-        Parses a JSON string into a dictionary, handling potential JSONDecodeError.
-        """
+        """Parses a JSON string into a dictionary, handling potential JSONDecodeError."""
         try:
             return json.loads(value)
-        except Exception as e:
+        except Exception:
             return value
 
     ollama_root_params = {
@@ -196,9 +188,7 @@ def apply_model_params_to_body_ollama(params: dict, form_data: dict) -> dict:
             del params[key]
 
     # Unlike OpenAI, Ollama does not support params directly in the body
-    form_data["options"] = apply_model_params_to_body(
-        params, (form_data.get("options", {}) or {}), mappings
-    )
+    form_data["options"] = apply_model_params_to_body(params, (form_data.get("options", {}) or {}), mappings)
     return form_data
 
 
@@ -231,9 +221,7 @@ def convert_messages_openai_to_ollama(messages: list[dict]) -> list[dict]:
                     "id": tool_call.get("id", None),
                     "function": {
                         "name": tool_call.get("function", {}).get("name", ""),
-                        "arguments": json.loads(
-                            tool_call.get("function", {}).get("arguments", {})
-                        ),
+                        "arguments": json.loads(tool_call.get("function", {}).get("arguments", {})),
                     },
                 }
                 ollama_tool_calls.append(ollama_tool_call)
@@ -277,22 +265,20 @@ def convert_messages_openai_to_ollama(messages: list[dict]) -> list[dict]:
 
 
 def convert_payload_openai_to_ollama(openai_payload: dict) -> dict:
-    """
-    Converts a payload formatted for OpenAI's API to be compatible with Ollama's API endpoint for chat completions.
+    """Converts a payload formatted for OpenAI's API to be compatible with Ollama's API endpoint for chat completions.
 
     Args:
         openai_payload (dict): The payload originally designed for OpenAI API usage.
 
     Returns:
         dict: A modified payload compatible with the Ollama API.
+
     """
     ollama_payload = {}
 
     # Mapping basic model and message details
     ollama_payload["model"] = openai_payload.get("model")
-    ollama_payload["messages"] = convert_messages_openai_to_ollama(
-        openai_payload.get("messages")
-    )
+    ollama_payload["messages"] = convert_messages_openai_to_ollama(openai_payload.get("messages"))
     ollama_payload["stream"] = openai_payload.get("stream", False)
     if "tools" in openai_payload:
         ollama_payload["tools"] = openai_payload["tools"]
@@ -307,12 +293,10 @@ def convert_payload_openai_to_ollama(openai_payload: dict) -> dict:
         ollama_options = openai_payload["options"]
 
         def parse_json(value: str) -> dict:
-            """
-            Parses a JSON string into a dictionary, handling potential JSONDecodeError.
-            """
+            """Parses a JSON string into a dictionary, handling potential JSONDecodeError."""
             try:
                 return json.loads(value)
-            except Exception as e:
+            except Exception:
                 return value
 
         ollama_root_params = {
@@ -363,14 +347,14 @@ def convert_payload_openai_to_ollama(openai_payload: dict) -> dict:
 
 
 def convert_embedding_payload_openai_to_ollama(openai_payload: dict) -> dict:
-    """
-    Convert an embeddings request payload from OpenAI format to Ollama format.
+    """Convert an embeddings request payload from OpenAI format to Ollama format.
 
     Args:
         openai_payload (dict): The original payload designed for OpenAI API usage.
 
     Returns:
         dict: A payload compatible with the Ollama API embeddings endpoint.
+
     """
     ollama_payload = {"model": openai_payload.get("model")}
     input_value = openai_payload.get("input")

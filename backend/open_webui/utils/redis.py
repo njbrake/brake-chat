@@ -1,10 +1,8 @@
 import inspect
+import logging
 from urllib.parse import urlparse
 
-import logging
-
 import redis
-
 from open_webui.env import REDIS_SENTINEL_MAX_RETRY_COUNT
 
 log = logging.getLogger(__name__)
@@ -65,33 +63,31 @@ class SentinelRedisProxy:
 
             return _wrapped
 
-        else:
-
-            def _wrapped(*args, **kwargs):
-                for i in range(REDIS_SENTINEL_MAX_RETRY_COUNT):
-                    try:
-                        method = getattr(self._master(), item)
-                        return method(*args, **kwargs)
-                    except (
-                        redis.exceptions.ConnectionError,
-                        redis.exceptions.ReadOnlyError,
-                    ) as e:
-                        if i < REDIS_SENTINEL_MAX_RETRY_COUNT - 1:
-                            log.debug(
-                                "Redis sentinel fail-over (%s). Retry %s/%s",
-                                type(e).__name__,
-                                i + 1,
-                                REDIS_SENTINEL_MAX_RETRY_COUNT,
-                            )
-                            continue
-                        log.error(
-                            "Redis operation failed after %s retries: %s",
+        def _wrapped(*args, **kwargs):
+            for i in range(REDIS_SENTINEL_MAX_RETRY_COUNT):
+                try:
+                    method = getattr(self._master(), item)
+                    return method(*args, **kwargs)
+                except (
+                    redis.exceptions.ConnectionError,
+                    redis.exceptions.ReadOnlyError,
+                ) as e:
+                    if i < REDIS_SENTINEL_MAX_RETRY_COUNT - 1:
+                        log.debug(
+                            "Redis sentinel fail-over (%s). Retry %s/%s",
+                            type(e).__name__,
+                            i + 1,
                             REDIS_SENTINEL_MAX_RETRY_COUNT,
-                            e,
                         )
-                        raise e from e
+                        continue
+                    log.error(
+                        "Redis operation failed after %s retries: %s",
+                        REDIS_SENTINEL_MAX_RETRY_COUNT,
+                        e,
+                    )
+                    raise e from e
 
-            return _wrapped
+        return _wrapped
 
 
 def parse_redis_service_url(redis_url):
@@ -115,7 +111,6 @@ def get_redis_connection(
     async_mode=False,
     decode_responses=True,
 ):
-
     cache_key = (
         redis_url,
         tuple(redis_sentinels) if redis_sentinels else (),
@@ -150,9 +145,7 @@ def get_redis_connection(
         elif redis_cluster:
             if not redis_url:
                 raise ValueError("Redis URL must be provided for cluster mode.")
-            return redis.cluster.RedisCluster.from_url(
-                redis_url, decode_responses=decode_responses
-            )
+            return redis.cluster.RedisCluster.from_url(redis_url, decode_responses=decode_responses)
         elif redis_url:
             connection = redis.from_url(redis_url, decode_responses=decode_responses)
     else:
@@ -176,13 +169,9 @@ def get_redis_connection(
         elif redis_cluster:
             if not redis_url:
                 raise ValueError("Redis URL must be provided for cluster mode.")
-            return redis.cluster.RedisCluster.from_url(
-                redis_url, decode_responses=decode_responses
-            )
+            return redis.cluster.RedisCluster.from_url(redis_url, decode_responses=decode_responses)
         elif redis_url:
-            connection = redis.Redis.from_url(
-                redis_url, decode_responses=decode_responses
-            )
+            connection = redis.Redis.from_url(redis_url, decode_responses=decode_responses)
 
     _CONNECTION_CACHE[cache_key] = connection
     return connection
@@ -203,7 +192,5 @@ def get_sentinel_url_from_env(redis_url, sentinel_hosts_env, sentinel_port_env):
     auth_part = ""
     if username or password:
         auth_part = f"{username}:{password}@"
-    hosts_part = ",".join(
-        f"{host}:{sentinel_port_env}" for host in sentinel_hosts_env.split(",")
-    )
+    hosts_part = ",".join(f"{host}:{sentinel_port_env}" for host in sentinel_hosts_env.split(","))
     return f"redis+sentinel://{auth_part}{hosts_part}/{redis_config['db']}/{redis_config['service']}"

@@ -1,21 +1,18 @@
 # tasks.py
 import asyncio
-from typing import Dict
-from uuid import uuid4
 import json
 import logging
+from uuid import uuid4
+
 from redis.asyncio import Redis
-from fastapi import Request
-from typing import Dict, List, Optional
 
-from open_webui.env import SRC_LOG_LEVELS, REDIS_KEY_PREFIX
-
+from open_webui.env import REDIS_KEY_PREFIX, SRC_LOG_LEVELS
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["MAIN"])
 
 # A dictionary to keep track of active tasks
-tasks: Dict[str, asyncio.Task] = {}
+tasks: dict[str, asyncio.Task] = {}
 item_tasks = {}
 
 
@@ -48,7 +45,7 @@ async def redis_task_command_listener(app):
 ### ------------------------------
 
 
-async def redis_save_task(redis: Redis, task_id: str, item_id: Optional[str]):
+async def redis_save_task(redis: Redis, task_id: str, item_id: str | None):
     pipe = redis.pipeline()
     pipe.hset(REDIS_TASKS_KEY, task_id, item_id or "")
     if item_id:
@@ -56,7 +53,7 @@ async def redis_save_task(redis: Redis, task_id: str, item_id: Optional[str]):
     await pipe.execute()
 
 
-async def redis_cleanup_task(redis: Redis, task_id: str, item_id: Optional[str]):
+async def redis_cleanup_task(redis: Redis, task_id: str, item_id: str | None):
     pipe = redis.pipeline()
     pipe.hdel(REDIS_TASKS_KEY, task_id)
     if item_id:
@@ -66,11 +63,11 @@ async def redis_cleanup_task(redis: Redis, task_id: str, item_id: Optional[str])
     await pipe.execute()
 
 
-async def redis_list_tasks(redis: Redis) -> List[str]:
+async def redis_list_tasks(redis: Redis) -> list[str]:
     return list(await redis.hkeys(REDIS_TASKS_KEY))
 
 
-async def redis_list_item_tasks(redis: Redis, item_id: str) -> List[str]:
+async def redis_list_item_tasks(redis: Redis, item_id: str) -> list[str]:
     return list(await redis.smembers(f"{REDIS_ITEM_TASKS_KEY}:{item_id}"))
 
 
@@ -79,9 +76,7 @@ async def redis_send_command(redis: Redis, command: dict):
 
 
 async def cleanup_task(redis, task_id: str, id=None):
-    """
-    Remove a completed or canceled task from the global `tasks` dictionary.
-    """
+    """Remove a completed or canceled task from the global `tasks` dictionary."""
     if redis:
         await redis_cleanup_task(redis, task_id, id)
 
@@ -95,16 +90,12 @@ async def cleanup_task(redis, task_id: str, id=None):
 
 
 async def create_task(redis, coroutine, id=None):
-    """
-    Create a new asyncio task and add it to the global task dictionary.
-    """
+    """Create a new asyncio task and add it to the global task dictionary."""
     task_id = str(uuid4())  # Generate a unique ID for the task
     task = asyncio.create_task(coroutine)  # Create the task
 
     # Add a done callback for cleanup
-    task.add_done_callback(
-        lambda t: asyncio.create_task(cleanup_task(redis, task_id, id))
-    )
+    task.add_done_callback(lambda t: asyncio.create_task(cleanup_task(redis, task_id, id)))
     tasks[task_id] = task
 
     # If an ID is provided, associate the task with that ID
@@ -120,27 +111,21 @@ async def create_task(redis, coroutine, id=None):
 
 
 async def list_tasks(redis):
-    """
-    List all currently active task IDs.
-    """
+    """List all currently active task IDs."""
     if redis:
         return await redis_list_tasks(redis)
     return list(tasks.keys())
 
 
 async def list_task_ids_by_item_id(redis, id):
-    """
-    List all tasks associated with a specific ID.
-    """
+    """List all tasks associated with a specific ID."""
     if redis:
         return await redis_list_item_tasks(redis, id)
     return item_tasks.get(id, [])
 
 
 async def stop_task(redis, task_id: str):
-    """
-    Cancel a running task and remove it from the global task list.
-    """
+    """Cancel a running task and remove it from the global task list."""
     if redis:
         # PUBSUB: All instances check if they have this task, and stop if so.
         await redis_send_command(
@@ -171,9 +156,7 @@ async def stop_task(redis, task_id: str):
 
 
 async def stop_item_tasks(redis: Redis, item_id: str):
-    """
-    Stop all tasks associated with a specific item ID.
-    """
+    """Stop all tasks associated with a specific item ID."""
     task_ids = await list_task_ids_by_item_id(redis, item_id)
     if not task_ids:
         return {"status": True, "message": f"No tasks found for item {item_id}."}
