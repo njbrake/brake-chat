@@ -178,11 +178,15 @@
 	};
 
 	const initChannels = async () => {
-		await channels.set(await getChannels(localStorage.token));
+		try {
+			await channels.set(await getChannels(localStorage.token));
+		} catch (error) {
+			console.error('Failed to load channels:', error);
+			await channels.set([]);
+		}
 	};
 
 	const initChatList = async () => {
-		// Reset pagination variables
 		console.log('initChatList');
 		currentChatPage.set(1);
 		allChatsLoaded = false;
@@ -190,24 +194,38 @@
 
 		initFolders();
 		await Promise.all([
-			await (async () => {
+			(async () => {
 				console.log('Init tags');
-				const _tags = await getAllChatTags(localStorage.token);
-				tags.set(_tags);
+				try {
+					const _tags = await getAllChatTags(localStorage.token);
+					tags.set(_tags);
+				} catch (error) {
+					console.error('Failed to load tags:', error);
+					tags.set([]);
+				}
 			})(),
-			await (async () => {
+			(async () => {
 				console.log('Init pinned chats');
-				const _pinnedChats = await getPinnedChats(localStorage.token);
-				pinnedChats.set(_pinnedChats);
+				try {
+					const _pinnedChats = await getPinnedChats(localStorage.token);
+					pinnedChats.set(_pinnedChats);
+				} catch (error) {
+					console.error('Failed to load pinned chats:', error);
+					pinnedChats.set([]);
+				}
 			})(),
-			await (async () => {
+			(async () => {
 				console.log('Init chat list');
-				const _chats = await getChatList(localStorage.token, $currentChatPage);
-				await chats.set(_chats);
+				try {
+					const _chats = await getChatList(localStorage.token, $currentChatPage);
+					await chats.set(_chats);
+				} catch (error) {
+					console.error('Failed to load chats:', error);
+					await chats.set([]);
+				}
 			})()
 		]);
 
-		// Enable pagination
 		scrollPaginationEnabled.set(true);
 	};
 
@@ -216,13 +234,14 @@
 
 		currentChatPage.set($currentChatPage + 1);
 
-		let newChatList = [];
-
-		newChatList = await getChatList(localStorage.token, $currentChatPage);
-
-		// once the bottom of the list has been reached (no results) there is no need to continue querying
-		allChatsLoaded = newChatList.length === 0;
-		await chats.set([...($chats ? $chats : []), ...newChatList]);
+		try {
+			let newChatList = await getChatList(localStorage.token, $currentChatPage);
+			allChatsLoaded = newChatList.length === 0;
+			await chats.set([...($chats ? $chats : []), ...newChatList]);
+		} catch (error) {
+			console.error('Failed to load more chats:', error);
+			allChatsLoaded = true;
+		}
 
 		chatListLoading = false;
 	};
