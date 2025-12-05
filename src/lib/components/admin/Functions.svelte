@@ -161,14 +161,18 @@
 			functions = functions.filter((f) => f.id !== func.id);
 
 			_functions.set(await getFunctions(localStorage.token));
-			models.set(
-				await getModels(
-					localStorage.token,
-					$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null),
-					false,
-					true
-				)
-			);
+			try {
+				models.set(
+					await getModels(
+						localStorage.token,
+						$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null),
+						false,
+						true
+					)
+				);
+			} catch (error) {
+				console.error('Failed to refresh models list:', error);
+			}
 		}
 	};
 
@@ -189,14 +193,18 @@
 			}
 
 			_functions.set(await getFunctions(localStorage.token));
-			models.set(
-				await getModels(
-					localStorage.token,
-					$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null),
-					false,
-					true
-				)
-			);
+			try {
+				models.set(
+					await getModels(
+						localStorage.token,
+						$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null),
+						false,
+						true
+					)
+				);
+			} catch (error) {
+				console.error('Failed to refresh models list:', error);
+			}
 		}
 	};
 

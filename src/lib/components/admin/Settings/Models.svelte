@@ -135,12 +135,16 @@
 		}
 		await init();
 
-		_models.set(
-			await getModels(
-				localStorage.token,
-				$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
-			)
-		);
+		try {
+			_models.set(
+				await getModels(
+					localStorage.token,
+					$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
+				)
+			);
+		} catch (error) {
+			console.error('Failed to refresh models list:', error);
+		}
 	};
 
 	const toggleModelHandler = async (model) => {
@@ -161,12 +165,16 @@
 		}
 
 		// await init();
-		_models.set(
-			await getModels(
-				localStorage.token,
-				$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
-			)
-		);
+		try {
+			_models.set(
+				await getModels(
+					localStorage.token,
+					$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
+				)
+			);
+		} catch (error) {
+			console.error('Failed to refresh models list:', error);
+		}
 	};
 
 	const hideModelHandler = async (model) => {

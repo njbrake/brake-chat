@@ -520,7 +520,11 @@
 	const saveSettings = async (updated) => {
 		console.log(updated);
 		await settings.set({ ...$settings, ...updated });
-		await models.set(await getModels());
+		try {
+			await models.set(await getModels());
+		} catch (error) {
+			console.error('Failed to refresh models list:', error);
+		}
 		await updateUserSettings(localStorage.token, { ui: $settings });
 	};
 

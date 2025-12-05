@@ -7,12 +7,17 @@
 	onMount(async () => {
 		await Promise.all([
 			(async () => {
-				models.set(
-					await getModels(
-						localStorage.token,
-						$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
-					)
-				);
+				try {
+					models.set(
+						await getModels(
+							localStorage.token,
+							$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
+						)
+					);
+				} catch (error) {
+					console.error('Failed to load models:', error);
+					models.set([]);
+				}
 			})()
 		]);
 	});

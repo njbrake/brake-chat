@@ -27,12 +27,16 @@
 
 		if (evaluationConfig) {
 			toast.success($i18n.t('Settings saved successfully!'));
-			models.set(
-				await getModels(
-					localStorage.token,
-					$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
-				)
-			);
+			try {
+				models.set(
+					await getModels(
+						localStorage.token,
+						$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
+					)
+				);
+			} catch (error) {
+				console.error('Failed to refresh models list:', error);
+			}
 		}
 	};
 
@@ -41,12 +45,16 @@
 		evaluationConfig.EVALUATION_ARENA_MODELS = [...evaluationConfig.EVALUATION_ARENA_MODELS];
 
 		await submitHandler();
-		models.set(
-			await getModels(
-				localStorage.token,
-				$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
-			)
-		);
+		try {
+			models.set(
+				await getModels(
+					localStorage.token,
+					$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
+				)
+			);
+		} catch (error) {
+			console.error('Failed to refresh models list:', error);
+		}
 	};
 
 	const editModelHandler = async (model, modelIdx) => {
@@ -54,12 +62,16 @@
 		evaluationConfig.EVALUATION_ARENA_MODELS = [...evaluationConfig.EVALUATION_ARENA_MODELS];
 
 		await submitHandler();
-		models.set(
-			await getModels(
-				localStorage.token,
-				$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
-			)
-		);
+		try {
+			models.set(
+				await getModels(
+					localStorage.token,
+					$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
+				)
+			);
+		} catch (error) {
+			console.error('Failed to refresh models list:', error);
+		}
 	};
 
 	const deleteModelHandler = async (modelIdx) => {
@@ -68,12 +80,16 @@
 		);
 
 		await submitHandler();
-		models.set(
-			await getModels(
-				localStorage.token,
-				$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
-			)
-		);
+		try {
+			models.set(
+				await getModels(
+					localStorage.token,
+					$config?.features?.enable_direct_connections && ($settings?.directConnections ?? null)
+				)
+			);
+		} catch (error) {
+			console.error('Failed to refresh models list:', error);
+		}
 	};
 
 	onMount(async () => {

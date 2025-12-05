@@ -74,7 +74,11 @@
 
 			if (res) {
 				toast.success($i18n.t('OpenAI API settings updated'));
-				await models.set(await getModels());
+				try {
+					await models.set(await getModels());
+				} catch (error) {
+					console.error('Failed to refresh models list:', error);
+				}
 			}
 		}
 	};
@@ -86,8 +90,12 @@
 
 		if (res) {
 			toast.success($i18n.t('Connections settings updated'));
-			await models.set(await getModels());
-			await config.set(await getBackendConfig());
+			try {
+				await models.set(await getModels());
+				await config.set(await getBackendConfig());
+			} catch (error) {
+				console.error('Failed to refresh models/config:', error);
+			}
 		}
 	};
 
