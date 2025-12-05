@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getAllTags } from '$lib/apis/chats';
+	import { getAllChatTags } from '$lib/apis/chats';
 	import { folders, tags } from '$lib/stores';
 	import { getContext, createEventDispatcher, onMount, onDestroy, tick } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -188,7 +188,7 @@
 	const initTags = async () => {
 		loading = true;
 
-		await tags.set(await getAllTags(localStorage.token));
+		await tags.set(await getAllChatTags(localStorage.token));
 		loading = false;
 	};
 

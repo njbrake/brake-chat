@@ -42,7 +42,7 @@
 
 	import { executeToolServer, getBackendConfig, getVersion } from '$lib/apis';
 	import { getSessionUser, userSignOut } from '$lib/apis/auths';
-	import { getAllTags, getChatList } from '$lib/apis/chats';
+	import { getAllChatTags, getChatList } from '$lib/apis/chats';
 	import { chatCompletion } from '$lib/apis/openai';
 
 	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL, WEBUI_HOSTNAME } from '$lib/constants';
@@ -257,7 +257,7 @@
 				currentChatPage.set(1);
 				await chats.set(await getChatList(localStorage.token, $currentChatPage));
 			} else if (type === 'chat:tags') {
-				tags.set(await getAllTags(localStorage.token));
+				tags.set(await getAllChatTags(localStorage.token));
 			}
 		} else if (data?.session_id === $socket.id) {
 			if (type === 'execute:python') {

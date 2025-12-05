@@ -12,7 +12,7 @@
 	import { selectedFolder } from '$lib/stores';
 
 	import { deleteFolderById, getFolderById, updateFolderById } from '$lib/apis/folders';
-	import { getChatsByFolderId } from '$lib/apis/chats';
+	import { getAllChats } from '$lib/apis/chats';
 
 	import FolderModal from '$lib/components/layout/Sidebar/Folders/FolderModal.svelte';
 
@@ -113,11 +113,12 @@
 	};
 
 	const exportHandler = async () => {
-		const chats = await getChatsByFolderId(localStorage.token, folder.id).catch((error) => {
+		const allChats = await getAllChats(localStorage.token).catch((error) => {
 			toast.error(`${error}`);
 			return null;
 		});
-		if (!chats) {
+		const chats = allChats?.filter((chat) => chat.folder_id === folder.id) || [];
+		if (!chats || chats.length === 0) {
 			return;
 		}
 

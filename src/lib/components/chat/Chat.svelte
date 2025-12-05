@@ -59,13 +59,12 @@
 
 	import {
 		createNewChat,
-		getAllTags,
+		getAllChatTags,
 		getChatById,
 		getChatList,
-		getPinnedChatList,
-		getTagsById,
-		updateChatById,
-		updateChatFolderIdById
+		getPinnedChats,
+		getAllChatTagsById,
+		updateChatById
 	} from '$lib/apis/chats';
 	import { generateOpenAIChatCompletion } from '$lib/apis/openai';
 	import { processWeb, processWebSearch, processYoutubeVideo } from '$lib/apis/retrieval';
@@ -395,7 +394,7 @@
 					await chats.set(await getChatList(localStorage.token, $currentChatPage));
 				} else if (type === 'chat:tags') {
 					chat = await getChatById(localStorage.token, $chatId);
-					allTags.set(await getAllTags(localStorage.token));
+					allTags.set(await getAllChatTags(localStorage.token));
 				} else if (type === 'source' || type === 'citation') {
 					if (data?.type === 'code_execution') {
 						// Code execution; update existing code execution by ID, or add new one.
@@ -1076,7 +1075,7 @@
 		});
 
 		if (chat) {
-			tags = await getTagsById(localStorage.token, $chatId).catch(async (error) => {
+			tags = await getAllChatTagsById(localStorage.token, $chatId).catch(async (error) => {
 				return [];
 			});
 
@@ -2324,7 +2323,7 @@
 
 	const moveChatHandler = async (chatId, folderId) => {
 		if (chatId && folderId) {
-			const res = await updateChatFolderIdById(localStorage.token, chatId, folderId).catch(
+			const res = await updateChatById(localStorage.token, chatId, { folder_id: folderId }).catch(
 				(error) => {
 					toast.error(`${error}`);
 					return null;
@@ -2334,7 +2333,7 @@
 			if (res) {
 				currentChatPage.set(1);
 				await chats.set(await getChatList(localStorage.token, $currentChatPage));
-				await pinnedChats.set(await getPinnedChatList(localStorage.token));
+				await pinnedChats.set(await getPinnedChats(localStorage.token));
 
 				toast.success($i18n.t('Chat moved successfully'));
 			}

@@ -33,11 +33,12 @@
 
 	import {
 		getChatList,
-		getAllTags,
-		getPinnedChatList,
-		toggleChatPinnedStatusById,
+		getAllChatTags,
+		getPinnedChats,
+		pinChatById,
+		unpinChatById,
 		getChatById,
-		updateChatFolderIdById,
+		updateChatById,
 		importChats
 	} from '$lib/apis/chats';
 	import { createNewFolder, getFolders, updateFolderParentIdById } from '$lib/apis/folders';
@@ -191,12 +192,12 @@
 		await Promise.all([
 			await (async () => {
 				console.log('Init tags');
-				const _tags = await getAllTags(localStorage.token);
+				const _tags = await getAllChatTags(localStorage.token);
 				tags.set(_tags);
 			})(),
 			await (async () => {
 				console.log('Init pinned chats');
-				const _pinnedChats = await getPinnedChatList(localStorage.token);
+				const _pinnedChats = await getPinnedChats(localStorage.token);
 				pinnedChats.set(_pinnedChats);
 			})(),
 			await (async () => {
@@ -1019,18 +1020,18 @@
 							if (chat) {
 								console.log(chat);
 								if (chat.folder_id) {
-									const res = await updateChatFolderIdById(localStorage.token, chat.id, null).catch(
-										(error) => {
-											toast.error(`${error}`);
-											return null;
-										}
-									);
+									const res = await updateChatById(localStorage.token, chat.id, {
+										folder_id: null
+									}).catch((error) => {
+										toast.error(`${error}`);
+										return null;
+									});
 
 									folderRegistry[chat.folder_id]?.setFolderItems();
 								}
 
 								if (chat.pinned) {
-									const res = await toggleChatPinnedStatusById(localStorage.token, chat.id);
+									await unpinChatById(localStorage.token, chat.id);
 								}
 
 								initChatList();
@@ -1085,18 +1086,16 @@
 											if (chat) {
 												console.log(chat);
 												if (chat.folder_id) {
-													const res = await updateChatFolderIdById(
-														localStorage.token,
-														chat.id,
-														null
-													).catch((error) => {
+													const res = await updateChatById(localStorage.token, chat.id, {
+														folder_id: null
+													}).catch((error) => {
 														toast.error(`${error}`);
 														return null;
 													});
 												}
 
 												if (!chat.pinned) {
-													const res = await toggleChatPinnedStatusById(localStorage.token, chat.id);
+													await pinChatById(localStorage.token, chat.id);
 												}
 
 												initChatList();

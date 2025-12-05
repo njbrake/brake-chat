@@ -3,7 +3,7 @@
 	import { models, config } from '$lib/stores';
 
 	import { toast } from 'svelte-sonner';
-	import { deleteSharedChatById, getChatById, shareChatById } from '$lib/apis/chats';
+	import { deleteChatShareById, getChatById, shareChatById } from '$lib/apis/chats';
 	import { copyToClipboard } from '$lib/utils';
 
 	import Modal from '../common/Modal.svelte';
@@ -107,7 +107,7 @@
 						<button
 							class="underline"
 							on:click={async () => {
-								const res = await deleteSharedChatById(localStorage.token, chatId);
+								const res = await deleteChatShareById(localStorage.token, chatId);
 
 								if (res) {
 									chat = await getChatById(localStorage.token, chatId);
