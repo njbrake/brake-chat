@@ -54,7 +54,7 @@
 	import FilesOverlay from './MessageInput/FilesOverlay.svelte';
 	import ToolServersModal from './ToolServersModal.svelte';
 
-	import RichTextInput from '../common/RichTextInput.svelte';
+	import MarkdownInput from '../common/MarkdownInput.svelte';
 	import Tooltip from '../common/Tooltip.svelte';
 	import FileItem from '../common/FileItem.svelte';
 	import Image from '../common/Image.svelte';
@@ -76,7 +76,7 @@
 
 	import { KokoroWorker } from '$lib/workers/KokoroWorker';
 
-	import { getSuggestionRenderer } from '../common/RichTextInput/suggestions';
+	import { getSuggestionRenderer } from '../common/MarkdownInput/suggestions';
 	import CommandSuggestionList from './MessageInput/CommandSuggestionList.svelte';
 	import Knobs from '../icons/Knobs.svelte';
 	import ValvesModal from '../workspace/common/ValvesModal.svelte';
@@ -1192,7 +1192,7 @@
 									{#if suggestions}
 										{#key $settings?.richTextInput ?? true}
 											{#key $settings?.showFormattingToolbar ?? false}
-												<RichTextInput
+												<MarkdownInput
 													bind:this={chatInputElement}
 													id="chat-input"
 													onChange={(e) => {
