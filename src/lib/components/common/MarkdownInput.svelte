@@ -44,7 +44,10 @@
 	let charCount = 0;
 
 	export let editor = {
-		storage: { files: files, characterCount: { words: () => wordCount, characters: () => charCount } },
+		storage: {
+			files: files,
+			characterCount: { words: () => wordCount, characters: () => charCount }
+		},
 		commands: {
 			focus: () => focus(),
 			clearContent: () => {

@@ -267,7 +267,8 @@
 						JSON.parse(
 							JSON.stringify({
 								stdout: '',
-								stderr: 'Pyodide support has been removed. Please configure Jupyter execution engine instead.',
+								stderr:
+									'Pyodide support has been removed. Please configure Jupyter execution engine instead.',
 								result: null
 							})
 						)

@@ -1,30 +1,8 @@
 import { RETRIEVAL_API_BASE_URL } from '$lib/constants';
+import { api } from '$lib/utils/apiClient';
 
 export const getRAGConfig = async (token: string) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/config`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		}
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			console.error(err);
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.get('/config', token, RETRIEVAL_API_BASE_URL);
 };
 
 type ChunkConfigForm = {
@@ -60,60 +38,11 @@ type RAGConfigForm = {
 };
 
 export const updateRAGConfig = async (token: string, payload: RAGConfigForm) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/config/update`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({
-			...payload
-		})
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			console.error(err);
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post('/config/update', payload, token, RETRIEVAL_API_BASE_URL);
 };
 
 export const getQuerySettings = async (token: string) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/query/settings`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		}
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			console.error(err);
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.get('/query/settings', token, RETRIEVAL_API_BASE_URL);
 };
 
 type QuerySettings = {
@@ -123,60 +52,11 @@ type QuerySettings = {
 };
 
 export const updateQuerySettings = async (token: string, settings: QuerySettings) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/query/settings/update`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({
-			...settings
-		})
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			console.error(err);
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post('/query/settings/update', settings, token, RETRIEVAL_API_BASE_URL);
 };
 
 export const getEmbeddingConfig = async (token: string) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/embedding`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		}
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			console.error(err);
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.get('/embedding', token, RETRIEVAL_API_BASE_URL);
 };
 
 type OpenAIConfigForm = {
@@ -199,60 +79,11 @@ type EmbeddingModelUpdateForm = {
 };
 
 export const updateEmbeddingConfig = async (token: string, payload: EmbeddingModelUpdateForm) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/embedding/update`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({
-			...payload
-		})
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			console.error(err);
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post('/embedding/update', payload, token, RETRIEVAL_API_BASE_URL);
 };
 
 export const getRerankingConfig = async (token: string) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/reranking`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		}
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			console.error(err);
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.get('/reranking', token, RETRIEVAL_API_BASE_URL);
 };
 
 type RerankingModelUpdateForm = {
@@ -260,33 +91,7 @@ type RerankingModelUpdateForm = {
 };
 
 export const updateRerankingConfig = async (token: string, payload: RerankingModelUpdateForm) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/reranking/update`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({
-			...payload
-		})
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			console.error(err);
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post('/reranking/update', payload, token, RETRIEVAL_API_BASE_URL);
 };
 
 export interface SearchDocument {
@@ -296,66 +101,11 @@ export interface SearchDocument {
 }
 
 export const processYoutubeVideo = async (token: string, url: string) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/process/youtube`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({
-			url: url
-		})
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			error = err.detail;
-			console.error(err);
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post('/process/youtube', { url }, token, RETRIEVAL_API_BASE_URL);
 };
 
 export const processWeb = async (token: string, collection_name: string, url: string) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/process/web`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({
-			url: url,
-			collection_name: collection_name
-		})
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			error = err.detail;
-			console.error(err);
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post('/process/web', { url, collection_name }, token, RETRIEVAL_API_BASE_URL);
 };
 
 export const processWebSearch = async (
@@ -363,34 +113,12 @@ export const processWebSearch = async (
 	query: string,
 	collection_name?: string
 ): Promise<SearchDocument | null> => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/process/web/search`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({
-			query,
-			collection_name: collection_name ?? ''
-		})
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			console.error(err);
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post(
+		'/process/web/search',
+		{ query, collection_name: collection_name ?? '' },
+		token,
+		RETRIEVAL_API_BASE_URL
+	);
 };
 
 export const queryDoc = async (
@@ -399,35 +127,7 @@ export const queryDoc = async (
 	query: string,
 	k: number | null = null
 ) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/query/doc`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({
-			collection_name: collection_name,
-			query: query,
-			k: k
-		})
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post('/query/doc', { collection_name, query, k }, token, RETRIEVAL_API_BASE_URL);
 };
 
 export const queryCollection = async (
@@ -436,85 +136,18 @@ export const queryCollection = async (
 	query: string,
 	k: number | null = null
 ) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/query/collection`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({
-			collection_names: collection_names,
-			query: query,
-			k: k
-		})
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post(
+		'/query/collection',
+		{ collection_names, query, k },
+		token,
+		RETRIEVAL_API_BASE_URL
+	);
 };
 
 export const resetUploadDir = async (token: string) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/reset/uploads`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			authorization: `Bearer ${token}`
-		}
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post('/reset/uploads', undefined, token, RETRIEVAL_API_BASE_URL);
 };
 
 export const resetVectorDB = async (token: string) => {
-	let error = null;
-
-	const res = await fetch(`${RETRIEVAL_API_BASE_URL}/reset/db`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			authorization: `Bearer ${token}`
-		}
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			error = err.detail;
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post('/reset/db', undefined, token, RETRIEVAL_API_BASE_URL);
 };
