@@ -1,5 +1,5 @@
-import { WEBUI_API_BASE_URL } from '$lib/constants';
 import { getTimeRange } from '$lib/utils';
+import { api } from '$lib/utils/apiClient';
 
 type NoteItem = {
 	title: string;
@@ -9,73 +9,20 @@ type NoteItem = {
 };
 
 export const createNewNote = async (token: string, note: NoteItem) => {
-	let error = null;
-
-	const res = await fetch(`${WEBUI_API_BASE_URL}/notes/create`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({
-			...note
-		})
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.catch((err) => {
-			error = err.detail;
-			console.error(err);
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post('/notes/create', note, token);
 };
 
 export const getNotes = async (token: string = '', raw: boolean = false) => {
-	let error = null;
-
-	const res = await fetch(`${WEBUI_API_BASE_URL}/notes/`, {
-		method: 'GET',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			authorization: `Bearer ${token}`
-		}
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.then((json) => {
-			return json;
-		})
-		.catch((err) => {
-			error = err.detail;
-			console.error(err);
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
+	const res = await api.get('/notes/', token);
 
 	if (raw) {
-		return res; // Return raw response if requested
+		return res;
 	}
 
 	if (!Array.isArray(res)) {
-		return {}; // or throw new Error("Notes response is not an array")
+		return {};
 	}
 
-	// Build the grouped object
 	const grouped: Record<string, any[]> = {};
 	for (const note of res) {
 		const timeRange = getTimeRange(note.updated_at / 1000000000);
@@ -92,136 +39,23 @@ export const getNotes = async (token: string = '', raw: boolean = false) => {
 };
 
 export const getNoteList = async (token: string = '', page: number | null = null) => {
-	let error = null;
 	const searchParams = new URLSearchParams();
 
 	if (page !== null) {
 		searchParams.append('page', `${page}`);
 	}
 
-	const res = await fetch(`${WEBUI_API_BASE_URL}/notes/list?${searchParams.toString()}`, {
-		method: 'GET',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			authorization: `Bearer ${token}`
-		}
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.then((json) => {
-			return json;
-		})
-		.catch((err) => {
-			error = err.detail;
-			console.error(err);
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.get(`/notes/list?${searchParams.toString()}`, token);
 };
 
 export const getNoteById = async (token: string, id: string) => {
-	let error = null;
-
-	const res = await fetch(`${WEBUI_API_BASE_URL}/notes/${id}`, {
-		method: 'GET',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			authorization: `Bearer ${token}`
-		}
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.then((json) => {
-			return json;
-		})
-		.catch((err) => {
-			error = err.detail;
-
-			console.error(err);
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.get(`/notes/${id}`, token);
 };
 
 export const updateNoteById = async (token: string, id: string, note: NoteItem) => {
-	let error = null;
-
-	const res = await fetch(`${WEBUI_API_BASE_URL}/notes/${id}/update`, {
-		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			authorization: `Bearer ${token}`
-		},
-		body: JSON.stringify({
-			...note
-		})
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.then((json) => {
-			return json;
-		})
-		.catch((err) => {
-			error = err.detail;
-
-			console.error(err);
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.post(`/notes/${id}/update`, note, token);
 };
 
 export const deleteNoteById = async (token: string, id: string) => {
-	let error = null;
-
-	const res = await fetch(`${WEBUI_API_BASE_URL}/notes/${id}/delete`, {
-		method: 'DELETE',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			authorization: `Bearer ${token}`
-		}
-	})
-		.then(async (res) => {
-			if (!res.ok) throw await res.json();
-			return res.json();
-		})
-		.then((json) => {
-			return json;
-		})
-		.catch((err) => {
-			error = err.detail;
-
-			console.error(err);
-			return null;
-		});
-
-	if (error) {
-		throw error;
-	}
-
-	return res;
+	return api.delete(`/notes/${id}/delete`, token);
 };

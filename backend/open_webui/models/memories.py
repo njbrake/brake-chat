@@ -1,6 +1,5 @@
 import time
 import uuid
-from typing import Optional
 
 from open_webui.internal.db import Base, get_db
 from pydantic import BaseModel, ConfigDict
@@ -41,18 +40,16 @@ class MemoriesTable:
         self,
         user_id: str,
         content: str,
-    ) -> Optional[MemoryModel]:
+    ) -> MemoryModel | None:
         with get_db() as db:
             id = str(uuid.uuid4())
 
             memory = MemoryModel(
-                **{
-                    "id": id,
-                    "user_id": user_id,
-                    "content": content,
-                    "created_at": int(time.time()),
-                    "updated_at": int(time.time()),
-                }
+                id=id,
+                user_id=user_id,
+                content=content,
+                created_at=int(time.time()),
+                updated_at=int(time.time()),
             )
             result = Memory(**memory.model_dump())
             db.add(result)
@@ -60,15 +57,14 @@ class MemoriesTable:
             db.refresh(result)
             if result:
                 return MemoryModel.model_validate(result)
-            else:
-                return None
+            return None
 
     def update_memory_by_id_and_user_id(
         self,
         id: str,
         user_id: str,
         content: str,
-    ) -> Optional[MemoryModel]:
+    ) -> MemoryModel | None:
         with get_db() as db:
             try:
                 memory = db.get(Memory, id)
@@ -99,7 +95,7 @@ class MemoriesTable:
             except Exception:
                 return None
 
-    def get_memory_by_id(self, id: str) -> Optional[MemoryModel]:
+    def get_memory_by_id(self, id: str) -> MemoryModel | None:
         with get_db() as db:
             try:
                 memory = db.get(Memory, id)

@@ -1,5 +1,6 @@
 import json
 from uuid import uuid4
+
 from open_webui.utils.misc import (
     openai_chat_chunk_message_template,
     openai_chat_completion_message_template,
@@ -12,7 +13,7 @@ def convert_ollama_tool_call_to_openai(tool_calls: list) -> list:
         function = tool_call.get("function", {})
         openai_tool_call = {
             "index": tool_call.get("index", function.get("index", 0)),
-            "id": tool_call.get("id", f"call_{str(uuid4())}"),
+            "id": tool_call.get("id", f"call_{uuid4()!s}"),
             "type": "function",
             "function": {
                 "name": function.get("name", ""),
@@ -27,13 +28,7 @@ def convert_ollama_usage_to_openai(data: dict) -> dict:
     return {
         "response_token/s": (
             round(
-                (
-                    (
-                        data.get("eval_count", 0)
-                        / ((data.get("eval_duration", 0) / 10_000_000))
-                    )
-                    * 100
-                ),
+                ((data.get("eval_count", 0) / (data.get("eval_duration", 0) / 10_000_000)) * 100),
                 2,
             )
             if data.get("eval_duration", 0) > 0
@@ -41,13 +36,7 @@ def convert_ollama_usage_to_openai(data: dict) -> dict:
         ),
         "prompt_token/s": (
             round(
-                (
-                    (
-                        data.get("prompt_eval_count", 0)
-                        / ((data.get("prompt_eval_duration", 0) / 10_000_000))
-                    )
-                    * 100
-                ),
+                ((data.get("prompt_eval_count", 0) / (data.get("prompt_eval_duration", 0) / 10_000_000)) * 100),
                 2,
             )
             if data.get("prompt_eval_duration", 0) > 0
@@ -56,14 +45,10 @@ def convert_ollama_usage_to_openai(data: dict) -> dict:
         "total_duration": data.get("total_duration", 0),
         "load_duration": data.get("load_duration", 0),
         "prompt_eval_count": data.get("prompt_eval_count", 0),
-        "prompt_tokens": int(
-            data.get("prompt_eval_count", 0)
-        ),  # This is the OpenAI compatible key
+        "prompt_tokens": int(data.get("prompt_eval_count", 0)),  # This is the OpenAI compatible key
         "prompt_eval_duration": data.get("prompt_eval_duration", 0),
         "eval_count": data.get("eval_count", 0),
-        "completion_tokens": int(
-            data.get("eval_count", 0)
-        ),  # This is the OpenAI compatible key
+        "completion_tokens": int(data.get("eval_count", 0)),  # This is the OpenAI compatible key
         "eval_duration": data.get("eval_duration", 0),
         "approximate_total": (lambda s: f"{s // 3600}h{(s % 3600) // 60}m{s % 60}s")(
             (data.get("total_duration", 0) or 0) // 1_000_000_000
@@ -118,9 +103,7 @@ async def convert_streaming_response_ollama_to_openai(ollama_streaming_response)
         if done:
             usage = convert_ollama_usage_to_openai(data)
 
-        data = openai_chat_chunk_message_template(
-            model, message_content, reasoning_content, openai_tool_calls, usage
-        )
+        data = openai_chat_chunk_message_template(model, message_content, reasoning_content, openai_tool_calls, usage)
 
         line = f"data: {json.dumps(data)}\n\n"
         yield line
@@ -129,8 +112,7 @@ async def convert_streaming_response_ollama_to_openai(ollama_streaming_response)
 
 
 def convert_embedding_response_ollama_to_openai(response) -> dict:
-    """
-    Convert the response from Ollama embeddings endpoint to the OpenAI-compatible format.
+    """Convert the response from Ollama embeddings endpoint to the OpenAI-compatible format.
 
     Args:
         response (dict): The response from the Ollama API,
@@ -147,6 +129,7 @@ def convert_embedding_response_ollama_to_openai(response) -> dict:
                 ],
                 "model": "...",
             }
+
     """
     # Ollama batch-style output
     if isinstance(response, dict) and "embeddings" in response:
@@ -165,7 +148,7 @@ def convert_embedding_response_ollama_to_openai(response) -> dict:
             "model": response.get("model"),
         }
     # Ollama single output
-    elif isinstance(response, dict) and "embedding" in response:
+    if isinstance(response, dict) and "embedding" in response:
         return {
             "object": "list",
             "data": [
@@ -178,11 +161,7 @@ def convert_embedding_response_ollama_to_openai(response) -> dict:
             "model": response.get("model"),
         }
     # Already OpenAI-compatible?
-    elif (
-        isinstance(response, dict)
-        and "data" in response
-        and isinstance(response["data"], list)
-    ):
+    if isinstance(response, dict) and "data" in response and isinstance(response["data"], list):
         return response
 
     # Fallback: return as is if unrecognized

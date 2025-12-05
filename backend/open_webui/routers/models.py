@@ -1,34 +1,29 @@
-from typing import Optional
-import io
 import base64
-import json
-import asyncio
+import io
 import logging
+from typing import Optional
 
-from open_webui.models.models import (
-    ModelForm,
-    ModelModel,
-    ModelResponse,
-    ModelListResponse,
-    Models,
-)
-
-from pydantic import BaseModel
-from open_webui.constants import ERROR_MESSAGES
 from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
     Request,
-    status,
     Response,
+    status,
 )
 from fastapi.responses import FileResponse, StreamingResponse
-
-
-from open_webui.utils.auth import get_admin_user, get_verified_user
-from open_webui.utils.access_control import has_access, has_permission
 from open_webui.config import BYPASS_ADMIN_ACCESS_CONTROL, STATIC_DIR
+from open_webui.constants import ERROR_MESSAGES
+from open_webui.models.models import (
+    ModelForm,
+    ModelListResponse,
+    ModelModel,
+    ModelResponse,
+    Models,
+)
+from open_webui.utils.access_control import has_access, has_permission
+from open_webui.utils.auth import get_admin_user, get_verified_user
+from pydantic import BaseModel
 
 log = logging.getLogger(__name__)
 
@@ -47,19 +42,16 @@ def is_valid_model_id(model_id: str) -> bool:
 PAGE_ITEM_COUNT = 30
 
 
-@router.get(
-    "/list", response_model=ModelListResponse
-)  # do NOT use "/" as path, conflicts with main.py
+@router.get("/list", response_model=ModelListResponse)  # do NOT use "/" as path, conflicts with main.py
 async def get_models(
-    query: Optional[str] = None,
-    view_option: Optional[str] = None,
-    tag: Optional[str] = None,
-    order_by: Optional[str] = None,
-    direction: Optional[str] = None,
-    page: Optional[int] = 1,
+    query: str | None = None,
+    view_option: str | None = None,
+    tag: str | None = None,
+    order_by: str | None = None,
+    direction: str | None = None,
+    page: int | None = 1,
     user=Depends(get_verified_user),
 ):
-
     limit = PAGE_ITEM_COUNT
 
     page = max(1, page)
@@ -110,7 +102,7 @@ async def get_model_tags(user=Depends(get_verified_user)):
         if model.meta:
             meta = model.meta.model_dump()
             for tag in meta.get("tags", []):
-                tags_set.add((tag.get("name")))
+                tags_set.add(tag.get("name"))
 
     tags = [tag for tag in tags_set]
     tags.sort()
@@ -149,15 +141,13 @@ async def create_new_model(
             detail=ERROR_MESSAGES.MODEL_ID_TOO_LONG,
         )
 
-    else:
-        model = Models.insert_new_model(form_data, user.id)
-        if model:
-            return model
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=ERROR_MESSAGES.DEFAULT(),
-            )
+    model = Models.insert_new_model(form_data, user.id)
+    if model:
+        return model
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=ERROR_MESSAGES.DEFAULT(),
+    )
 
 
 ############################
@@ -177,8 +167,7 @@ async def export_models(request: Request, user=Depends(get_verified_user)):
 
     if user.role == "admin" and BYPASS_ADMIN_ACCESS_CONTROL:
         return Models.get_models()
-    else:
-        return Models.get_models_by_user_id(user.id)
+    return Models.get_models_by_user_id(user.id)
 
 
 ############################
@@ -217,9 +206,7 @@ async def import_models(
                         model_data["meta"] = model_data.get("meta", {})
                         model_data["params"] = model_data.get("params", {})
 
-                        updated_model = ModelForm(
-                            **{**existing_model.model_dump(), **model_data}
-                        )
+                        updated_model = ModelForm(**{**existing_model.model_dump(), **model_data})
                         Models.update_model_by_id(model_id, updated_model)
                     else:
                         # Insert new model
@@ -228,8 +215,7 @@ async def import_models(
                         new_model = ModelForm(**model_data)
                         Models.insert_new_model(user_id=user.id, form_data=new_model)
             return True
-        else:
-            raise HTTPException(status_code=400, detail="Invalid JSON format")
+        raise HTTPException(status_code=400, detail="Invalid JSON format")
     except Exception as e:
         log.exception(e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -245,9 +231,7 @@ class SyncModelsForm(BaseModel):
 
 
 @router.post("/sync", response_model=list[ModelModel])
-async def sync_models(
-    request: Request, form_data: SyncModelsForm, user=Depends(get_admin_user)
-):
+async def sync_models(request: Request, form_data: SyncModelsForm, user=Depends(get_admin_user)):
     return Models.sync_models(user.id, form_data.models)
 
 
@@ -293,7 +277,7 @@ async def get_model_profile_image(id: str, user=Depends(get_verified_user)):
                     status_code=status.HTTP_302_FOUND,
                     headers={"Location": model.meta.profile_image_url},
                 )
-            elif model.meta.profile_image_url.startswith("data:image"):
+            if model.meta.profile_image_url.startswith("data:image"):
                 try:
                     header, base64_data = model.meta.profile_image_url.split(",", 1)
                     image_data = base64.b64decode(base64_data)
@@ -304,12 +288,11 @@ async def get_model_profile_image(id: str, user=Depends(get_verified_user)):
                         media_type="image/png",
                         headers={"Content-Disposition": "inline; filename=image.png"},
                     )
-                except Exception as e:
+                except Exception:
                     pass
 
         return FileResponse(f"{STATIC_DIR}/favicon.png")
-    else:
-        return FileResponse(f"{STATIC_DIR}/favicon.png")
+    return FileResponse(f"{STATIC_DIR}/favicon.png")
 
 
 ############################
@@ -321,30 +304,23 @@ async def get_model_profile_image(id: str, user=Depends(get_verified_user)):
 async def toggle_model_by_id(id: str, user=Depends(get_verified_user)):
     model = Models.get_model_by_id(id)
     if model:
-        if (
-            user.role == "admin"
-            or model.user_id == user.id
-            or has_access(user.id, "write", model.access_control)
-        ):
+        if user.role == "admin" or model.user_id == user.id or has_access(user.id, "write", model.access_control):
             model = Models.toggle_model_by_id(id)
 
             if model:
                 return model
-            else:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=ERROR_MESSAGES.DEFAULT("Error updating function"),
-                )
-        else:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=ERROR_MESSAGES.UNAUTHORIZED,
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=ERROR_MESSAGES.DEFAULT("Error updating function"),
             )
-    else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=ERROR_MESSAGES.NOT_FOUND,
+            detail=ERROR_MESSAGES.UNAUTHORIZED,
         )
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=ERROR_MESSAGES.NOT_FOUND,
+    )
 
 
 ############################
@@ -364,11 +340,7 @@ async def update_model_by_id(
             detail=ERROR_MESSAGES.NOT_FOUND,
         )
 
-    if (
-        model.user_id != user.id
-        and not has_access(user.id, "write", model.access_control)
-        and user.role != "admin"
-    ):
+    if model.user_id != user.id and not has_access(user.id, "write", model.access_control) and user.role != "admin":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=ERROR_MESSAGES.ACCESS_PROHIBITED,
@@ -392,11 +364,7 @@ async def delete_model_by_id(form_data: ModelIdForm, user=Depends(get_verified_u
             detail=ERROR_MESSAGES.NOT_FOUND,
         )
 
-    if (
-        user.role != "admin"
-        and model.user_id != user.id
-        and not has_access(user.id, "write", model.access_control)
-    ):
+    if user.role != "admin" and model.user_id != user.id and not has_access(user.id, "write", model.access_control):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=ERROR_MESSAGES.UNAUTHORIZED,

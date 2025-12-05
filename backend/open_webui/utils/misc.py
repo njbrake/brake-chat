@@ -1,18 +1,16 @@
+import collections.abc
 import hashlib
+import json
+import logging
 import re
 import threading
 import time
 import uuid
-import logging
 from datetime import timedelta
 from pathlib import Path
-from typing import Callable, Optional
-import json
+
 import aiohttp
-
-
-import collections.abc
-from open_webui.env import SRC_LOG_LEVELS, CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE
+from open_webui.env import CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE, SRC_LOG_LEVELS
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["MAIN"])
@@ -43,9 +41,8 @@ def get_allow_block_lists(filter_list):
     return allow_list, block_list
 
 
-def is_string_allowed(string: str, filter_list: Optional[list[str]] = None) -> bool:
-    """
-    Checks if a string is allowed based on the provided filter list.
+def is_string_allowed(string: str, filter_list: list[str] | None = None) -> bool:
+    """Checks if a string is allowed based on the provided filter list.
     :param string: The string to check (e.g., domain or hostname).
     :param filter_list: List of allowed/blocked strings. Strings starting with "!" are blocked.
     :return: True if the string is allowed, False otherwise.
@@ -69,14 +66,12 @@ def is_string_allowed(string: str, filter_list: Optional[list[str]] = None) -> b
 
 
 def get_message_list(messages_map, message_id):
-    """
-    Reconstructs a list of messages in order up to the specified message_id.
+    """Reconstructs a list of messages in order up to the specified message_id.
 
     :param message_id: ID of the message to reconstruct the chain
     :param messages: Message history dict containing all messages
     :return: List of ordered messages starting from the root to the given message
     """
-
     # Handle case where messages is None
     if not messages_map:
         return []  # Return empty list instead of None to prevent iteration errors
@@ -91,9 +86,7 @@ def get_message_list(messages_map, message_id):
     message_list = []
 
     while current_message:
-        message_list.insert(
-            0, current_message
-        )  # Insert the message at the beginning of the list
+        message_list.insert(0, current_message)  # Insert the message at the beginning of the list
         parent_id = current_message.get("parentId")  # Use .get() for safety
         current_message = messages_map.get(parent_id) if parent_id else None
 
@@ -147,11 +140,7 @@ def reconstruct_messages_with_tool_calls(messages: list[dict]) -> list[dict]:
 
                 assistant_msg = {
                     "role": "assistant",
-                    "content": (
-                        serialize_content_blocks_for_reconstruction(temp_blocks)
-                        if temp_blocks
-                        else ""
-                    ),
+                    "content": (serialize_content_blocks_for_reconstruction(temp_blocks) if temp_blocks else ""),
                     "tool_calls": tool_calls,
                 }
                 reconstructed.append(assistant_msg)
@@ -186,22 +175,17 @@ def reconstruct_messages_with_tool_calls(messages: list[dict]) -> list[dict]:
 
 
 def get_messages_content(messages: list[dict]) -> str:
-    return "\n".join(
-        [
-            f"{message['role'].upper()}: {get_content_from_message(message)}"
-            for message in messages
-        ]
-    )
+    return "\n".join([f"{message['role'].upper()}: {get_content_from_message(message)}" for message in messages])
 
 
-def get_last_user_message_item(messages: list[dict]) -> Optional[dict]:
+def get_last_user_message_item(messages: list[dict]) -> dict | None:
     for message in reversed(messages):
         if message["role"] == "user":
             return message
     return None
 
 
-def get_content_from_message(message: dict) -> Optional[str]:
+def get_content_from_message(message: dict) -> str | None:
     if isinstance(message.get("content"), list):
         for item in message["content"]:
             if item["type"] == "text":
@@ -211,28 +195,28 @@ def get_content_from_message(message: dict) -> Optional[str]:
     return None
 
 
-def get_last_user_message(messages: list[dict]) -> Optional[str]:
+def get_last_user_message(messages: list[dict]) -> str | None:
     message = get_last_user_message_item(messages)
     if message is None:
         return None
     return get_content_from_message(message)
 
 
-def get_last_assistant_message_item(messages: list[dict]) -> Optional[dict]:
+def get_last_assistant_message_item(messages: list[dict]) -> dict | None:
     for message in reversed(messages):
         if message["role"] == "assistant":
             return message
     return None
 
 
-def get_last_assistant_message(messages: list[dict]) -> Optional[str]:
+def get_last_assistant_message(messages: list[dict]) -> str | None:
     for message in reversed(messages):
         if message["role"] == "assistant":
             return get_content_from_message(message)
     return None
 
 
-def get_system_message(messages: list[dict]) -> Optional[dict]:
+def get_system_message(messages: list[dict]) -> dict | None:
     for message in messages:
         if message["role"] == "system":
             return message
@@ -243,7 +227,7 @@ def remove_system_message(messages: list[dict]) -> list[dict]:
     return [message for message in messages if message["role"] != "system"]
 
 
-def pop_system_message(messages: list[dict]) -> tuple[Optional[dict], list[dict]]:
+def pop_system_message(messages: list[dict]) -> tuple[dict | None, list[dict]]:
     return get_system_message(messages), remove_system_message(messages)
 
 
@@ -271,18 +255,14 @@ def replace_system_message_content(content: str, messages: list[dict]) -> dict:
     return messages
 
 
-def add_or_update_system_message(
-    content: str, messages: list[dict], append: bool = False
-):
-    """
-    Adds a new system message at the beginning of the messages list
+def add_or_update_system_message(content: str, messages: list[dict], append: bool = False):
+    """Adds a new system message at the beginning of the messages list
     or updates the existing system message at the beginning.
 
     :param msg: The message to be added or appended.
     :param messages: The list of message dictionaries.
     :return: The updated list of message dictionaries.
     """
-
     if messages and messages[0].get("role") == "system":
         messages[0] = update_message_content(messages[0], content, append)
     else:
@@ -293,15 +273,13 @@ def add_or_update_system_message(
 
 
 def add_or_update_user_message(content: str, messages: list[dict], append: bool = True):
-    """
-    Adds a new user message at the end of the messages list
+    """Adds a new user message at the end of the messages list
     or updates the existing user message at the end.
 
     :param msg: The message to be added or appended.
     :param messages: The list of message dictionaries.
     :return: The updated list of message dictionaries.
     """
-
     if messages and messages[-1].get("role") == "user":
         messages[-1] = update_message_content(messages[-1], content, append)
     else:
@@ -311,9 +289,7 @@ def add_or_update_user_message(content: str, messages: list[dict], append: bool 
     return messages
 
 
-def prepend_to_first_user_message_content(
-    content: str, messages: list[dict]
-) -> list[dict]:
+def prepend_to_first_user_message_content(content: str, messages: list[dict]) -> list[dict]:
     for message in messages:
         if message["role"] == "user":
             message = update_message_content(message, content, append=False)
@@ -322,15 +298,13 @@ def prepend_to_first_user_message_content(
 
 
 def append_or_update_assistant_message(content: str, messages: list[dict]):
-    """
-    Adds a new assistant message at the end of the messages list
+    """Adds a new assistant message at the end of the messages list
     or updates the existing assistant message at the end.
 
     :param msg: The message to be added or appended.
     :param messages: The list of message dictionaries.
     :return: The updated list of message dictionaries.
     """
-
     if messages and messages[-1].get("role") == "assistant":
         messages[-1]["content"] = f"{messages[-1]['content']}\n{content}"
     else:
@@ -342,7 +316,7 @@ def append_or_update_assistant_message(content: str, messages: list[dict]):
 
 def openai_chat_message_template(model: str):
     return {
-        "id": f"{model}-{str(uuid.uuid4())}",
+        "id": f"{model}-{uuid.uuid4()!s}",
         "created": int(time.time()),
         "model": model,
         "choices": [{"index": 0, "logprobs": None, "finish_reason": None}],
@@ -351,10 +325,10 @@ def openai_chat_message_template(model: str):
 
 def openai_chat_chunk_message_template(
     model: str,
-    content: Optional[str] = None,
-    reasoning_content: Optional[str] = None,
-    tool_calls: Optional[list[dict]] = None,
-    usage: Optional[dict] = None,
+    content: str | None = None,
+    reasoning_content: str | None = None,
+    tool_calls: list[dict] | None = None,
+    usage: dict | None = None,
 ) -> dict:
     template = openai_chat_message_template(model)
     template["object"] = "chat.completion.chunk"
@@ -381,10 +355,10 @@ def openai_chat_chunk_message_template(
 
 def openai_chat_completion_message_template(
     model: str,
-    message: Optional[str] = None,
-    reasoning_content: Optional[str] = None,
-    tool_calls: Optional[list[dict]] = None,
-    usage: Optional[dict] = None,
+    message: str | None = None,
+    reasoning_content: str | None = None,
+    tool_calls: list[dict] | None = None,
+    usage: dict | None = None,
 ) -> dict:
     template = openai_chat_message_template(model)
     template["object"] = "chat.completion"
@@ -480,7 +454,7 @@ def extract_folders_after_data_docs(path):
     return tags
 
 
-def parse_duration(duration: str) -> Optional[timedelta]:
+def parse_duration(duration: str) -> timedelta | None:
     if duration == "-1" or duration == "0":
         return None
 
@@ -538,16 +512,12 @@ def parse_ollama_modelfile(model_text):
     data = {"base_model_id": None, "params": {}}
 
     # Parse base model
-    base_model_match = re.search(
-        r"^FROM\s+(\w+)", model_text, re.MULTILINE | re.IGNORECASE
-    )
+    base_model_match = re.search(r"^FROM\s+(\w+)", model_text, re.MULTILINE | re.IGNORECASE)
     if base_model_match:
         data["base_model_id"] = base_model_match.group(1)
 
     # Parse template
-    template_match = re.search(
-        r'TEMPLATE\s+"""(.+?)"""', model_text, re.DOTALL | re.IGNORECASE
-    )
+    template_match = re.search(r'TEMPLATE\s+"""(.+?)"""', model_text, re.DOTALL | re.IGNORECASE)
     if template_match:
         data["params"] = {"template": template_match.group(1).strip()}
 
@@ -581,12 +551,8 @@ def parse_ollama_modelfile(model_text):
         data["params"]["adapter"] = adapter_match.group(1)
 
     # Parse system description
-    system_desc_match = re.search(
-        r'SYSTEM\s+"""(.+?)"""', model_text, re.DOTALL | re.IGNORECASE
-    )
-    system_desc_match_single = re.search(
-        r"SYSTEM\s+([^\n]+)", model_text, re.IGNORECASE
-    )
+    system_desc_match = re.search(r'SYSTEM\s+"""(.+?)"""', model_text, re.DOTALL | re.IGNORECASE)
+    system_desc_match_single = re.search(r"SYSTEM\s+([^\n]+)", model_text, re.IGNORECASE)
 
     if system_desc_match:
         data["params"]["system"] = system_desc_match.group(1).strip()
@@ -612,25 +578,22 @@ def convert_logit_bias_input_to_json(user_input):
         token, bias = pair.split(":")
         token = str(token.strip())
         bias = int(bias.strip())
-        bias = 100 if bias > 100 else -100 if bias < -100 else bias
+        bias = 100 if bias > 100 else max(bias, -100)
         logit_bias_json[token] = bias
     return json.dumps(logit_bias_json)
 
 
 def freeze(value):
-    """
-    Freeze a value to make it hashable.
-    """
+    """Freeze a value to make it hashable."""
     if isinstance(value, dict):
         return frozenset((k, freeze(v)) for k, v in value.items())
-    elif isinstance(value, list):
+    if isinstance(value, list):
         return tuple(freeze(v) for v in value)
     return value
 
 
 def throttle(interval: float = 10.0):
-    """
-    Decorator to prevent a function from being called more than once within a specified duration.
+    """Decorator to prevent a function from being called more than once within a specified duration.
     If the function is called again within the duration, it returns None. To avoid returning
     different types, the return type of the function should be Optional[T].
 
@@ -662,22 +625,18 @@ def throttle(interval: float = 10.0):
 
 def extract_urls(text: str) -> list[str]:
     # Regex pattern to match URLs
-    url_pattern = re.compile(
-        r"(https?://[^\s]+)", re.IGNORECASE
-    )  # Matches http and https URLs
+    url_pattern = re.compile(r"(https?://[^\s]+)", re.IGNORECASE)  # Matches http and https URLs
     return url_pattern.findall(text)
 
 
 def stream_chunks_handler(stream: aiohttp.StreamReader):
-    """
-    Handle stream response chunks, supporting large data chunks that exceed the original 16kb limit.
+    """Handle stream response chunks, supporting large data chunks that exceed the original 16kb limit.
     When a single line exceeds max_buffer_size, returns an empty JSON string {} and skips subsequent data
     until encountering normally sized data.
 
     :param stream: The stream reader to handle.
     :return: An async generator that yields the stream data.
     """
-
     max_buffer_size = CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE
     if max_buffer_size is None or max_buffer_size <= 0:
         return stream

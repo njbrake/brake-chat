@@ -21,10 +21,10 @@
 		getFolderById
 	} from '$lib/apis/folders';
 	import {
+		getAllChats,
 		getChatById,
-		getChatsByFolderId,
-		getChatListByFolderId,
-		updateChatFolderIdById,
+		getChatList,
+		updateChatById,
 		importChats
 	} from '$lib/apis/chats';
 
@@ -170,11 +170,9 @@
 								}
 
 								// Move the chat
-								const res = await updateChatFolderIdById(
-									localStorage.token,
-									chat.id,
-									folderId
-								).catch((error) => {
+								const res = await updateChatById(localStorage.token, chat.id, {
+									folder_id: folderId
+								}).catch((error) => {
 									toast.error(`${error}`);
 									return null;
 								});
@@ -370,10 +368,11 @@
 	export const setFolderItems = async () => {
 		await tick();
 		if (open) {
-			chats = await getChatListByFolderId(localStorage.token, folderId).catch((error) => {
+			chats = await getChatList(localStorage.token).catch((error) => {
 				toast.error(`${error}`);
 				return [];
 			});
+			chats = chats.filter((chat) => chat.folder_id === folderId);
 		} else {
 			chats = null;
 		}
@@ -400,11 +399,12 @@
 	};
 
 	const exportHandler = async () => {
-		const chats = await getChatsByFolderId(localStorage.token, folderId).catch((error) => {
+		let allChats = await getAllChats(localStorage.token).catch((error) => {
 			toast.error(`${error}`);
 			return null;
 		});
-		if (!chats) {
+		const chats = allChats?.filter((chat) => chat.folder_id === folderId) || [];
+		if (!chats || chats.length === 0) {
 			return;
 		}
 

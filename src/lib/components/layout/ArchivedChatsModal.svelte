@@ -4,12 +4,7 @@
 
 	import { toast } from 'svelte-sonner';
 	import { getContext } from 'svelte';
-	import {
-		archiveChatById,
-		getAllArchivedChats,
-		getArchivedChatList,
-		unarchiveAllChats
-	} from '$lib/apis/chats';
+	import { archiveChatById, getAllArchivedChats, unarchiveAllChats } from '$lib/apis/chats';
 
 	import ChatsModal from './ChatsModal.svelte';
 	import UnarchiveAllConfirmDialog from '$lib/components/common/ConfirmDialog.svelte';
@@ -58,10 +53,10 @@
 		chatList = null;
 
 		if (query === '') {
-			chatList = await getArchivedChatList(localStorage.token, page, filter);
+			chatList = await getAllArchivedChats(localStorage.token);
 		} else {
 			searchDebounceTimeout = setTimeout(async () => {
-				chatList = await getArchivedChatList(localStorage.token, page, filter);
+				chatList = await getAllArchivedChats(localStorage.token);
 			}, 500);
 		}
 
@@ -79,9 +74,9 @@
 		let newChatList = [];
 
 		if (query) {
-			newChatList = await getArchivedChatList(localStorage.token, page, filter);
+			newChatList = await getAllArchivedChats(localStorage.token);
 		} else {
-			newChatList = await getArchivedChatList(localStorage.token, page, filter);
+			newChatList = await getAllArchivedChats(localStorage.token);
 		}
 
 		// once the bottom of the list has been reached (no results) there is no need to continue querying
@@ -126,7 +121,7 @@
 	};
 
 	const init = async () => {
-		chatList = await getArchivedChatList(localStorage.token);
+		chatList = await getAllArchivedChats(localStorage.token);
 	};
 
 	$: if (show) {

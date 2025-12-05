@@ -26,12 +26,12 @@
 	import { uploadFile } from '$lib/apis/files';
 	import { WEBUI_API_BASE_URL } from '$lib/constants';
 
-	import { getSuggestionRenderer } from '../common/RichTextInput/suggestions';
+	import { getSuggestionRenderer } from '../common/MarkdownInput/suggestions';
 	import CommandSuggestionList from '../chat/MessageInput/CommandSuggestionList.svelte';
 
 	import InputMenu from './MessageInput/InputMenu.svelte';
 	import Tooltip from '../common/Tooltip.svelte';
-	import RichTextInput from '../common/RichTextInput.svelte';
+	import MarkdownInput from '../common/MarkdownInput.svelte';
 	import VoiceRecording from '../chat/MessageInput/VoiceRecording.svelte';
 	import FileItem from '../common/FileItem.svelte';
 	import Image from '../common/Image.svelte';
@@ -866,7 +866,7 @@
 									class="scrollbar-hidden rtl:text-right ltr:text-left bg-transparent dark:text-gray-100 outline-hidden w-full pt-2.5 pb-[5px] px-1 resize-none h-fit max-h-96 overflow-auto"
 								>
 									{#key $settings?.richTextInput}
-										<RichTextInput
+										<MarkdownInput
 											id="chat-input"
 											bind:this={chatInputElement}
 											json={true}

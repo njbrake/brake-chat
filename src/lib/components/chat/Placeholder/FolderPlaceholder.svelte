@@ -7,7 +7,7 @@
 	import ChatList from './ChatList.svelte';
 	import FolderKnowledge from './FolderKnowledge.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-	import { getChatListByFolderId } from '$lib/apis/chats';
+	import { getChatList } from '$lib/apis/chats';
 
 	export let folder = null;
 
@@ -26,12 +26,11 @@
 
 		let newChatList = [];
 
-		newChatList = await getChatListByFolderId(localStorage.token, folder.id, page).catch(
-			(error) => {
-				console.error(error);
-				return [];
-			}
-		);
+		const allChats = await getChatList(localStorage.token).catch((error) => {
+			console.error(error);
+			return [];
+		});
+		newChatList = allChats.filter((chat) => chat.folder_id === folder.id);
 
 		// once the bottom of the list has been reached (no results) there is no need to continue querying
 		allChatsLoaded = newChatList.length === 0;
@@ -47,10 +46,10 @@
 		chatListLoading = false;
 
 		if (folder && folder.id) {
-			const res = await getChatListByFolderId(localStorage.token, folder.id, page);
+			const allChats = await getChatList(localStorage.token);
 
-			if (res) {
-				chats = res;
+			if (allChats) {
+				chats = allChats.filter((chat) => chat.folder_id === folder.id);
 			} else {
 				chats = [];
 			}

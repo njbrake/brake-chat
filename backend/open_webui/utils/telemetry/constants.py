@@ -10,9 +10,7 @@ SPAN_ERROR_TYPE = "error"
 
 
 class SpanAttributes(_SpanAttributes):
-    """
-    Span Attributes
-    """
+    """Span Attributes"""
 
     DB_INSTANCE = "db.instance"
     DB_TYPE = "db.type"

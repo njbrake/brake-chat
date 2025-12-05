@@ -1,33 +1,25 @@
 import logging
-import copy
-from fastapi import APIRouter, Depends, Request, HTTPException
-from pydantic import BaseModel, ConfigDict
+
 import aiohttp
-
-from typing import Optional
-
+from fastapi import APIRouter, Depends, HTTPException, Request
+from mcp.shared.auth import OAuthMetadata
+from open_webui.config import BannerModel, get_config, save_config
+from open_webui.env import SRC_LOG_LEVELS
 from open_webui.utils.auth import get_admin_user, get_verified_user
-from open_webui.config import get_config, save_config
-from open_webui.config import BannerModel
-
+from open_webui.utils.mcp.client import MCPClient
+from open_webui.utils.oauth import (
+    OAuthClientInformationFull,
+    decrypt_data,
+    encrypt_data,
+    get_discovery_urls,
+    get_oauth_client_info_with_dynamic_client_registration,
+)
 from open_webui.utils.tools import (
     get_tool_server_data,
     get_tool_server_url,
     set_tool_servers,
 )
-from open_webui.utils.mcp.client import MCPClient
-from open_webui.models.oauth_sessions import OAuthSessions
-
-from open_webui.env import SRC_LOG_LEVELS
-
-from open_webui.utils.oauth import (
-    get_discovery_urls,
-    get_oauth_client_info_with_dynamic_client_registration,
-    encrypt_data,
-    decrypt_data,
-    OAuthClientInformationFull,
-)
-from mcp.shared.auth import OAuthMetadata
+from pydantic import BaseModel, ConfigDict
 
 router = APIRouter()
 
@@ -84,12 +76,8 @@ async def set_connections_config(
     form_data: ConnectionsConfigForm,
     user=Depends(get_admin_user),
 ):
-    request.app.state.config.ENABLE_DIRECT_CONNECTIONS = (
-        form_data.ENABLE_DIRECT_CONNECTIONS
-    )
-    request.app.state.config.ENABLE_BASE_MODELS_CACHE = (
-        form_data.ENABLE_BASE_MODELS_CACHE
-    )
+    request.app.state.config.ENABLE_DIRECT_CONNECTIONS = form_data.ENABLE_DIRECT_CONNECTIONS
+    request.app.state.config.ENABLE_BASE_MODELS_CACHE = form_data.ENABLE_BASE_MODELS_CACHE
 
     return {
         "ENABLE_DIRECT_CONNECTIONS": request.app.state.config.ENABLE_DIRECT_CONNECTIONS,
@@ -100,14 +88,14 @@ async def set_connections_config(
 class OAuthClientRegistrationForm(BaseModel):
     url: str
     client_id: str
-    client_name: Optional[str] = None
+    client_name: str | None = None
 
 
 @router.post("/oauth/clients/register")
 async def register_oauth_client(
     request: Request,
     form_data: OAuthClientRegistrationForm,
-    type: Optional[str] = None,
+    type: str | None = None,
     user=Depends(get_admin_user),
 ):
     try:
@@ -115,22 +103,18 @@ async def register_oauth_client(
         if type:
             oauth_client_id = f"{type}:{form_data.client_id}"
 
-        oauth_client_info = (
-            await get_oauth_client_info_with_dynamic_client_registration(
-                request, oauth_client_id, form_data.url
-            )
+        oauth_client_info = await get_oauth_client_info_with_dynamic_client_registration(
+            request, oauth_client_id, form_data.url
         )
         return {
             "status": True,
-            "oauth_client_info": encrypt_data(
-                oauth_client_info.model_dump(mode="json")
-            ),
+            "oauth_client_info": encrypt_data(oauth_client_info.model_dump(mode="json")),
         }
     except Exception as e:
         log.debug(f"Failed to register OAuth client: {e}")
         raise HTTPException(
             status_code=400,
-            detail=f"Failed to register OAuth client",
+            detail="Failed to register OAuth client",
         )
 
 
@@ -142,11 +126,11 @@ async def register_oauth_client(
 class ToolServerConnection(BaseModel):
     url: str
     path: str
-    type: Optional[str] = "openapi"  # openapi, mcp
-    auth_type: Optional[str]
-    headers: Optional[dict | str] = None
-    key: Optional[str]
-    config: Optional[dict]
+    type: str | None = "openapi"  # openapi, mcp
+    auth_type: str | None
+    headers: dict | str | None = None
+    key: str | None
+    config: dict | None
 
     model_config = ConfigDict(extra="allow")
 
@@ -197,9 +181,7 @@ async def set_tool_servers_config(
 
             if auth_type == "oauth_2.1" and server_id:
                 try:
-                    oauth_client_info = connection.get("info", {}).get(
-                        "oauth_client_info", ""
-                    )
+                    oauth_client_info = connection.get("info", {}).get("oauth_client_info", "")
                     oauth_client_info = decrypt_data(oauth_client_info)
 
                     request.app.state.oauth_client_manager.add_client(
@@ -216,41 +198,27 @@ async def set_tool_servers_config(
 
 
 @router.post("/tool_servers/verify")
-async def verify_tool_servers_config(
-    request: Request, form_data: ToolServerConnection, user=Depends(get_admin_user)
-):
-    """
-    Verify the connection to the tool server.
-    """
+async def verify_tool_servers_config(request: Request, form_data: ToolServerConnection, user=Depends(get_admin_user)):
+    """Verify the connection to the tool server."""
     try:
         if form_data.type == "mcp":
             if form_data.auth_type == "oauth_2.1":
                 discovery_urls = get_discovery_urls(form_data.url)
                 for discovery_url in discovery_urls:
-                    log.debug(
-                        f"Trying to fetch OAuth 2.1 discovery document from {discovery_url}"
-                    )
+                    log.debug(f"Trying to fetch OAuth 2.1 discovery document from {discovery_url}")
                     async with aiohttp.ClientSession(trust_env=True) as session:
-                        async with session.get(
-                            discovery_url
-                        ) as oauth_server_metadata_response:
+                        async with session.get(discovery_url) as oauth_server_metadata_response:
                             if oauth_server_metadata_response.status == 200:
                                 try:
-                                    oauth_server_metadata = (
-                                        OAuthMetadata.model_validate(
-                                            await oauth_server_metadata_response.json()
-                                        )
+                                    oauth_server_metadata = OAuthMetadata.model_validate(
+                                        await oauth_server_metadata_response.json()
                                     )
                                     return {
                                         "status": True,
-                                        "oauth_server_metadata": oauth_server_metadata.model_dump(
-                                            mode="json"
-                                        ),
+                                        "oauth_server_metadata": oauth_server_metadata.model_dump(mode="json"),
                                     }
                                 except Exception as e:
-                                    log.info(
-                                        f"Failed to parse OAuth 2.1 discovery document: {e}"
-                                    )
+                                    log.info(f"Failed to parse OAuth 2.1 discovery document: {e}")
                                     raise HTTPException(
                                         status_code=400,
                                         detail=f"Failed to parse OAuth 2.1 discovery document from {discovery_url}",
@@ -260,52 +228,51 @@ async def verify_tool_servers_config(
                     status_code=400,
                     detail=f"Failed to fetch OAuth 2.1 discovery document from {discovery_urls}",
                 )
-            else:
-                try:
-                    client = MCPClient()
-                    headers = None
+            try:
+                client = MCPClient()
+                headers = None
 
-                    token = None
-                    if form_data.auth_type == "bearer":
-                        token = form_data.key
-                    elif form_data.auth_type == "session":
-                        token = request.state.token.credentials
-                    elif form_data.auth_type == "system_oauth":
-                        oauth_token = None
-                        try:
-                            if request.cookies.get("oauth_session_id", None):
-                                oauth_token = await request.app.state.oauth_manager.get_oauth_token(
-                                    user.id,
-                                    request.cookies.get("oauth_session_id", None),
-                                )
+                token = None
+                if form_data.auth_type == "bearer":
+                    token = form_data.key
+                elif form_data.auth_type == "session":
+                    token = request.state.token.credentials
+                elif form_data.auth_type == "system_oauth":
+                    oauth_token = None
+                    try:
+                        if request.cookies.get("oauth_session_id", None):
+                            oauth_token = await request.app.state.oauth_manager.get_oauth_token(
+                                user.id,
+                                request.cookies.get("oauth_session_id", None),
+                            )
 
-                                if oauth_token:
-                                    token = oauth_token.get("access_token", "")
-                        except Exception as e:
-                            pass
-                    if token:
-                        headers = {"Authorization": f"Bearer {token}"}
+                            if oauth_token:
+                                token = oauth_token.get("access_token", "")
+                    except Exception:
+                        pass
+                if token:
+                    headers = {"Authorization": f"Bearer {token}"}
 
-                    if form_data.headers and isinstance(form_data.headers, dict):
-                        if headers is None:
-                            headers = {}
-                        headers.update(form_data.headers)
+                if form_data.headers and isinstance(form_data.headers, dict):
+                    if headers is None:
+                        headers = {}
+                    headers.update(form_data.headers)
 
-                    await client.connect(form_data.url, headers=headers)
-                    specs = await client.list_tool_specs()
-                    return {
-                        "status": True,
-                        "specs": specs,
-                    }
-                except Exception as e:
-                    log.debug(f"Failed to create MCP client: {e}")
-                    raise HTTPException(
-                        status_code=400,
-                        detail=f"Failed to create MCP client",
-                    )
-                finally:
-                    if client:
-                        await client.disconnect()
+                await client.connect(form_data.url, headers=headers)
+                specs = await client.list_tool_specs()
+                return {
+                    "status": True,
+                    "specs": specs,
+                }
+            except Exception as e:
+                log.debug(f"Failed to create MCP client: {e}")
+                raise HTTPException(
+                    status_code=400,
+                    detail="Failed to create MCP client",
+                )
+            finally:
+                if client:
+                    await client.disconnect()
         else:  # openapi
             token = None
             headers = None
@@ -316,17 +283,15 @@ async def verify_tool_servers_config(
             elif form_data.auth_type == "system_oauth":
                 try:
                     if request.cookies.get("oauth_session_id", None):
-                        oauth_token = (
-                            await request.app.state.oauth_manager.get_oauth_token(
-                                user.id,
-                                request.cookies.get("oauth_session_id", None),
-                            )
+                        oauth_token = await request.app.state.oauth_manager.get_oauth_token(
+                            user.id,
+                            request.cookies.get("oauth_session_id", None),
                         )
 
                         if oauth_token:
                             token = oauth_token.get("access_token", "")
 
-                except Exception as e:
+                except Exception:
                     pass
 
             if token:
@@ -345,7 +310,7 @@ async def verify_tool_servers_config(
         log.debug(f"Failed to connect to the tool server: {e}")
         raise HTTPException(
             status_code=400,
-            detail=f"Failed to connect to the tool server",
+            detail="Failed to connect to the tool server",
         )
 
 
@@ -355,19 +320,19 @@ async def verify_tool_servers_config(
 class CodeInterpreterConfigForm(BaseModel):
     ENABLE_CODE_EXECUTION: bool
     CODE_EXECUTION_ENGINE: str
-    CODE_EXECUTION_JUPYTER_URL: Optional[str]
-    CODE_EXECUTION_JUPYTER_AUTH: Optional[str]
-    CODE_EXECUTION_JUPYTER_AUTH_TOKEN: Optional[str]
-    CODE_EXECUTION_JUPYTER_AUTH_PASSWORD: Optional[str]
-    CODE_EXECUTION_JUPYTER_TIMEOUT: Optional[int]
+    CODE_EXECUTION_JUPYTER_URL: str | None
+    CODE_EXECUTION_JUPYTER_AUTH: str | None
+    CODE_EXECUTION_JUPYTER_AUTH_TOKEN: str | None
+    CODE_EXECUTION_JUPYTER_AUTH_PASSWORD: str | None
+    CODE_EXECUTION_JUPYTER_TIMEOUT: int | None
     ENABLE_CODE_INTERPRETER: bool
     CODE_INTERPRETER_ENGINE: str
-    CODE_INTERPRETER_PROMPT_TEMPLATE: Optional[str]
-    CODE_INTERPRETER_JUPYTER_URL: Optional[str]
-    CODE_INTERPRETER_JUPYTER_AUTH: Optional[str]
-    CODE_INTERPRETER_JUPYTER_AUTH_TOKEN: Optional[str]
-    CODE_INTERPRETER_JUPYTER_AUTH_PASSWORD: Optional[str]
-    CODE_INTERPRETER_JUPYTER_TIMEOUT: Optional[int]
+    CODE_INTERPRETER_PROMPT_TEMPLATE: str | None
+    CODE_INTERPRETER_JUPYTER_URL: str | None
+    CODE_INTERPRETER_JUPYTER_AUTH: str | None
+    CODE_INTERPRETER_JUPYTER_AUTH_TOKEN: str | None
+    CODE_INTERPRETER_JUPYTER_AUTH_PASSWORD: str | None
+    CODE_INTERPRETER_JUPYTER_TIMEOUT: int | None
 
 
 @router.get("/code_execution", response_model=CodeInterpreterConfigForm)
@@ -395,49 +360,26 @@ async def get_code_execution_config(request: Request, user=Depends(get_admin_use
 async def set_code_execution_config(
     request: Request, form_data: CodeInterpreterConfigForm, user=Depends(get_admin_user)
 ):
-
     request.app.state.config.ENABLE_CODE_EXECUTION = form_data.ENABLE_CODE_EXECUTION
 
     request.app.state.config.CODE_EXECUTION_ENGINE = form_data.CODE_EXECUTION_ENGINE
-    request.app.state.config.CODE_EXECUTION_JUPYTER_URL = (
-        form_data.CODE_EXECUTION_JUPYTER_URL
-    )
-    request.app.state.config.CODE_EXECUTION_JUPYTER_AUTH = (
-        form_data.CODE_EXECUTION_JUPYTER_AUTH
-    )
-    request.app.state.config.CODE_EXECUTION_JUPYTER_AUTH_TOKEN = (
-        form_data.CODE_EXECUTION_JUPYTER_AUTH_TOKEN
-    )
-    request.app.state.config.CODE_EXECUTION_JUPYTER_AUTH_PASSWORD = (
-        form_data.CODE_EXECUTION_JUPYTER_AUTH_PASSWORD
-    )
-    request.app.state.config.CODE_EXECUTION_JUPYTER_TIMEOUT = (
-        form_data.CODE_EXECUTION_JUPYTER_TIMEOUT
-    )
+    request.app.state.config.CODE_EXECUTION_JUPYTER_URL = form_data.CODE_EXECUTION_JUPYTER_URL
+    request.app.state.config.CODE_EXECUTION_JUPYTER_AUTH = form_data.CODE_EXECUTION_JUPYTER_AUTH
+    request.app.state.config.CODE_EXECUTION_JUPYTER_AUTH_TOKEN = form_data.CODE_EXECUTION_JUPYTER_AUTH_TOKEN
+    request.app.state.config.CODE_EXECUTION_JUPYTER_AUTH_PASSWORD = form_data.CODE_EXECUTION_JUPYTER_AUTH_PASSWORD
+    request.app.state.config.CODE_EXECUTION_JUPYTER_TIMEOUT = form_data.CODE_EXECUTION_JUPYTER_TIMEOUT
 
     request.app.state.config.ENABLE_CODE_INTERPRETER = form_data.ENABLE_CODE_INTERPRETER
     request.app.state.config.CODE_INTERPRETER_ENGINE = form_data.CODE_INTERPRETER_ENGINE
-    request.app.state.config.CODE_INTERPRETER_PROMPT_TEMPLATE = (
-        form_data.CODE_INTERPRETER_PROMPT_TEMPLATE
-    )
+    request.app.state.config.CODE_INTERPRETER_PROMPT_TEMPLATE = form_data.CODE_INTERPRETER_PROMPT_TEMPLATE
 
-    request.app.state.config.CODE_INTERPRETER_JUPYTER_URL = (
-        form_data.CODE_INTERPRETER_JUPYTER_URL
-    )
+    request.app.state.config.CODE_INTERPRETER_JUPYTER_URL = form_data.CODE_INTERPRETER_JUPYTER_URL
 
-    request.app.state.config.CODE_INTERPRETER_JUPYTER_AUTH = (
-        form_data.CODE_INTERPRETER_JUPYTER_AUTH
-    )
+    request.app.state.config.CODE_INTERPRETER_JUPYTER_AUTH = form_data.CODE_INTERPRETER_JUPYTER_AUTH
 
-    request.app.state.config.CODE_INTERPRETER_JUPYTER_AUTH_TOKEN = (
-        form_data.CODE_INTERPRETER_JUPYTER_AUTH_TOKEN
-    )
-    request.app.state.config.CODE_INTERPRETER_JUPYTER_AUTH_PASSWORD = (
-        form_data.CODE_INTERPRETER_JUPYTER_AUTH_PASSWORD
-    )
-    request.app.state.config.CODE_INTERPRETER_JUPYTER_TIMEOUT = (
-        form_data.CODE_INTERPRETER_JUPYTER_TIMEOUT
-    )
+    request.app.state.config.CODE_INTERPRETER_JUPYTER_AUTH_TOKEN = form_data.CODE_INTERPRETER_JUPYTER_AUTH_TOKEN
+    request.app.state.config.CODE_INTERPRETER_JUPYTER_AUTH_PASSWORD = form_data.CODE_INTERPRETER_JUPYTER_AUTH_PASSWORD
+    request.app.state.config.CODE_INTERPRETER_JUPYTER_TIMEOUT = form_data.CODE_INTERPRETER_JUPYTER_TIMEOUT
 
     return {
         "ENABLE_CODE_EXECUTION": request.app.state.config.ENABLE_CODE_EXECUTION,
@@ -462,9 +404,9 @@ async def set_code_execution_config(
 # SetDefaultModels
 ############################
 class ModelsConfigForm(BaseModel):
-    DEFAULT_MODELS: Optional[str]
-    DEFAULT_PINNED_MODELS: Optional[str]
-    MODEL_ORDER_LIST: Optional[list[str]]
+    DEFAULT_MODELS: str | None
+    DEFAULT_PINNED_MODELS: str | None
+    MODEL_ORDER_LIST: list[str] | None
 
 
 @router.get("/models", response_model=ModelsConfigForm)
@@ -477,9 +419,7 @@ async def get_models_config(request: Request, user=Depends(get_admin_user)):
 
 
 @router.post("/models", response_model=ModelsConfigForm)
-async def set_models_config(
-    request: Request, form_data: ModelsConfigForm, user=Depends(get_admin_user)
-):
+async def set_models_config(request: Request, form_data: ModelsConfigForm, user=Depends(get_admin_user)):
     request.app.state.config.DEFAULT_MODELS = form_data.DEFAULT_MODELS
     request.app.state.config.DEFAULT_PINNED_MODELS = form_data.DEFAULT_PINNED_MODELS
     request.app.state.config.MODEL_ORDER_LIST = form_data.MODEL_ORDER_LIST

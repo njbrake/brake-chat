@@ -4,30 +4,32 @@ import sys
 from typing import TYPE_CHECKING
 
 from loguru import logger
-from opentelemetry import trace
 from open_webui.env import (
-    AUDIT_UVICORN_LOGGER_NAMES,
     AUDIT_LOG_FILE_ROTATION_SIZE,
     AUDIT_LOG_LEVEL,
     AUDIT_LOGS_FILE_PATH,
-    GLOBAL_LOG_LEVEL,
+    AUDIT_UVICORN_LOGGER_NAMES,
     ENABLE_OTEL,
     ENABLE_OTEL_LOGS,
+    GLOBAL_LOG_LEVEL,
 )
-
+from opentelemetry import trace
 
 if TYPE_CHECKING:
     from loguru import Record
 
 
 def stdout_format(record: "Record") -> str:
-    """
-    Generates a formatted string for log records that are output to the console. This format includes a timestamp, log level, source location (module, function, and line), the log message, and any extra data (serialized as JSON).
+    """Generates a formatted string for log records that are output to the console. This format includes a timestamp, log level, source location (module, function, and line), the log message, and any extra data (serialized as JSON).
 
-    Parameters:
+    Parameters
+    ----------
     record (Record): A Loguru record that contains logging details including time, level, name, function, line, message, and any extra context.
-    Returns:
+
+    Returns
+    -------
     str: A formatted log string intended for stdout.
+
     """
     if record["extra"]:
         record["extra"]["extra_json"] = json.dumps(record["extra"])
@@ -43,14 +45,12 @@ def stdout_format(record: "Record") -> str:
 
 
 class InterceptHandler(logging.Handler):
-    """
-    Intercepts log records from Python's standard logging module
+    """Intercepts log records from Python's standard logging module
     and redirects them to Loguru's logger.
     """
 
     def emit(self, record):
-        """
-        Called by the standard logging module for each log event.
+        """Called by the standard logging module for each log event.
         It transforms the standard `LogRecord` into a format compatible with Loguru
         and passes it to Loguru's logger.
         """
@@ -64,9 +64,7 @@ class InterceptHandler(logging.Handler):
             frame = frame.f_back
             depth += 1
 
-        logger.opt(depth=depth, exception=record.exc_info).bind(
-            **self._get_extras()
-        ).log(level, record.getMessage())
+        logger.opt(depth=depth, exception=record.exc_info).bind(**self._get_extras()).log(level, record.getMessage())
         if ENABLE_OTEL and ENABLE_OTEL_LOGS:
             from open_webui.utils.telemetry.logs import otel_handler
 
@@ -85,15 +83,17 @@ class InterceptHandler(logging.Handler):
 
 
 def file_format(record: "Record"):
-    """
-    Formats audit log records into a structured JSON string for file output.
+    """Formats audit log records into a structured JSON string for file output.
 
-    Parameters:
+    Parameters
+    ----------
     record (Record): A Loguru record containing extra audit data.
-    Returns:
-    str: A JSON-formatted string representing the audit data.
-    """
 
+    Returns
+    -------
+    str: A JSON-formatted string representing the audit data.
+
+    """
     audit_data = {
         "id": record["extra"].get("id", ""),
         "timestamp": int(record["time"].timestamp()),
@@ -114,15 +114,16 @@ def file_format(record: "Record"):
 
 
 def start_logger():
-    """
-    Initializes and configures Loguru's logger with distinct handlers:
+    """Initializes and configures Loguru's logger with distinct handlers:
 
     A console (stdout) handler for general log messages (excluding those marked as auditable).
     An optional file handler for audit logs if audit logging is enabled.
     Additionally, this function reconfigures Python’s standard logging to route through Loguru and adjusts logging levels for Uvicorn.
 
-    Parameters:
+    Parameters
+    ----------
     enable_audit_logging (bool): Determines whether audit-specific log entries should be recorded to file.
+
     """
     logger.remove()
 
@@ -143,11 +144,9 @@ def start_logger():
                 filter=lambda record: record["extra"].get("auditable") is True,
             )
         except Exception as e:
-            logger.error(f"Failed to initialize audit log file handler: {str(e)}")
+            logger.error(f"Failed to initialize audit log file handler: {e!s}")
 
-    logging.basicConfig(
-        handlers=[InterceptHandler()], level=GLOBAL_LOG_LEVEL, force=True
-    )
+    logging.basicConfig(handlers=[InterceptHandler()], level=GLOBAL_LOG_LEVEL, force=True)
 
     for uvicorn_logger_name in ["uvicorn", "uvicorn.error"]:
         uvicorn_logger = logging.getLogger(uvicorn_logger_name)

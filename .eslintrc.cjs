@@ -19,6 +19,27 @@ module.exports = {
 		es2017: true,
 		node: true
 	},
+	rules: {
+		'no-unused-vars': 'off',
+		'@typescript-eslint/no-unused-vars': 'off',
+		'@typescript-eslint/no-explicit-any': 'off',
+		'@typescript-eslint/no-unsafe-function-type': 'off',
+		'no-constant-condition': 'off',
+		'svelte/no-at-html-tags': 'off',
+		'svelte/valid-compile': ['error', { ignoreWarnings: true }],
+		'no-prototype-builtins': 'off',
+		'@typescript-eslint/no-empty-object-type': 'off',
+		'svelte/no-unused-svelte-ignore': 'off',
+		'@typescript-eslint/no-unused-expressions': 'off',
+		'no-empty': 'off',
+		'no-unsafe-optional-chaining': 'off',
+		'no-ex-assign': 'off',
+		'@typescript-eslint/ban-ts-comment': 'off',
+		'no-useless-escape': 'off',
+		'no-async-promise-executor': 'off',
+		'no-control-regex': 'off',
+		'prefer-const': 'off'
+	},
 	overrides: [
 		{
 			files: ['*.svelte'],

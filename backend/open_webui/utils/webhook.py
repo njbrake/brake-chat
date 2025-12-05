@@ -1,9 +1,8 @@
 import json
 import logging
-import aiohttp
 
-from open_webui.config import WEBUI_FAVICON_URL
-from open_webui.env import SRC_LOG_LEVELS, VERSION
+import aiohttp
+from open_webui.env import SRC_LOG_LEVELS, VERSION, WEBUI_FAVICON_URL
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["WEBHOOK"])
@@ -19,18 +18,11 @@ async def post_webhook(name: str, url: str, message: str, event_data: dict) -> b
             payload["text"] = message
         # Discord Webhooks
         elif "https://discord.com/api/webhooks" in url:
-            payload["content"] = (
-                message
-                if len(message) < 2000
-                else f"{message[: 2000 - 20]}... (truncated)"
-            )
+            payload["content"] = message if len(message) < 2000 else f"{message[: 2000 - 20]}... (truncated)"
         # Microsoft Teams Webhooks
         elif "webhook.office.com" in url:
             action = event_data.get("action", "undefined")
-            facts = [
-                {"name": name, "value": value}
-                for name, value in json.loads(event_data.get("user", {})).items()
-            ]
+            facts = [{"name": name, "value": value} for name, value in json.loads(event_data.get("user", {})).items()]
             payload = {
                 "@type": "MessageCard",
                 "@context": "http://schema.org/extensions",

@@ -43,7 +43,7 @@
 	import AddTextContentModal from './KnowledgeBase/AddTextContentModal.svelte';
 
 	import SyncConfirmDialog from '../../common/ConfirmDialog.svelte';
-	import RichTextInput from '$lib/components/common/RichTextInput.svelte';
+	import MarkdownInput from '$lib/components/common/MarkdownInput.svelte';
 	import EllipsisVertical from '$lib/components/icons/EllipsisVertical.svelte';
 	import Drawer from '$lib/components/common/Drawer.svelte';
 	import ChevronLeft from '$lib/components/icons/ChevronLeft.svelte';
@@ -555,7 +555,7 @@
 					continue;
 				}
 
-				// Not sure why you have to call webkitGetAsEntry and isDirectory seperate, but it won't work if you try item.webkitGetAsEntry().isDirectory
+				// Not sure why you have to call webkitGetAsEntry and isDirectory separate, but it won't work if you try item.webkitGetAsEntry().isDirectory
 				const wkentry = item.webkitGetAsEntry();
 				const isDirectory = wkentry.isDirectory;
 				if (isDirectory) {

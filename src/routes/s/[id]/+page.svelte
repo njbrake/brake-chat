@@ -8,7 +8,7 @@
 	import { settings, chatId, WEBUI_NAME, models, config } from '$lib/stores';
 	import { convertMessagesToHistory, createMessagesList } from '$lib/utils';
 
-	import { getChatByShareId, cloneSharedChatById } from '$lib/apis/chats';
+	import { getChatByShareId, cloneChatById } from '$lib/apis/chats';
 
 	import Messages from '$lib/components/chat/Messages.svelte';
 
@@ -130,7 +130,7 @@
 	const cloneSharedChat = async () => {
 		if (!chat) return;
 
-		const res = await cloneSharedChatById(localStorage.token, chat.id).catch((error) => {
+		const res = await cloneChatById(localStorage.token, chat.id).catch((error) => {
 			toast.error(`${error}`);
 			return null;
 		});

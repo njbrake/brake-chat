@@ -52,7 +52,7 @@ transformers
 sentence-transformers==5.1.1
 accelerate
 pyarrow==20.0.0 # fix: pin pyarrow version to 20 for rpi compatibility #15897
-einops==0.8.1 
+einops==0.8.1
 
 ftfy==6.2.3
 chardet==5.2.0
@@ -83,7 +83,6 @@ rank-bm25==0.2.2
 onnxruntime==1.20.1
 faster-whisper==1.1.1
 
-black==25.9.0
 youtube-transcript-api==1.2.2
 pytube==15.0.0
 

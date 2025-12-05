@@ -62,7 +62,7 @@
 
 	import { deleteNoteById, getNoteById, updateNoteById } from '$lib/apis/notes';
 
-	import RichTextInput from '../common/RichTextInput.svelte';
+	import MarkdownInput from '../common/MarkdownInput.svelte';
 	import Spinner from '../common/Spinner.svelte';
 	import MicSolid from '../icons/MicSolid.svelte';
 	import VoiceRecording from '../chat/MessageInput/VoiceRecording.svelte';
@@ -165,7 +165,7 @@
 		loading = false;
 	};
 
-	let debounceTimeout: NodeJS.Timeout | null = null;
+	let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	const changeDebounceHandler = () => {
 		if (debounceTimeout) {
@@ -1141,21 +1141,13 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 							></div>
 						{/if}
 
-						<RichTextInput
+						<MarkdownInput
 							bind:this={inputElement}
 							bind:editor
 							id={`note-${note.id}`}
 							className="input-prose-sm px-0.5"
-							json={true}
-							bind:value={note.data.content.json}
+							bind:value={note.data.content.md}
 							html={note.data?.content?.html}
-							documentId={`note:${note.id}`}
-							collaboration={true}
-							socket={$socket}
-							user={$user}
-							dragHandle={true}
-							link={true}
-							image={true}
 							{files}
 							placeholder={$i18n.t('Write something...')}
 							editable={versionIdx === null && !editing}
@@ -1176,6 +1168,7 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 							onChange={(content) => {
 								note.data.content.html = content.html;
 								note.data.content.md = content.md;
+								note.data.content.json = null;
 
 								if (editor) {
 									wordCount = editor.storage.characterCount.words();
@@ -1189,18 +1182,9 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 										return null;
 									});
 
-									if (fileItem.type === 'image') {
-										// If the file is an image, insert it directly
-										currentEditor
-											.chain()
-											.insertContentAt(pos, {
-												type: 'image',
-												attrs: {
-													src: `data://${fileItem.id}`
-												}
-											})
-											.focus()
-											.run();
+									if (fileItem?.type === 'image') {
+										const markdown = `![${fileItem.name || 'image'}](data://${fileItem.id})`;
+										inputElement?.insertContent(markdown);
 									}
 								});
 							}}
@@ -1218,17 +1202,9 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 											const blob = item.getAsFile();
 											const fileItem = await inputFileHandler(blob);
 
-											if (editor) {
-												editor
-													?.chain()
-													.insertContentAt(editor.state.selection.$anchor.pos, {
-														type: 'image',
-														attrs: {
-															src: `data://${fileItem.id}` // Use data URI for the image
-														}
-													})
-													.focus()
-													.run();
+											if (fileItem?.type === 'image') {
+												const markdown = `![${fileItem.name || 'image'}](data://${fileItem.id})`;
+												inputElement?.insertContent(markdown);
 											}
 										} else if (item?.kind === 'file') {
 											const file = item.getAsFile();

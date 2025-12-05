@@ -10,13 +10,11 @@
 		archiveChatById,
 		cloneChatById,
 		deleteChatById,
-		getAllTags,
+		getAllChatTags,
 		getChatById,
 		getChatList,
-		getChatListByTagName,
-		getPinnedChatList,
-		updateChatById,
-		updateChatFolderIdById
+		getPinnedChats,
+		updateChatById
 	} from '$lib/apis/chats';
 	import {
 		chatId,
@@ -88,7 +86,7 @@
 
 			currentChatPage.set(1);
 			await chats.set(await getChatList(localStorage.token, $currentChatPage));
-			await pinnedChats.set(await getPinnedChatList(localStorage.token));
+			await pinnedChats.set(await getPinnedChats(localStorage.token));
 
 			dispatch('change');
 		}
@@ -111,7 +109,7 @@
 
 			currentChatPage.set(1);
 			await chats.set(await getChatList(localStorage.token, $currentChatPage));
-			await pinnedChats.set(await getPinnedChatList(localStorage.token));
+			await pinnedChats.set(await getPinnedChats(localStorage.token));
 		}
 	};
 
@@ -122,7 +120,7 @@
 		});
 
 		if (res) {
-			tags.set(await getAllTags(localStorage.token));
+			tags.set(await getAllChatTags(localStorage.token));
 			if ($chatId === id) {
 				await goto('/');
 
@@ -141,7 +139,7 @@
 
 	const moveChatHandler = async (chatId, folderId) => {
 		if (chatId && folderId) {
-			const res = await updateChatFolderIdById(localStorage.token, chatId, folderId).catch(
+			const res = await updateChatById(localStorage.token, chatId, { folder_id: folderId }).catch(
 				(error) => {
 					toast.error(`${error}`);
 					return null;
@@ -151,7 +149,7 @@
 			if (res) {
 				currentChatPage.set(1);
 				await chats.set(await getChatList(localStorage.token, $currentChatPage));
-				await pinnedChats.set(await getPinnedChatList(localStorage.token));
+				await pinnedChats.set(await getPinnedChats(localStorage.token));
 
 				dispatch('change');
 

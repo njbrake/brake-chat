@@ -1,59 +1,39 @@
+import asyncio
+import copy
 import inspect
+import json
 import logging
 import re
-import inspect
-import aiohttp
-import asyncio
-import yaml
-import json
-
-from pydantic import BaseModel
-from pydantic.fields import FieldInfo
+from collections.abc import Awaitable, Callable
+from functools import partial, update_wrapper
 from typing import (
     Any,
-    Awaitable,
-    Callable,
     get_type_hints,
-    get_args,
-    get_origin,
-    Dict,
-    List,
-    Tuple,
-    Union,
-    Optional,
-    Type,
 )
-from functools import update_wrapper, partial
 
-
+import aiohttp
+import yaml
 from fastapi import Request
-from pydantic import BaseModel, Field, create_model
-
 from langchain_core.utils.function_calling import (
     convert_to_openai_function as convert_pydantic_model_to_openai_function_spec,
 )
-
-
-from open_webui.utils.misc import is_string_allowed
-from open_webui.models.tools import Tools
-from open_webui.models.users import UserModel
-from open_webui.utils.plugin import load_tool_module_by_id
 from open_webui.env import (
-    SRC_LOG_LEVELS,
+    AIOHTTP_CLIENT_SESSION_TOOL_SERVER_SSL,
     AIOHTTP_CLIENT_TIMEOUT,
     AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA,
-    AIOHTTP_CLIENT_SESSION_TOOL_SERVER_SSL,
+    SRC_LOG_LEVELS,
 )
-
-import copy
+from open_webui.models.tools import Tools
+from open_webui.models.users import UserModel
+from open_webui.utils.misc import is_string_allowed
+from open_webui.utils.plugin import load_tool_module_by_id
+from pydantic import BaseModel, Field, create_model
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["MODELS"])
 
 
-def get_async_tool_function_and_apply_extra_params(
-    function: Callable, extra_params: dict
-) -> Callable[..., Awaitable]:
+def get_async_tool_function_and_apply_extra_params(function: Callable, extra_params: dict) -> Callable[..., Awaitable]:
     sig = inspect.signature(function)
     extra_params = {k: v for k, v in extra_params.items() if k in sig.parameters}
     partial_func = partial(function, **extra_params)
@@ -68,9 +48,7 @@ def get_async_tool_function_and_apply_extra_params(
         # Keep remaining parameters
         parameters.append(parameter)
 
-    new_sig = inspect.Signature(
-        parameters=parameters, return_annotation=sig.return_annotation
-    )
+    new_sig = inspect.Signature(parameters=parameters, return_annotation=sig.return_annotation)
 
     if inspect.iscoroutinefunction(function):
         # wrap the functools.partial as python-genai has trouble with it
@@ -84,7 +62,7 @@ def get_async_tool_function_and_apply_extra_params(
             return partial_func(*args, **kwargs)
 
     update_wrapper(new_function, function)
-    new_function.__signature__ = new_sig
+    new_function.__signature__ = new_sig  # type: ignore
 
     new_function.__function__ = function  # type: ignore
     new_function.__extra_params__ = extra_params  # type: ignore
@@ -106,15 +84,12 @@ def get_updated_tool_function(function: Callable, extra_params: dict):
     return function
 
 
-async def get_tools(
-    request: Request, tool_ids: list[str], user: UserModel, extra_params: dict
-) -> dict[str, dict]:
+async def get_tools(request: Request, tool_ids: list[str], user: UserModel, extra_params: dict) -> dict[str, dict]:
     tools_dict = {}
 
     for tool_id in tool_ids:
         tool = Tools.get_tool_by_id(tool_id)
         if tool is None:
-
             if tool_id.startswith("server:"):
                 splits = tool_id.split(":")
 
@@ -131,7 +106,6 @@ async def get_tools(
                     function_names = server_id_splits[1].split(",")
 
                 if type == "openapi":
-
                     tool_server_data = None
                     for server in await get_tool_servers(request):
                         if server["id"] == server_id:
@@ -143,24 +117,18 @@ async def get_tools(
                         continue
 
                     tool_server_idx = tool_server_data.get("idx", 0)
-                    tool_server_connection = (
-                        request.app.state.config.TOOL_SERVER_CONNECTIONS[
-                            tool_server_idx
-                        ]
-                    )
+                    tool_server_connection = request.app.state.config.TOOL_SERVER_CONNECTIONS[tool_server_idx]
 
                     specs = tool_server_data.get("specs", [])
-                    function_name_filter_value = tool_server_connection.get(
-                        "config", {}
-                    ).get("function_name_filter_list", "")
+                    function_name_filter_value = tool_server_connection.get("config", {}).get(
+                        "function_name_filter_list", ""
+                    )
                     # Handle both string (legacy) and list (current) formats
                     if isinstance(function_name_filter_value, list):
                         function_name_filter_list = function_name_filter_value
                     elif isinstance(function_name_filter_value, str):
                         function_name_filter_list = (
-                            function_name_filter_value.split(",")
-                            if function_name_filter_value
-                            else []
+                            function_name_filter_value.split(",") if function_name_filter_value else []
                         )
                     else:
                         function_name_filter_list = []
@@ -168,9 +136,7 @@ async def get_tools(
                     for spec in specs:
                         function_name = spec["name"]
                         if function_name_filter_list:
-                            if not is_string_allowed(
-                                function_name, function_name_filter_list
-                            ):
+                            if not is_string_allowed(function_name, function_name_filter_list):
                                 # Skip this function
                                 continue
 
@@ -182,33 +148,25 @@ async def get_tools(
                         }
 
                         if auth_type == "bearer":
-                            headers["Authorization"] = (
-                                f"Bearer {tool_server_connection.get('key', '')}"
-                            )
+                            headers["Authorization"] = f"Bearer {tool_server_connection.get('key', '')}"
                         elif auth_type == "none":
                             # No authentication
                             pass
                         elif auth_type == "session":
                             cookies = request.cookies
-                            headers["Authorization"] = (
-                                f"Bearer {request.state.token.credentials}"
-                            )
+                            headers["Authorization"] = f"Bearer {request.state.token.credentials}"
                         elif auth_type == "system_oauth":
                             cookies = request.cookies
                             oauth_token = extra_params.get("__oauth_token__", None)
                             if oauth_token:
-                                headers["Authorization"] = (
-                                    f"Bearer {oauth_token.get('access_token', '')}"
-                                )
+                                headers["Authorization"] = f"Bearer {oauth_token.get('access_token', '')}"
 
                         connection_headers = tool_server_connection.get("headers", None)
                         if connection_headers and isinstance(connection_headers, dict):
                             for key, value in connection_headers.items():
                                 headers[key] = value
 
-                        def make_tool_function(
-                            function_name, tool_server_data, headers
-                        ):
+                        def make_tool_function(function_name, tool_server_data, headers):
                             async def tool_function(**kwargs):
                                 return await execute_tool_server(
                                     url=tool_server_data["url"],
@@ -221,9 +179,7 @@ async def get_tools(
 
                             return tool_function
 
-                        tool_function = make_tool_function(
-                            function_name, tool_server_data, headers
-                        )
+                        tool_function = make_tool_function(function_name, tool_server_data, headers)
 
                         callable = get_async_tool_function_and_apply_extra_params(
                             tool_function,
@@ -240,9 +196,7 @@ async def get_tools(
 
                         # Handle function name collisions
                         while function_name in tools_dict:
-                            log.warning(
-                                f"Tool {function_name} already exists in another tools!"
-                            )
+                            log.warning(f"Tool {function_name} already exists in another tools!")
                             # Prepend server ID to function name
                             function_name = f"{server_id}_{function_name}"
 
@@ -281,9 +235,7 @@ async def get_tools(
 
                 # Remove internal reserved parameters (e.g. __id__, __user__)
                 spec["parameters"]["properties"] = {
-                    key: val
-                    for key, val in spec["parameters"]["properties"].items()
-                    if not key.startswith("__")
+                    key: val for key, val in spec["parameters"]["properties"].items() if not key.startswith("__")
                 }
 
                 # convert to function that takes only model params and inserts custom params
@@ -311,17 +263,14 @@ async def get_tools(
                     "spec": spec,
                     # Misc info
                     "metadata": {
-                        "file_handler": hasattr(module, "file_handler")
-                        and module.file_handler,
+                        "file_handler": hasattr(module, "file_handler") and module.file_handler,
                         "citation": hasattr(module, "citation") and module.citation,
                     },
                 }
 
                 # Handle function name collisions
                 while function_name in tools_dict:
-                    log.warning(
-                        f"Tool {function_name} already exists in another tools!"
-                    )
+                    log.warning(f"Tool {function_name} already exists in another tools!")
                     # Prepend tool ID to function name
                     function_name = f"{tool_id}_{function_name}"
 
@@ -331,16 +280,15 @@ async def get_tools(
 
 
 def parse_description(docstring: str | None) -> str:
-    """
-    Parse a function's docstring to extract the description.
+    """Parse a function's docstring to extract the description.
 
     Args:
         docstring (str): The docstring to parse.
 
     Returns:
         str: The description.
-    """
 
+    """
     if not docstring:
         return ""
 
@@ -357,14 +305,14 @@ def parse_description(docstring: str | None) -> str:
 
 
 def parse_docstring(docstring):
-    """
-    Parse a function's docstring to extract parameter descriptions in reST format.
+    """Parse a function's docstring to extract parameter descriptions in reST format.
 
     Args:
         docstring (str): The docstring to parse.
 
     Returns:
         dict: A dictionary where keys are parameter names and values are descriptions.
+
     """
     if not docstring:
         return {}
@@ -386,8 +334,7 @@ def parse_docstring(docstring):
 
 
 def convert_function_to_pydantic_model(func: Callable) -> type[BaseModel]:
-    """
-    Converts a Python function's type hints and docstring to a Pydantic model,
+    """Converts a Python function's type hints and docstring to a Pydantic model,
     including support for nested types, default values, and descriptions.
 
     Args:
@@ -396,6 +343,7 @@ def convert_function_to_pydantic_model(func: Callable) -> type[BaseModel]:
 
     Returns:
         A Pydantic model class.
+
     """
     type_hints = get_type_hints(func)
     signature = inspect.signature(func)
@@ -421,7 +369,7 @@ def convert_function_to_pydantic_model(func: Callable) -> type[BaseModel]:
         else:
             field_defs[name] = type_hint, default_value
 
-    model = create_model(func.__name__, **field_defs)
+    model = create_model(func.__name__, **field_defs)  # type: ignore[call-overload]
     model.__doc__ = function_description
 
     return model
@@ -431,9 +379,7 @@ def get_functions_from_tool(tool: object) -> list[Callable]:
     return [
         getattr(tool, func)
         for func in dir(tool)
-        if callable(
-            getattr(tool, func)
-        )  # checks if the attribute is callable (a method or function).
+        if callable(getattr(tool, func))  # checks if the attribute is callable (a method or function).
         and not func.startswith(
             "__"
         )  # filters out special (dunder) methods like init, str, etc. — these are usually built-in functions of an object that you might not need to use directly.
@@ -444,22 +390,15 @@ def get_functions_from_tool(tool: object) -> list[Callable]:
 
 
 def get_tool_specs(tool_module: object) -> list[dict]:
-    function_models = map(
-        convert_function_to_pydantic_model, get_functions_from_tool(tool_module)
-    )
+    function_models = map(convert_function_to_pydantic_model, get_functions_from_tool(tool_module))
 
-    specs = [
-        convert_pydantic_model_to_openai_function_spec(function_model)
-        for function_model in function_models
-    ]
+    specs = [convert_pydantic_model_to_openai_function_spec(function_model) for function_model in function_models]
 
     return specs
 
 
 def resolve_schema(schema, components):
-    """
-    Recursively resolves a JSON schema using OpenAPI components.
-    """
+    """Recursively resolves a JSON schema using OpenAPI components."""
     if not schema:
         return {}
 
@@ -476,9 +415,7 @@ def resolve_schema(schema, components):
     # Recursively resolve inner schemas
     if "properties" in resolved_schema:
         for prop, prop_schema in resolved_schema["properties"].items():
-            resolved_schema["properties"][prop] = resolve_schema(
-                prop_schema, components
-            )
+            resolved_schema["properties"][prop] = resolve_schema(prop_schema, components)
 
     if "items" in resolved_schema:
         resolved_schema["items"] = resolve_schema(resolved_schema["items"], components)
@@ -487,14 +424,14 @@ def resolve_schema(schema, components):
 
 
 def convert_openapi_to_tool_payload(openapi_spec):
-    """
-    Converts an OpenAPI specification into a custom tool payload structure.
+    """Converts an OpenAPI specification into a custom tool payload structure.
 
     Args:
         openapi_spec (dict): The OpenAPI specification as a Python dict.
 
     Returns:
         list: A list of tool payloads.
+
     """
     tool_payload = []
 
@@ -517,12 +454,8 @@ def convert_openapi_to_tool_payload(openapi_spec):
                     description = param_schema.get("description", "")
                     if not description:
                         description = param.get("description") or ""
-                    if param_schema.get("enum") and isinstance(
-                        param_schema.get("enum"), list
-                    ):
-                        description += (
-                            f". Possible values: {', '.join(param_schema.get('enum'))}"
-                        )
+                    if param_schema.get("enum") and isinstance(param_schema.get("enum"), list):
+                        description += f". Possible values: {', '.join(param_schema.get('enum'))}"
                     param_property = {
                         "type": param_schema.get("type"),
                         "description": description,
@@ -542,25 +475,16 @@ def convert_openapi_to_tool_payload(openapi_spec):
                     content = request_body.get("content", {})
                     json_schema = content.get("application/json", {}).get("schema")
                     if json_schema:
-                        resolved_schema = resolve_schema(
-                            json_schema, openapi_spec.get("components", {})
-                        )
+                        resolved_schema = resolve_schema(json_schema, openapi_spec.get("components", {}))
 
                         if resolved_schema.get("properties"):
-                            tool["parameters"]["properties"].update(
-                                resolved_schema["properties"]
-                            )
+                            tool["parameters"]["properties"].update(resolved_schema["properties"])
                             if "required" in resolved_schema:
                                 tool["parameters"]["required"] = list(
-                                    set(
-                                        tool["parameters"]["required"]
-                                        + resolved_schema["required"]
-                                    )
+                                    set(tool["parameters"]["required"] + resolved_schema["required"])
                                 )
                         elif resolved_schema.get("type") == "array":
-                            tool["parameters"] = (
-                                resolved_schema  # special case for array
-                            )
+                            tool["parameters"] = resolved_schema  # special case for array
 
                 tool_payload.append(tool)
 
@@ -568,14 +492,10 @@ def convert_openapi_to_tool_payload(openapi_spec):
 
 
 async def set_tool_servers(request: Request):
-    request.app.state.TOOL_SERVERS = await get_tool_servers_data(
-        request.app.state.config.TOOL_SERVER_CONNECTIONS
-    )
+    request.app.state.TOOL_SERVERS = await get_tool_servers_data(request.app.state.config.TOOL_SERVER_CONNECTIONS)
 
     if request.app.state.redis is not None:
-        await request.app.state.redis.set(
-            "tool_servers", json.dumps(request.app.state.TOOL_SERVERS)
-        )
+        await request.app.state.redis.set("tool_servers", json.dumps(request.app.state.TOOL_SERVERS))
 
     return request.app.state.TOOL_SERVERS
 
@@ -595,7 +515,7 @@ async def get_tool_servers(request: Request):
     return tool_servers
 
 
-async def get_tool_server_data(url: str, headers: Optional[dict]) -> Dict[str, Any]:
+async def get_tool_server_data(url: str, headers: dict | None) -> dict[str, Any]:
     _headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -608,9 +528,7 @@ async def get_tool_server_data(url: str, headers: Optional[dict]) -> Dict[str, A
     try:
         timeout = aiohttp.ClientTimeout(total=AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA)
         async with aiohttp.ClientSession(timeout=timeout, trust_env=True) as session:
-            async with session.get(
-                url, headers=_headers, ssl=AIOHTTP_CLIENT_SESSION_TOOL_SERVER_SSL
-            ) as response:
+            async with session.get(url, headers=_headers, ssl=AIOHTTP_CLIENT_SESSION_TOOL_SERVER_SSL) as response:
                 if response.status != 200:
                     error_body = await response.json()
                     raise Exception(error_body)
@@ -644,16 +562,13 @@ async def get_tool_server_data(url: str, headers: Optional[dict]) -> Dict[str, A
     return res
 
 
-async def get_tool_servers_data(servers: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+async def get_tool_servers_data(servers: list[dict[str, Any]]) -> list[dict[str, Any]]:
     # Prepare list of enabled servers along with their original index
 
     tasks = []
     server_entries = []
     for idx, server in enumerate(servers):
-        if (
-            server.get("config", {}).get("enable")
-            and server.get("type", "openapi") == "openapi"
-        ):
+        if server.get("config", {}).get("enable") and server.get("type", "openapi") == "openapi":
             info = server.get("info", {})
 
             auth_type = server.get("auth_type", "bearer")
@@ -743,12 +658,12 @@ async def get_tool_servers_data(servers: List[Dict[str, Any]]) -> List[Dict[str,
 
 async def execute_tool_server(
     url: str,
-    headers: Dict[str, str],
-    cookies: Dict[str, str],
+    headers: dict[str, str],
+    cookies: dict[str, str],
     name: str,
-    params: Dict[str, Any],
-    server_data: Dict[str, Any],
-) -> Tuple[Dict[str, Any], Optional[Dict[str, Any]]]:
+    params: dict[str, Any],
+    server_data: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any] | None]:
     error = None
     try:
         openapi = server_data.get("openapi", {})
@@ -855,10 +770,8 @@ async def execute_tool_server(
         return ({"error": error}, None)
 
 
-def get_tool_server_url(url: Optional[str], path: str) -> str:
-    """
-    Build the full URL for a tool server, given a base url and a path.
-    """
+def get_tool_server_url(url: str | None, path: str) -> str:
+    """Build the full URL for a tool server, given a base url and a path."""
     if "://" in path:
         # If it contains "://", it's a full URL
         return path

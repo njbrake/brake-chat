@@ -12,7 +12,7 @@
 	import { selectedFolder } from '$lib/stores';
 
 	import { deleteFolderById, getFolderById, updateFolderById } from '$lib/apis/folders';
-	import { getChatsByFolderId } from '$lib/apis/chats';
+	import { getAllChats } from '$lib/apis/chats';
 
 	import FolderModal from '$lib/components/layout/Sidebar/Folders/FolderModal.svelte';
 
@@ -113,11 +113,12 @@
 	};
 
 	const exportHandler = async () => {
-		const chats = await getChatsByFolderId(localStorage.token, folder.id).catch((error) => {
+		const allChats = await getAllChats(localStorage.token).catch((error) => {
 			toast.error(`${error}`);
 			return null;
 		});
-		if (!chats) {
+		const chats = allChats?.filter((chat) => chat.folder_id === folder.id) || [];
+		if (!chats || chats.length === 0) {
 			return;
 		}
 
@@ -146,11 +147,11 @@
 	>
 		<div class=" text-sm text-gray-700 dark:text-gray-300 flex-1 line-clamp-3 mb-2">
 			<!-- {$i18n.t('This will delete <strong>{{NAME}}</strong> and <strong>all its contents</strong>.', {
-				NAME: folders[folderId].name
+				NAME: folder.name
 			})} -->
 
 			{$i18n.t(`Are you sure you want to delete "{{NAME}}"?`, {
-				NAME: folders[folderId].name
+				NAME: folder.name
 			})}
 		</div>
 

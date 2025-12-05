@@ -1,6 +1,19 @@
-from fastapi import FastAPI
-from opentelemetry import trace
+from base64 import b64encode
 
+from fastapi import FastAPI
+from open_webui.env import (
+    ENABLE_OTEL_METRICS,
+    ENABLE_OTEL_TRACES,
+    OTEL_BASIC_AUTH_PASSWORD,
+    OTEL_BASIC_AUTH_USERNAME,
+    OTEL_EXPORTER_OTLP_ENDPOINT,
+    OTEL_EXPORTER_OTLP_INSECURE,
+    OTEL_OTLP_SPAN_EXPORTER,
+    OTEL_SERVICE_NAME,
+)
+from open_webui.utils.telemetry.instrumentors import Instrumentor
+from open_webui.utils.telemetry.metrics import setup_metrics
+from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import (
     OTLPSpanExporter as HttpOTLPSpanExporter,
@@ -9,20 +22,6 @@ from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from sqlalchemy import Engine
-from base64 import b64encode
-
-from open_webui.utils.telemetry.instrumentors import Instrumentor
-from open_webui.utils.telemetry.metrics import setup_metrics
-from open_webui.env import (
-    OTEL_SERVICE_NAME,
-    OTEL_EXPORTER_OTLP_ENDPOINT,
-    OTEL_EXPORTER_OTLP_INSECURE,
-    ENABLE_OTEL_TRACES,
-    ENABLE_OTEL_METRICS,
-    OTEL_BASIC_AUTH_USERNAME,
-    OTEL_BASIC_AUTH_PASSWORD,
-    OTEL_OTLP_SPAN_EXPORTER,
-)
 
 
 def setup(app: FastAPI, db_engine: Engine):
@@ -50,7 +49,8 @@ def setup(app: FastAPI, db_engine: Engine):
                 insecure=OTEL_EXPORTER_OTLP_INSECURE,
                 headers=headers,
             )
-        trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(exporter))
+        tracer_provider = trace.get_tracer_provider()
+        tracer_provider.add_span_processor(BatchSpanProcessor(exporter))  # type: ignore
         Instrumentor(app=app, db_engine=db_engine).instrument()
 
     # set up metrics only if enabled

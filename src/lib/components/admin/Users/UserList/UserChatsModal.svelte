@@ -7,7 +7,7 @@
 
 	dayjs.extend(localizedFormat);
 
-	import { getChatListByUserId, deleteChatById, getArchivedChatList } from '$lib/apis/chats';
+	import { getChatListByUserId, deleteChatById, getAllArchivedChats } from '$lib/apis/chats';
 
 	import Modal from '$lib/components/common/Modal.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';

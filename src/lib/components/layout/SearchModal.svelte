@@ -5,7 +5,7 @@
 
 	import Modal from '$lib/components/common/Modal.svelte';
 	import SearchInput from './Sidebar/SearchInput.svelte';
-	import { getChatById, getChatList, getChatListBySearchText } from '$lib/apis/chats';
+	import { getChatById, getChatList, searchChats } from '$lib/apis/chats';
 	import Spinner from '../common/Spinner.svelte';
 
 	import dayjs from '$lib/dayjs';
@@ -125,7 +125,7 @@
 			chatList = await getChatList(localStorage.token, page);
 		} else {
 			searchDebounceTimeout = setTimeout(async () => {
-				chatList = await getChatListBySearchText(localStorage.token, query, page);
+				chatList = await searchChats(localStorage.token, query, page);
 
 				if ((chatList ?? []).length === 0) {
 					allChatsLoaded = true;
@@ -154,7 +154,7 @@
 		let newChatList = [];
 
 		if (query) {
-			newChatList = await getChatListBySearchText(localStorage.token, query, page);
+			newChatList = await searchChats(localStorage.token, query, page);
 		} else {
 			newChatList = await getChatList(localStorage.token, page);
 		}

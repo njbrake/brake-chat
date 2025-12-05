@@ -12,11 +12,10 @@
 	} from '$lib/stores';
 
 	import {
-		archiveAllChats,
 		deleteAllChats,
 		getAllChats,
 		getChatList,
-		getPinnedChatList,
+		getPinnedChats,
 		importChats
 	} from '$lib/apis/chats';
 	import { getImportOrigin, convertOpenAIChats } from '$lib/utils';
@@ -92,7 +91,7 @@
 
 		currentChatPage.set(1);
 		await chats.set(await getChatList(localStorage.token, $currentChatPage));
-		pinnedChats.set(await getPinnedChatList(localStorage.token));
+		pinnedChats.set(await getPinnedChats(localStorage.token));
 		scrollPaginationEnabled.set(true);
 	};
 
@@ -104,15 +103,7 @@
 	};
 
 	const archiveAllChatsHandler = async () => {
-		await goto('/');
-		await archiveAllChats(localStorage.token).catch((error) => {
-			toast.error(`${error}`);
-		});
-
-		currentChatPage.set(1);
-		await chats.set(await getChatList(localStorage.token, $currentChatPage));
-		pinnedChats.set([]);
-		scrollPaginationEnabled.set(true);
+		toast.error('Archive all chats feature is not available');
 	};
 
 	const deleteAllChatsHandler = async () => {

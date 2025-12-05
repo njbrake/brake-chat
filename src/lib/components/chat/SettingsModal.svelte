@@ -445,7 +445,7 @@
 				'license',
 				'redistributions',
 				'release',
-				'see whats new',
+				"see what's new",
 				'seewhatsnew',
 				'settings',
 				'software info',

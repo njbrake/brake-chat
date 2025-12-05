@@ -18,11 +18,7 @@
 	import DocumentDuplicate from '$lib/components/icons/DocumentDuplicate.svelte';
 	import Bookmark from '$lib/components/icons/Bookmark.svelte';
 	import BookmarkSlash from '$lib/components/icons/BookmarkSlash.svelte';
-	import {
-		getChatById,
-		getChatPinnedStatusById,
-		toggleChatPinnedStatusById
-	} from '$lib/apis/chats';
+	import { getChatById, getPinnedChats, pinChatById, unpinChatById } from '$lib/apis/chats';
 	import { chats, folders, settings, theme, user } from '$lib/stores';
 	import { createMessagesList } from '$lib/utils';
 	import { downloadChatAsPDF } from '$lib/apis/utils';
@@ -50,12 +46,18 @@
 	let showFullMessages = false;
 
 	const pinHandler = async () => {
-		await toggleChatPinnedStatusById(localStorage.token, chatId);
+		if (pinned) {
+			await unpinChatById(localStorage.token, chatId);
+		} else {
+			await pinChatById(localStorage.token, chatId);
+		}
+		pinned = !pinned;
 		dispatch('change');
 	};
 
 	const checkPinned = async () => {
-		pinned = await getChatPinnedStatusById(localStorage.token, chatId);
+		const pinnedChats = await getPinnedChats(localStorage.token);
+		pinned = pinnedChats.some((chat) => chat.id === chatId);
 	};
 
 	const getChatAsText = async (chat) => {

@@ -1,17 +1,14 @@
+import re
+import uuid
+from collections.abc import AsyncGenerator, MutableMapping
 from contextlib import asynccontextmanager
 from dataclasses import asdict, dataclass
 from enum import Enum
-import re
 from typing import (
     TYPE_CHECKING,
     Any,
-    AsyncGenerator,
-    Dict,
-    MutableMapping,
-    Optional,
     cast,
 )
-import uuid
 
 from asgiref.typing import (
     ASGI3Application,
@@ -19,15 +16,15 @@ from asgiref.typing import (
     ASGIReceiveEvent,
     ASGISendCallable,
     ASGISendEvent,
+)
+from asgiref.typing import (
     Scope as ASGIScope,
 )
 from loguru import logger
-from starlette.requests import Request
-
 from open_webui.env import AUDIT_LOG_LEVEL, MAX_BODY_LOG_SIZE
-from open_webui.utils.auth import get_current_user, get_http_authorization_cred
 from open_webui.models.users import UserModel
-
+from open_webui.utils.auth import get_current_user, get_http_authorization_cred
+from starlette.requests import Request
 
 if TYPE_CHECKING:
     from loguru import Logger
@@ -37,17 +34,17 @@ if TYPE_CHECKING:
 class AuditLogEntry:
     # `Metadata` audit level properties
     id: str
-    user: Optional[dict[str, Any]]
+    user: dict[str, Any] | None
     audit_level: str
     verb: str
     request_uri: str
-    user_agent: Optional[str] = None
-    source_ip: Optional[str] = None
+    user_agent: str | None = None
+    source_ip: str | None = None
     # `Request` audit level properties
     request_object: Any = None
     # `Request Response` level
     response_object: Any = None
-    response_status_code: Optional[int] = None
+    response_status_code: int | None = None
 
 
 class AuditLevel(str, Enum):
@@ -58,11 +55,12 @@ class AuditLevel(str, Enum):
 
 
 class AuditLogger:
-    """
-    A helper class that encapsulates audit logging functionality. It uses Loguru’s logger with an auditable binding to ensure that audit log entries are filtered correctly.
+    """A helper class that encapsulates audit logging functionality. It uses Loguru’s logger with an auditable binding to ensure that audit log entries are filtered correctly.
 
-    Parameters:
+    Parameters
+    ----------
     logger (Logger): An instance of Loguru’s logger.
+
     """
 
     def __init__(self, logger: "Logger"):
@@ -73,9 +71,8 @@ class AuditLogger:
         audit_entry: AuditLogEntry,
         *,
         log_level: str = "INFO",
-        extra: Optional[dict] = None,
+        extra: dict | None = None,
     ):
-
         entry = asdict(audit_entry)
 
         if extra:
@@ -89,39 +86,33 @@ class AuditLogger:
 
 
 class AuditContext:
-    """
-    Captures and aggregates the HTTP request and response bodies during the processing of a request. It ensures that only a configurable maximum amount of data is stored to prevent excessive memory usage.
+    """Captures and aggregates the HTTP request and response bodies during the processing of a request. It ensures that only a configurable maximum amount of data is stored to prevent excessive memory usage.
 
     Attributes:
     request_body (bytearray): Accumulated request payload.
     response_body (bytearray): Accumulated response payload.
     max_body_size (int): Maximum number of bytes to capture.
     metadata (Dict[str, Any]): A dictionary to store additional audit metadata (user, http verb, user agent, etc.).
+
     """
 
     def __init__(self, max_body_size: int = MAX_BODY_LOG_SIZE):
         self.request_body = bytearray()
         self.response_body = bytearray()
         self.max_body_size = max_body_size
-        self.metadata: Dict[str, Any] = {}
+        self.metadata: dict[str, Any] = {}
 
     def add_request_chunk(self, chunk: bytes):
         if len(self.request_body) < self.max_body_size:
-            self.request_body.extend(
-                chunk[: self.max_body_size - len(self.request_body)]
-            )
+            self.request_body.extend(chunk[: self.max_body_size - len(self.request_body)])
 
     def add_response_chunk(self, chunk: bytes):
         if len(self.response_body) < self.max_body_size:
-            self.response_body.extend(
-                chunk[: self.max_body_size - len(self.response_body)]
-            )
+            self.response_body.extend(chunk[: self.max_body_size - len(self.response_body)])
 
 
 class AuditLoggingMiddleware:
-    """
-    ASGI middleware that intercepts HTTP requests and responses to perform audit logging. It captures request/response bodies (depending on audit level), headers, HTTP methods, and user information, then logs a structured audit entry at the end of the request cycle.
-    """
+    """ASGI middleware that intercepts HTTP requests and responses to perform audit logging. It captures request/response bodies (depending on audit level), headers, HTTP methods, and user information, then logs a structured audit entry at the end of the request cycle."""
 
     AUDITED_METHODS = {"PUT", "PATCH", "DELETE", "POST"}
 
@@ -129,7 +120,7 @@ class AuditLoggingMiddleware:
         self,
         app: ASGI3Application,
         *,
-        excluded_paths: Optional[list[str]] = None,
+        excluded_paths: list[str] | None = None,
         max_body_size: int = MAX_BODY_LOG_SIZE,
         audit_level: AuditLevel = AuditLevel.NONE,
     ) -> None:
@@ -148,7 +139,7 @@ class AuditLoggingMiddleware:
         if scope["type"] != "http":
             return await self.app(scope, receive, send)
 
-        request = Request(scope=cast(MutableMapping, scope))
+        request = Request(scope=cast("MutableMapping", scope))
 
         if self._should_skip_auditing(request):
             return await self.app(scope, receive, send)
@@ -178,36 +169,27 @@ class AuditLoggingMiddleware:
             await self.app(scope, receive_wrapper, send_wrapper)
 
     @asynccontextmanager
-    async def _audit_context(
-        self, request: Request
-    ) -> AsyncGenerator[AuditContext, None]:
-        """
-        async context manager that ensures that an audit log entry is recorded after the request is processed.
-        """
+    async def _audit_context(self, request: Request) -> AsyncGenerator[AuditContext, None]:
+        """Async context manager that ensures that an audit log entry is recorded after the request is processed."""
         context = AuditContext()
         try:
             yield context
         finally:
             await self._log_audit_entry(request, context)
 
-    async def _get_authenticated_user(self, request: Request) -> Optional[UserModel]:
+    async def _get_authenticated_user(self, request: Request) -> UserModel | None:
         auth_header = request.headers.get("Authorization")
 
         try:
-            user = get_current_user(
-                request, None, None, get_http_authorization_cred(auth_header)
-            )
+            user = get_current_user(request, None, None, get_http_authorization_cred(auth_header))
             return user
         except Exception as e:
-            logger.debug(f"Failed to get authenticated user: {str(e)}")
+            logger.debug(f"Failed to get authenticated user: {e!s}")
 
         return None
 
     def _should_skip_auditing(self, request: Request) -> bool:
-        if (
-            request.method not in {"POST", "PUT", "PATCH", "DELETE"}
-            or AUDIT_LOG_LEVEL == "NONE"
-        ):
+        if request.method not in {"POST", "PUT", "PATCH", "DELETE"} or AUDIT_LOG_LEVEL == "NONE":
             return True
 
         ALWAYS_LOG_ENDPOINTS = {
@@ -225,9 +207,7 @@ class AuditLoggingMiddleware:
             return True
 
         # match either /api/<resource>/...(for the endpoint /api/chat case) or /api/v1/<resource>/...
-        pattern = re.compile(
-            r"^/api(?:/v1)?/(" + "|".join(self.excluded_paths) + r")\b"
-        )
+        pattern = re.compile(r"^/api(?:/v1)?/(" + "|".join(self.excluded_paths) + r")\b")
         if pattern.match(request.url.path):
             return True
 
@@ -250,9 +230,7 @@ class AuditLoggingMiddleware:
         try:
             user = await self._get_authenticated_user(request)
 
-            user = (
-                user.model_dump(include={"id", "name", "email", "role"}) if user else {}
-            )
+            user = user.model_dump(include={"id", "name", "email", "role"}) if user else {}
 
             request_body = context.request_body.decode("utf-8", errors="replace")
             response_body = context.response_body.decode("utf-8", errors="replace")
@@ -280,4 +258,4 @@ class AuditLoggingMiddleware:
 
             self.audit_logger.write(entry)
         except Exception as e:
-            logger.error(f"Failed to log audit entry: {str(e)}")
+            logger.error(f"Failed to log audit entry: {e!s}")
