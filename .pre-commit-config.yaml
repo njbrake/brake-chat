@@ -37,6 +37,14 @@ repos:
         verbose: true
         exclude: alembic|migrations
 
+      - id: i18n-parse
+        name: i18n-parse
+        entry: npm run i18n:parse
+        language: system
+        types_or: [javascript, jsx, ts, tsx, svelte]
+        pass_filenames: false
+        verbose: true
+
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: "v4.0.0-alpha.8"
     hooks:
