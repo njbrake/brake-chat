@@ -28,8 +28,8 @@ def search_duckduckgo(
     # Use the DDGS context manager to create a DDGS object
     search_results = []
     with DDGS() as ddgs:
-        if concurrent_requests:
-            ddgs.threads = concurrent_requests
+        if concurrent_requests and hasattr(ddgs, "threads"):
+            ddgs.threads = concurrent_requests  # type: ignore
 
         # Use the ddgs.text() method to perform the search
         try:

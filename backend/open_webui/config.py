@@ -938,7 +938,9 @@ OPENAI_API_CONFIGS = PersistentConfig(
 # Get the actual OpenAI API key based on the base URL
 OPENAI_API_KEY = ""
 try:
-    OPENAI_API_KEY = OPENAI_API_KEYS.value[OPENAI_API_BASE_URLS.value.index("https://api.openai.com/v1")]
+    openai_keys: list = OPENAI_API_KEYS.value  # type: ignore
+    openai_urls: list = OPENAI_API_BASE_URLS.value  # type: ignore
+    OPENAI_API_KEY = openai_keys[openai_urls.index("https://api.openai.com/v1")]
 except Exception:
     pass
 OPENAI_API_BASE_URL = "https://api.openai.com/v1"
@@ -2554,6 +2556,144 @@ TAVILY_EXTRACT_DEPTH = PersistentConfig(
     "TAVILY_EXTRACT_DEPTH",
     "rag.web.search.tavily_extract_depth",
     os.getenv("TAVILY_EXTRACT_DEPTH", "basic"),
+)
+
+SEARXNG_QUERY_URL = PersistentConfig(
+    "SEARXNG_QUERY_URL",
+    "rag.web.search.searxng_query_url",
+    os.environ.get("SEARXNG_QUERY_URL", ""),
+)
+
+YACY_QUERY_URL = PersistentConfig(
+    "YACY_QUERY_URL",
+    "rag.web.search.yacy_query_url",
+    os.environ.get("YACY_QUERY_URL", ""),
+)
+
+YACY_USERNAME = PersistentConfig(
+    "YACY_USERNAME",
+    "rag.web.search.yacy_username",
+    os.environ.get("YACY_USERNAME", ""),
+)
+
+YACY_PASSWORD = PersistentConfig(
+    "YACY_PASSWORD",
+    "rag.web.search.yacy_password",
+    os.environ.get("YACY_PASSWORD", ""),
+)
+
+KAGI_SEARCH_API_KEY = PersistentConfig(
+    "KAGI_SEARCH_API_KEY",
+    "rag.web.search.kagi_search_api_key",
+    os.getenv("KAGI_SEARCH_API_KEY", ""),
+)
+
+MOJEEK_SEARCH_API_KEY = PersistentConfig(
+    "MOJEEK_SEARCH_API_KEY",
+    "rag.web.search.mojeek_search_api_key",
+    os.getenv("MOJEEK_SEARCH_API_KEY", ""),
+)
+
+SERPSTACK_API_KEY = PersistentConfig(
+    "SERPSTACK_API_KEY",
+    "rag.web.search.serpstack_api_key",
+    os.getenv("SERPSTACK_API_KEY", ""),
+)
+
+SERPSTACK_HTTPS = PersistentConfig(
+    "SERPSTACK_HTTPS",
+    "rag.web.search.serpstack_https",
+    os.getenv("SERPSTACK_HTTPS", "True").lower() == "true",
+)
+
+SERPER_API_KEY = PersistentConfig(
+    "SERPER_API_KEY",
+    "rag.web.search.serper_api_key",
+    os.getenv("SERPER_API_KEY", ""),
+)
+
+SERPLY_API_KEY = PersistentConfig(
+    "SERPLY_API_KEY",
+    "rag.web.search.serply_api_key",
+    os.getenv("SERPLY_API_KEY", ""),
+)
+
+SEARCHAPI_API_KEY = PersistentConfig(
+    "SEARCHAPI_API_KEY",
+    "rag.web.search.searchapi_api_key",
+    os.getenv("SEARCHAPI_API_KEY", ""),
+)
+
+SEARCHAPI_ENGINE = PersistentConfig(
+    "SEARCHAPI_ENGINE",
+    "rag.web.search.searchapi_engine",
+    os.getenv("SEARCHAPI_ENGINE", "google"),
+)
+
+SERPAPI_API_KEY = PersistentConfig(
+    "SERPAPI_API_KEY",
+    "rag.web.search.serpapi_api_key",
+    os.getenv("SERPAPI_API_KEY", ""),
+)
+
+SERPAPI_ENGINE = PersistentConfig(
+    "SERPAPI_ENGINE",
+    "rag.web.search.serpapi_engine",
+    os.getenv("SERPAPI_ENGINE", "google"),
+)
+
+JINA_API_KEY = PersistentConfig(
+    "JINA_API_KEY",
+    "rag.web.search.jina_api_key",
+    os.getenv("JINA_API_KEY", ""),
+)
+
+EXA_API_KEY = PersistentConfig(
+    "EXA_API_KEY",
+    "rag.web.search.exa_api_key",
+    os.getenv("EXA_API_KEY", ""),
+)
+
+PERPLEXITY_API_KEY = PersistentConfig(
+    "PERPLEXITY_API_KEY",
+    "rag.web.search.perplexity_api_key",
+    os.getenv("PERPLEXITY_API_KEY", ""),
+)
+
+PERPLEXITY_MODEL = PersistentConfig(
+    "PERPLEXITY_MODEL",
+    "rag.web.search.perplexity_model",
+    os.getenv("PERPLEXITY_MODEL", "llama-3.1-sonar-small-128k-online"),
+)
+
+PERPLEXITY_SEARCH_CONTEXT_USAGE = PersistentConfig(
+    "PERPLEXITY_SEARCH_CONTEXT_USAGE",
+    "rag.web.search.perplexity_search_context_usage",
+    os.getenv("PERPLEXITY_SEARCH_CONTEXT_USAGE", "True").lower() == "true",
+)
+
+PERPLEXITY_SEARCH_API_URL = PersistentConfig(
+    "PERPLEXITY_SEARCH_API_URL",
+    "rag.web.search.perplexity_search_api_url",
+    os.getenv("PERPLEXITY_SEARCH_API_URL", "https://api.perplexity.ai"),
+)
+
+SOUGOU_API_SID = PersistentConfig(
+    "SOUGOU_API_SID",
+    "rag.web.search.sougou_api_sid",
+    os.getenv("SOUGOU_API_SID", ""),
+)
+
+SOUGOU_API_SK = PersistentConfig(
+    "SOUGOU_API_SK",
+    "rag.web.search.sougou_api_sk",
+    os.getenv("SOUGOU_API_SK", ""),
+)
+
+OLLAMA_CLOUD_WEB_SEARCH_API_KEY = PersistentConfig(
+    "OLLAMA_CLOUD_WEB_SEARCH_API_KEY",
+    "rag.web.search.ollama_cloud_web_search_api_key",
+    os.getenv("OLLAMA_CLOUD_WEB_SEARCH_API_KEY", ""),
 )
 
 PLAYWRIGHT_WS_URL = PersistentConfig(

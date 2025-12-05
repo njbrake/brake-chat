@@ -1596,7 +1596,7 @@ async def process_web_search(request: Request, form_data: SearchForm, user=Depen
 
     try:
         if request.app.state.config.BYPASS_WEB_SEARCH_WEB_LOADER:
-            search_results = [item for result in search_results for item in result if result]
+            flattened_results = [item for result in search_results for item in result if result]
 
             docs = [
                 Document(
@@ -1608,7 +1608,7 @@ async def process_web_search(request: Request, form_data: SearchForm, user=Depen
                         "link": result.link,
                     },
                 )
-                for result in search_results
+                for result in flattened_results
                 if hasattr(result, "snippet") and result.snippet is not None
             ]
         else:
@@ -1679,6 +1679,7 @@ class QueryDocForm(BaseModel):
     k_reranker: int | None = None
     r: float | None = None
     hybrid: bool | None = None
+    hybrid_bm25_weight: float | None = None
 
 
 @router.post("/query/doc")

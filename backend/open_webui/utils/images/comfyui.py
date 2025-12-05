@@ -195,6 +195,7 @@ class ComfyUIEditImageForm(BaseModel):
 
     image: str | list[str]
     prompt: str
+    negative_prompt: str | None = None
     width: int | None = None
     height: int | None = None
     n: int | None = None

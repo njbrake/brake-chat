@@ -288,8 +288,8 @@ class ChatTable:
         if isinstance(message.get("content"), str):
             message["content"] = message["content"].replace("\x00", "")
 
-        chat = chat.chat
-        history = chat.get("history", {})
+        chat_dict: dict = chat.chat
+        history = chat_dict.get("history", {})
 
         if message_id in history.get("messages", {}):
             existing_message = history["messages"][message_id]
@@ -306,8 +306,8 @@ class ChatTable:
 
         history["currentId"] = message_id
 
-        chat["history"] = history
-        return self.update_chat_by_id(id, chat)
+        chat_dict["history"] = history
+        return self.update_chat_by_id(id, chat_dict)
 
     def add_message_status_to_chat_by_id_and_message_id(
         self, id: str, message_id: str, status: dict
@@ -316,24 +316,24 @@ class ChatTable:
         if chat is None:
             return None
 
-        chat = chat.chat
-        history = chat.get("history", {})
+        chat_dict: dict = chat.chat
+        history = chat_dict.get("history", {})
 
         if message_id in history.get("messages", {}):
             status_history = history["messages"][message_id].get("statusHistory", [])
             status_history.append(status)
             history["messages"][message_id]["statusHistory"] = status_history
 
-        chat["history"] = history
-        return self.update_chat_by_id(id, chat)
+        chat_dict["history"] = history
+        return self.update_chat_by_id(id, chat_dict)
 
     def add_message_files_by_id_and_message_id(self, id: str, message_id: str, files: list[dict]) -> list[dict]:
         chat = self.get_chat_by_id(id)
         if chat is None:
             return None
 
-        chat = chat.chat
-        history = chat.get("history", {})
+        chat_dict: dict = chat.chat
+        history = chat_dict.get("history", {})
 
         message_files = []
 
@@ -342,8 +342,8 @@ class ChatTable:
             message_files = message_files + files
             history["messages"][message_id]["files"] = message_files
 
-        chat["history"] = history
-        self.update_chat_by_id(id, chat)
+        chat_dict["history"] = history
+        self.update_chat_by_id(id, chat_dict)
         return message_files
 
     def insert_shared_chat_by_chat_id(self, chat_id: str) -> ChatModel | None:

@@ -580,8 +580,8 @@ async def unload_model(
     form_data: ModelNameForm,
     user=Depends(get_admin_user),
 ):
-    form_data = form_data.model_dump(exclude_none=True)
-    model_name = form_data.get("model", form_data.get("name"))
+    form_data_dict: dict = form_data.model_dump(exclude_none=True)
+    model_name = form_data_dict.get("model", form_data_dict.get("name"))
 
     if not model_name:
         raise HTTPException(status_code=400, detail="Missing name of the model to unload.")
@@ -644,14 +644,14 @@ async def pull_model(
     url_idx: int = 0,
     user=Depends(get_admin_user),
 ):
-    form_data = form_data.model_dump(exclude_none=True)
-    form_data["model"] = form_data.get("model", form_data.get("name"))
+    form_data_dict: dict = form_data.model_dump(exclude_none=True)
+    form_data_dict["model"] = form_data_dict.get("model", form_data_dict.get("name"))
 
     url = request.app.state.config.OLLAMA_BASE_URLS[url_idx]
     log.info(f"url: {url}")
 
     # Admin should be able to pull models from any source
-    payload = {**form_data, "insecure": True}
+    payload = {**form_data_dict, "insecure": True}
 
     return await send_post_request(
         url=f"{url}/api/pull",
@@ -798,10 +798,10 @@ async def delete_model(
     url_idx: int | None = None,
     user=Depends(get_admin_user),
 ):
-    form_data = form_data.model_dump(exclude_none=True)
-    form_data["model"] = form_data.get("model", form_data.get("name"))
+    form_data_dict: dict = form_data.model_dump(exclude_none=True)
+    form_data_dict["model"] = form_data_dict.get("model", form_data_dict.get("name"))
 
-    model = form_data.get("model")
+    model = form_data_dict.get("model")
 
     if url_idx is None:
         await get_all_models(request, user=user)
@@ -857,13 +857,13 @@ async def delete_model(
 
 @router.post("/api/show")
 async def show_model_info(request: Request, form_data: ModelNameForm, user=Depends(get_verified_user)):
-    form_data = form_data.model_dump(exclude_none=True)
-    form_data["model"] = form_data.get("model", form_data.get("name"))
+    form_data_dict: dict = form_data.model_dump(exclude_none=True)
+    form_data_dict["model"] = form_data_dict.get("model", form_data_dict.get("name"))
 
     await get_all_models(request, user=user)
     models = request.app.state.OLLAMA_MODELS
 
-    model = form_data.get("model")
+    model = form_data_dict.get("model")
 
     if model not in models:
         raise HTTPException(
@@ -1196,7 +1196,7 @@ async def generate_chat_completion(
 
     metadata = form_data.pop("metadata", None)
     try:
-        form_data = GenerateChatCompletionForm(**form_data)
+        form_data_obj = GenerateChatCompletionForm(**form_data)
     except Exception as e:
         log.exception(e)
         raise HTTPException(
@@ -1204,7 +1204,8 @@ async def generate_chat_completion(
             detail=str(e),
         )
 
-    payload: dict[str, Any] = {**form_data.model_dump(exclude_none=True)}
+    payload: dict[str, Any] = {**form_data_obj.model_dump(exclude_none=True)}
+    stream_mode: bool | None = payload.get("stream", True)  # type: ignore
 
     payload.pop("metadata", None)
 
@@ -1256,7 +1257,7 @@ async def generate_chat_completion(
     return await send_post_request(
         url=f"{url}/api/chat",
         payload=json.dumps(payload),
-        stream=form_data.stream,
+        stream=stream_mode,
         key=get_api_key(url_idx, url, request.app.state.config.OLLAMA_API_CONFIGS),
         content_type="application/x-ndjson",
         user=user,
@@ -1302,7 +1303,7 @@ async def generate_openai_completion(
     metadata = form_data.pop("metadata", None)
 
     try:
-        form_data = OpenAICompletionForm(**form_data)
+        form_data_obj = OpenAICompletionForm(**form_data)
     except Exception as e:
         log.exception(e)
         raise HTTPException(
@@ -1310,10 +1311,10 @@ async def generate_openai_completion(
             detail=str(e),
         )
 
-    payload = {**form_data.model_dump(exclude_none=True, exclude=["metadata"])}
+    payload = {**form_data_obj.model_dump(exclude_none=True, exclude=["metadata"])}
     payload.pop("metadata", None)
 
-    model_id = form_data.model
+    model_id = form_data_obj.model
     if ":" not in model_id:
         model_id = f"{model_id}:latest"
 

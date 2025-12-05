@@ -657,7 +657,7 @@ async def reset_knowledge_by_id(id: str, user=Depends(get_verified_user)):
 
 
 @router.post("/{id}/files/batch/add", response_model=Optional[KnowledgeFilesResponse])
-def add_files_to_knowledge_batch(
+async def add_files_to_knowledge_batch(
     request: Request,
     id: str,
     form_data: list[KnowledgeFileIdForm],
@@ -709,7 +709,8 @@ def add_files_to_knowledge_batch(
     existing_file_ids = data.get("file_ids", [])
 
     # Only add files that were successfully processed
-    successful_file_ids = [r.file_id for r in result.results if r.status == "completed"]
+    batch_result = await result
+    successful_file_ids = [r.file_id for r in batch_result.results if r.status == "completed"]
     for file_id in successful_file_ids:
         if file_id not in existing_file_ids:
             existing_file_ids.append(file_id)
@@ -718,8 +719,8 @@ def add_files_to_knowledge_batch(
     knowledge = Knowledges.update_knowledge_data_by_id(id=id, data=data)
 
     # If there were any errors, include them in the response
-    if result.errors:
-        error_details = [f"{err.file_id}: {err.error}" for err in result.errors]
+    if batch_result.errors:
+        error_details = [f"{err.file_id}: {err.error}" for err in batch_result.errors]
         return KnowledgeFilesResponse(
             **knowledge.model_dump(),
             files=Files.get_file_metadatas_by_ids(existing_file_ids),

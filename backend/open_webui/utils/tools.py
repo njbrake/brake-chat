@@ -62,7 +62,7 @@ def get_async_tool_function_and_apply_extra_params(function: Callable, extra_par
             return partial_func(*args, **kwargs)
 
     update_wrapper(new_function, function)
-    new_function.__signature__ = new_sig
+    new_function.__signature__ = new_sig  # type: ignore
 
     new_function.__function__ = function  # type: ignore
     new_function.__extra_params__ = extra_params  # type: ignore

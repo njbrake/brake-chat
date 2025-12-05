@@ -405,7 +405,8 @@ async def get_all_models_responses(request: Request, user: UserModel) -> list:
                     del model["name"]
 
                 if prefix_id:
-                    model["id"] = f"{prefix_id}.{model.get('id', model.get('name', ''))}"
+                    model_dict: dict = model if isinstance(model, dict) else {}  # type: ignore
+                    model["id"] = f"{prefix_id}.{model_dict.get('id', model_dict.get('name', ''))}"
 
                 if tags:
                     model["tags"] = tags

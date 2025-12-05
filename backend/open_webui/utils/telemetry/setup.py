@@ -49,7 +49,8 @@ def setup(app: FastAPI, db_engine: Engine):
                 insecure=OTEL_EXPORTER_OTLP_INSECURE,
                 headers=headers,
             )
-        trace.get_tracer_provider().add_span_processor(BatchSpanProcessor(exporter))
+        tracer_provider = trace.get_tracer_provider()
+        tracer_provider.add_span_processor(BatchSpanProcessor(exporter))  # type: ignore
         Instrumentor(app=app, db_engine=db_engine).instrument()
 
     # set up metrics only if enabled

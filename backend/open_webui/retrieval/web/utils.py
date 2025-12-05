@@ -116,9 +116,11 @@ def verify_ssl_cert(url: str) -> bool:
         return True
 
     try:
+        import socket as sock_module
+
         hostname = url.split("://")[-1].split("/")[0]
         context = ssl.create_default_context(cafile=certifi.where())
-        with context.wrap_socket(ssl.socket(), server_hostname=hostname) as s:
+        with context.wrap_socket(sock_module.socket(), server_hostname=hostname) as s:
             s.connect((hostname, 443))
         return True
     except ssl.SSLError:
@@ -155,16 +157,18 @@ class URLProcessingMixin:
 
     async def _safe_process_url(self, url: str) -> bool:
         """Perform safety checks before processing a URL."""
-        if self.verify_ssl and not await self._verify_ssl_cert(url):
+        if hasattr(self, "verify_ssl") and self.verify_ssl and not await self._verify_ssl_cert(url):  # type: ignore
             raise ValueError(f"SSL certificate verification failed for {url}")
-        await self._wait_for_rate_limit()
+        if hasattr(self, "_wait_for_rate_limit"):
+            await self._wait_for_rate_limit()  # type: ignore
         return True
 
     def _safe_process_url_sync(self, url: str) -> bool:
         """Synchronous version of safety checks."""
-        if self.verify_ssl and not self._verify_ssl_cert(url):
+        if hasattr(self, "verify_ssl") and self.verify_ssl and not self._verify_ssl_cert(url):  # type: ignore
             raise ValueError(f"SSL certificate verification failed for {url}")
-        self._sync_wait_for_rate_limit()
+        if hasattr(self, "_sync_wait_for_rate_limit"):
+            self._sync_wait_for_rate_limit()  # type: ignore
         return True
 
 

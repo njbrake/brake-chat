@@ -76,7 +76,6 @@ from open_webui.config import (
     AUTOMATIC1111_PARAMS,
     BING_SEARCH_V7_ENDPOINT,
     BING_SEARCH_V7_SUBSCRIPTION_KEY,
-    BOCHA_SEARCH_API_KEY,
     BRAVE_SEARCH_API_KEY,
     BYPASS_ADMIN_ACCESS_CONTROL,
     BYPASS_EMBEDDING_AND_RETRIEVAL,
@@ -338,7 +337,6 @@ from open_webui.config import (
     # WebUI
     WEBUI_AUTH,
     WEBUI_BANNERS,
-    WEBUI_NAME,
     WEBUI_URL,
     WHISPER_MODEL,
     WHISPER_VAD_FILTER,
@@ -385,6 +383,7 @@ from open_webui.env import (
     WEBUI_AUTH_TRUSTED_EMAIL_HEADER,
     WEBUI_AUTH_TRUSTED_NAME_HEADER,
     WEBUI_BUILD_HASH,
+    WEBUI_NAME,
     WEBUI_SECRET_KEY,
     WEBUI_SESSION_COOKIE_SAME_SITE,
     WEBUI_SESSION_COOKIE_SECURE,
@@ -886,7 +885,6 @@ app.state.config.GOOGLE_PSE_ENGINE_ID = GOOGLE_PSE_ENGINE_ID
 app.state.config.BRAVE_SEARCH_API_KEY = BRAVE_SEARCH_API_KEY
 app.state.config.KAGI_SEARCH_API_KEY = KAGI_SEARCH_API_KEY
 app.state.config.MOJEEK_SEARCH_API_KEY = MOJEEK_SEARCH_API_KEY
-app.state.config.BOCHA_SEARCH_API_KEY = BOCHA_SEARCH_API_KEY
 app.state.config.SERPSTACK_API_KEY = SERPSTACK_API_KEY
 app.state.config.SERPSTACK_HTTPS = SERPSTACK_HTTPS
 app.state.config.SERPER_API_KEY = SERPER_API_KEY
@@ -1318,7 +1316,8 @@ if ENABLE_SCIM:
 try:
     audit_level = AuditLevel(AUDIT_LOG_LEVEL)
 except ValueError as e:
-    logger.error(f"Invalid audit level: {AUDIT_LOG_LEVEL}. Error: {e}")
+    if hasattr(logger, "error"):
+        logger.error(f"Invalid audit level: {AUDIT_LOG_LEVEL}. Error: {e}")  # type: ignore
     audit_level = AuditLevel.NONE
 
 if audit_level != AuditLevel.NONE:

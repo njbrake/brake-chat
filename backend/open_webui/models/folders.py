@@ -202,12 +202,12 @@ class FolderTable:
                 if not folder:
                     return None
 
-                form_data = form_data.model_dump(exclude_unset=True)
+                form_data_dict: dict = form_data.model_dump(exclude_unset=True)
 
                 existing_folder = (
                     db.query(Folder)
                     .filter_by(
-                        name=form_data.get("name"),
+                        name=form_data_dict.get("name"),
                         parent_id=folder.parent_id,
                         user_id=user_id,
                     )
@@ -217,17 +217,17 @@ class FolderTable:
                 if existing_folder and existing_folder.id != id:
                     return None
 
-                folder.name = form_data.get("name", folder.name)
-                if "data" in form_data:
+                folder.name = form_data_dict.get("name", folder.name)
+                if "data" in form_data_dict:
                     folder.data = {
                         **(folder.data or {}),
-                        **form_data["data"],
+                        **form_data_dict["data"],
                     }
 
-                if "meta" in form_data:
+                if "meta" in form_data_dict:
                     folder.meta = {
                         **(folder.meta or {}),
-                        **form_data["meta"],
+                        **form_data_dict["meta"],
                     }
 
                 folder.updated_at = int(time.time())

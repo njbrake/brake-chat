@@ -368,7 +368,6 @@ warn_unused_ignores = false
 check_untyped_defs = false
 disable_error_code = [
     "import-untyped",
-    "attr-defined",
     "operator",
     "union-attr",
     "arg-type",

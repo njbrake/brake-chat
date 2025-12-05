@@ -12,7 +12,7 @@ from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 from botocore.config import Config
 from botocore.exceptions import ClientError
-from google.cloud import storage
+from google.cloud import storage  # type: ignore
 from google.cloud.exceptions import GoogleCloudError, NotFound
 from open_webui.config import (
     AZURE_STORAGE_CONTAINER_NAME,

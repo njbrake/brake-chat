@@ -41,6 +41,7 @@ repos:
     rev: "v4.0.0-alpha.8"
     hooks:
       - id: prettier
+        args: ['--log-level=error']
         types_or: [javascript, jsx, ts, tsx, json, svelte, css, markdown, html]
         exclude: '^(package-lock\.json|.*\.lock|src/lib/i18n/.*|CHANGELOG\.md)$'
         additional_dependencies:

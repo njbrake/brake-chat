@@ -645,10 +645,11 @@ async def signout(request: Request, response: Response):
         ) or OPENID_PROVIDER_URL.value
 
         if session and oauth_server_metadata_url:
-            oauth_id_token = session.token.get("id_token")
+            oauth_id_token: dict = session.token  # type: ignore
+            oauth_id_token_str = oauth_id_token.get("id_token")
             try:
-                async with ClientSession(trust_env=True) as session:
-                    async with session.get(oauth_server_metadata_url) as r:
+                async with ClientSession(trust_env=True) as client_session:
+                    async with client_session.get(oauth_server_metadata_url) as r:
                         if r.status == 200:
                             openid_data = await r.json()
                             logout_url = openid_data.get("end_session_endpoint")
@@ -658,7 +659,7 @@ async def signout(request: Request, response: Response):
                                     status_code=200,
                                     content={
                                         "status": True,
-                                        "redirect_url": f"{logout_url}?id_token_hint={oauth_id_token}"
+                                        "redirect_url": f"{logout_url}?id_token_hint={oauth_id_token_str}"
                                         + (
                                             f"&post_logout_redirect_uri={WEBUI_AUTH_SIGNOUT_REDIRECT_URL}"
                                             if WEBUI_AUTH_SIGNOUT_REDIRECT_URL

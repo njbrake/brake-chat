@@ -42,6 +42,7 @@ class FileModel(BaseModel):
     filename: str
     path: str | None = None
 
+    content: dict | None = None
     data: dict | None = None
     meta: dict | None = None
 

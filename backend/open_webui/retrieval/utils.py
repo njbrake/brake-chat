@@ -337,12 +337,12 @@ def merge_and_sort_query_results(query_results: list[dict], k: int) -> dict:
                 if distance > combined[doc_hash][0]:
                     combined[doc_hash] = (distance, document, metadata)
 
-    combined = list(combined.values())
+    combined_list = list(combined.values())
     # Sort the list based on distances
-    combined.sort(key=lambda x: x[0], reverse=True)
+    combined_list.sort(key=lambda x: x[0], reverse=True)
 
     # Slice to keep only the top k elements
-    sorted_distances, sorted_documents, sorted_metadatas = zip(*combined[:k]) if combined else ([], [], [])
+    sorted_distances, sorted_documents, sorted_metadatas = zip(*combined_list[:k]) if combined_list else ([], [], [])
 
     # Create and return the output dictionary
     return {
