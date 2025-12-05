@@ -84,7 +84,7 @@ export const getChatByIdWithPagination = async (
 };
 
 export const updateChatById = async (token: string, id: string, chat: object) => {
-	return api.post(`/chats/${id}`, chat, token);
+	return api.post(`/chats/${id}`, { chat }, token);
 };
 
 export const deleteChatById = async (token: string, id: string) => {
