@@ -171,8 +171,8 @@
 		charCount = mdValue.length;
 	};
 
-	const handleInput = (e: Event) => {
-		if (e.target instanceof HTMLTextAreaElement) {
+	const handleInput = (e?: Event) => {
+		if (e && e.target instanceof HTMLTextAreaElement) {
 			mdValue = e.target.value;
 		}
 		value = mdValue;
