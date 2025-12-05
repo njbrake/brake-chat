@@ -11,6 +11,8 @@
 	dayjs.extend(localizedFormat);
 
 	import { getContext, onMount } from 'svelte';
+	import type { Writable } from 'svelte/store';
+	import type { i18nType } from '$lib/i18n';
 	const i18n = getContext<Writable<i18nType>>('i18n');
 
 	import { formatDate } from '$lib/utils';

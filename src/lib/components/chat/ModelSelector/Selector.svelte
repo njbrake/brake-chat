@@ -21,7 +21,8 @@
 		mobile,
 		temporaryChatEnabled,
 		settings,
-		config
+		config,
+		type Model
 	} from '$lib/stores';
 	import { toast } from 'svelte-sonner';
 	import { capitalizeFirstLetter, sanitizeResponseContent, splitStream } from '$lib/utils';

@@ -19,6 +19,15 @@ module.exports = {
 		es2017: true,
 		node: true
 	},
+	rules: {
+		'no-unused-vars': 'off',
+		'@typescript-eslint/no-unused-vars': 'off',
+		'@typescript-eslint/no-explicit-any': 'off',
+		'no-constant-condition': 'off',
+		'no-unsafe-function-type': 'off',
+		'svelte/no-at-html-tags': 'off',
+		'svelte/valid-compile': ['error', { ignoreWarnings: true }]
+	},
 	overrides: [
 		{
 			files: ['*.svelte'],

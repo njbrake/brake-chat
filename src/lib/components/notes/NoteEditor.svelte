@@ -165,7 +165,7 @@
 		loading = false;
 	};
 
-	let debounceTimeout: NodeJS.Timeout | null = null;
+	let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	const changeDebounceHandler = () => {
 		if (debounceTimeout) {

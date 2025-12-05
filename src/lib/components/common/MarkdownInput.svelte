@@ -171,7 +171,10 @@
 		charCount = mdValue.length;
 	};
 
-	const handleInput = () => {
+	const handleInput = (e: Event) => {
+		if (e.target instanceof HTMLTextAreaElement) {
+			mdValue = e.target.value;
+		}
 		value = mdValue;
 		htmlValue = getHTML();
 		updateCounts();
@@ -241,7 +244,7 @@
 	{:else}
 		<textarea
 			bind:this={textareaElement}
-			bind:value={mdValue}
+			value={mdValue}
 			{id}
 			{placeholder}
 			disabled={!editable}

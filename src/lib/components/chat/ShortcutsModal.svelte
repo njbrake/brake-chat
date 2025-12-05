@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getContext, onMount } from 'svelte';
 	import Modal from '../common/Modal.svelte';
-	import { shortcuts } from '$lib/shortcuts';
+	import { shortcuts, Shortcut } from '$lib/shortcuts';
 	import { settings } from '$lib/stores';
 	import ShortcutItem from './ShortcutItem.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
