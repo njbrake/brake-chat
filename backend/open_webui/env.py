@@ -269,14 +269,6 @@ if FROM_INIT_PY:
 # Database
 ####################################
 
-# Check if the file exists
-if os.path.exists(f"{DATA_DIR}/ollama.db"):
-    # Rename the file
-    os.rename(f"{DATA_DIR}/ollama.db", f"{DATA_DIR}/webui.db")
-    log.info("Database migrated from Ollama-WebUI successfully.")
-else:
-    pass
-
 DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{DATA_DIR}/webui.db")
 
 DATABASE_TYPE = os.environ.get("DATABASE_TYPE")
@@ -302,10 +294,6 @@ if all(DB_VARS.values()):
 elif DATABASE_TYPE == "sqlite+sqlcipher" and not os.environ.get("DATABASE_URL"):
     # Handle SQLCipher with local file when DATABASE_URL wasn't explicitly set
     DATABASE_URL = f"sqlite+sqlcipher:///{DATA_DIR}/webui.db"
-
-# Replace the postgres:// with postgresql://
-if "postgres://" in DATABASE_URL:
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
 
 DATABASE_SCHEMA = os.environ.get("DATABASE_SCHEMA", None)
 
@@ -452,12 +440,7 @@ WEBUI_AUTH_SIGNOUT_REDIRECT_URL = os.environ.get(
 # WEBUI_SECRET_KEY
 ####################################
 
-WEBUI_SECRET_KEY = os.environ.get(
-    "WEBUI_SECRET_KEY",
-    os.environ.get(
-        "WEBUI_JWT_SECRET_KEY", "t0p-s3cr3t"
-    ),  # DEPRECATED: remove at next major version
-)
+WEBUI_SECRET_KEY = os.environ.get("WEBUI_SECRET_KEY", "t0p-s3cr3t")
 
 WEBUI_SESSION_COOKIE_SAME_SITE = os.environ.get("WEBUI_SESSION_COOKIE_SAME_SITE", "lax")
 
@@ -489,10 +472,6 @@ ENABLE_COMPRESSION_MIDDLEWARE = (
 ####################################
 ENABLE_OAUTH_EMAIL_FALLBACK = (
     os.environ.get("ENABLE_OAUTH_EMAIL_FALLBACK", "False").lower() == "true"
-)
-
-ENABLE_OAUTH_ID_TOKEN_COOKIE = (
-    os.environ.get("ENABLE_OAUTH_ID_TOKEN_COOKIE", "True").lower() == "true"
 )
 
 OAUTH_CLIENT_INFO_ENCRYPTION_KEY = os.environ.get(
