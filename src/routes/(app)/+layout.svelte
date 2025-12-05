@@ -111,12 +111,19 @@
 	};
 
 	const setModels = async () => {
-		models.set(
-			await getModels(
-				localStorage.token,
-				$config?.features?.enable_direct_connections ? ($settings?.directConnections ?? null) : null
-			)
-		);
+		try {
+			models.set(
+				await getModels(
+					localStorage.token,
+					$config?.features?.enable_direct_connections
+						? ($settings?.directConnections ?? null)
+						: null
+				)
+			);
+		} catch (error) {
+			console.error('Failed to load models:', error);
+			models.set([]);
+		}
 	};
 
 	const setToolServers = async () => {
@@ -136,13 +143,23 @@
 	};
 
 	const setBanners = async () => {
-		const bannersData = await getBanners(localStorage.token);
-		banners.set(bannersData);
+		try {
+			const bannersData = await getBanners(localStorage.token);
+			banners.set(bannersData);
+		} catch (error) {
+			console.error('Failed to load banners:', error);
+			banners.set([]);
+		}
 	};
 
 	const setTools = async () => {
-		const toolsData = await getTools(localStorage.token);
-		tools.set(toolsData);
+		try {
+			const toolsData = await getTools(localStorage.token);
+			tools.set(toolsData);
+		} catch (error) {
+			console.error('Failed to load tools:', error);
+			tools.set([]);
+		}
 	};
 
 	onMount(async () => {
