@@ -85,8 +85,7 @@
 
 	$: selectedCount = selectedChatIds.size;
 	$: canDelete =
-		selectedCount > 0 &&
-		($user?.role === 'admin' || ($user?.permissions?.chat?.delete ?? false));
+		selectedCount > 0 && ($user?.role === 'admin' || ($user?.permissions?.chat?.delete ?? false));
 
 	// Pagination variables
 	let chatListLoading = false;
@@ -320,10 +319,7 @@
 		deleting = true;
 
 		try {
-			const result = await deleteChatsByIds(
-				localStorage.token,
-				Array.from(selectedChatIds)
-			);
+			const result = await deleteChatsByIds(localStorage.token, Array.from(selectedChatIds));
 
 			if (result.failed.length > 0) {
 				toast.error(
@@ -580,10 +576,7 @@
 	}}
 />
 
-<ConfirmDialog
-	bind:show={showBulkDeleteConfirm}
-	on:confirm={bulkDeleteHandler}
->
+<ConfirmDialog bind:show={showBulkDeleteConfirm} on:confirm={bulkDeleteHandler}>
 	<div class="flex flex-col gap-2">
 		<div class="text-lg font-medium">
 			{$i18n.t('Delete {{count}} chats?', { count: selectedCount })}
@@ -1361,41 +1354,45 @@
 					</div>
 				</Folder>
 
-			{#if editMode && selectedCount > 0}
-				<div
-					class="px-2 py-2 sticky bottom-[60px] z-10 -mt-3 sidebar bg-gray-50/95 dark:bg-gray-950/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-800"
-					transition:slide={{ duration: 200 }}
-					role="region"
-					aria-label={$i18n.t('Chat selection actions')}
-				>
-					<div class="flex items-center justify-between gap-2">
-						<div class="text-sm text-gray-600 dark:text-gray-400" role="status" aria-live="polite">
-							{$i18n.t('{{count}} chats selected', { count: selectedCount })}
-						</div>
-						<div class="flex gap-1.5">
-							<button
-								class="text-sm px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-900 transition"
-								on:click={selectAllChats}
-								aria-label={selectedChatIds.size === $chats.length
-									? $i18n.t('Deselect all chats')
-									: $i18n.t('Select all chats')}
+				{#if editMode && selectedCount > 0}
+					<div
+						class="px-2 py-2 sticky bottom-[60px] z-10 -mt-3 sidebar bg-gray-50/95 dark:bg-gray-950/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-800"
+						transition:slide={{ duration: 200 }}
+						role="region"
+						aria-label={$i18n.t('Chat selection actions')}
+					>
+						<div class="flex items-center justify-between gap-2">
+							<div
+								class="text-sm text-gray-600 dark:text-gray-400"
+								role="status"
+								aria-live="polite"
 							>
-								{selectedChatIds.size === $chats.length
-									? $i18n.t('Deselect All')
-									: $i18n.t('Select All')}
-							</button>
-							<button
-								class="text-sm px-3 py-1.5 rounded-xl bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-								on:click={() => (showBulkDeleteConfirm = true)}
-								disabled={deleting || !canDelete}
-								aria-label={$i18n.t('Delete selected chats')}
-							>
-								{deleting ? $i18n.t('Deleting...') : $i18n.t('Delete')}
-							</button>
+								{$i18n.t('{{count}} chats selected', { count: selectedCount })}
+							</div>
+							<div class="flex gap-1.5">
+								<button
+									class="text-sm px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-900 transition"
+									on:click={selectAllChats}
+									aria-label={selectedChatIds.size === $chats.length
+										? $i18n.t('Deselect all chats')
+										: $i18n.t('Select all chats')}
+								>
+									{selectedChatIds.size === $chats.length
+										? $i18n.t('Deselect All')
+										: $i18n.t('Select All')}
+								</button>
+								<button
+									class="text-sm px-3 py-1.5 rounded-xl bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+									on:click={() => (showBulkDeleteConfirm = true)}
+									disabled={deleting || !canDelete}
+									aria-label={$i18n.t('Delete selected chats')}
+								>
+									{deleting ? $i18n.t('Deleting...') : $i18n.t('Delete')}
+								</button>
+							</div>
 						</div>
 					</div>
-				</div>
-			{/if}
+				{/if}
 			</div>
 
 			<div class="px-1.5 pt-1.5 pb-2 sticky bottom-0 z-10 -mt-3 sidebar">
