@@ -64,6 +64,7 @@
 	import Sidebar from '../icons/Sidebar.svelte';
 	import PinnedModelList from './Sidebar/PinnedModelList.svelte';
 	import Note from '../icons/Note.svelte';
+	import GarbageBin from '../icons/GarbageBin.svelte';
 	import { slide } from 'svelte/transition';
 	import HotkeyHint from '../common/HotkeyHint.svelte';
 
@@ -897,7 +898,10 @@
 			</div>
 
 			<div
-				class="relative flex flex-col flex-1 overflow-y-auto scrollbar-hidden pt-3 pb-3"
+				class="relative flex flex-col flex-1 overflow-y-auto scrollbar-hidden pt-3 {editMode &&
+				selectedCount > 0
+					? 'pb-20'
+					: 'pb-3'}"
 				on:scroll={(e) => {
 					if (e.target.scrollTop === 0) {
 						scrollTop = 0;
@@ -1382,12 +1386,18 @@
 										: $i18n.t('Select All')}
 								</button>
 								<button
-									class="text-sm px-3 py-1.5 rounded-xl bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+									class="text-sm px-3 py-1.5 rounded-xl bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
 									on:click={() => (showBulkDeleteConfirm = true)}
 									disabled={deleting || !canDelete}
 									aria-label={$i18n.t('Delete selected chats')}
 								>
-									{deleting ? $i18n.t('Deleting...') : $i18n.t('Delete')}
+									{#if deleting}
+										<Spinner className="size-3.5" />
+										<span class="whitespace-nowrap">{$i18n.t('Deleting...')}</span>
+									{:else}
+										<GarbageBin className="size-4" strokeWidth="2" />
+										<span class="whitespace-nowrap">{$i18n.t('Delete')}</span>
+									{/if}
 								</button>
 							</div>
 						</div>

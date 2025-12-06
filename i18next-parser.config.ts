@@ -28,7 +28,7 @@ export default {
 	pluralSeparator: '_',
 	input: 'src/**/*.{js,svelte}',
 	sort: true,
-	verbose: true,
+	verbose: false,
 	failOnWarnings: false,
 	failOnUpdate: false,
 	customValueTemplate: null,
