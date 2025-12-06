@@ -39,7 +39,8 @@
 		unpinChatById,
 		getChatById,
 		updateChatById,
-		importChats
+		importChats,
+		deleteChatsByIds
 	} from '$lib/apis/chats';
 	import { createNewFolder, getFolders, updateFolderParentIdById } from '$lib/apis/folders';
 	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
@@ -51,6 +52,7 @@
 	import Loader from '../common/Loader.svelte';
 	import Folder from '../common/Folder.svelte';
 	import Tooltip from '../common/Tooltip.svelte';
+	import ConfirmDialog from '../common/ConfirmDialog.svelte';
 	import Folders from './Sidebar/Folders.svelte';
 	import { getChannels, createNewChannel } from '$lib/apis/channels';
 	import ChannelModal from './Sidebar/ChannelModal.svelte';
@@ -75,6 +77,16 @@
 	let selectedChatId = null;
 	let showCreateChannel = false;
 
+	// Edit mode and selection state
+	let editMode = false;
+	let selectedChatIds = new Set<string>();
+	let showBulkDeleteConfirm = false;
+	let deleting = false;
+
+	$: selectedCount = selectedChatIds.size;
+	$: canDelete =
+		selectedCount > 0 && ($user?.role === 'admin' || ($user?.permissions?.chat?.delete ?? false));
+
 	// Pagination variables
 	let chatListLoading = false;
 	let allChatsLoaded = false;
@@ -88,6 +100,10 @@
 
 	$: if ($selectedFolder) {
 		initFolders();
+	}
+
+	$: if ($selectedFolder !== null && editMode) {
+		exitEditMode();
 	}
 
 	const initFolders = async () => {
@@ -267,6 +283,69 @@
 		initChatList();
 	};
 
+	const enterEditMode = () => {
+		editMode = true;
+		selectedChatIds.clear();
+		selectedChatIds = selectedChatIds;
+	};
+
+	const exitEditMode = () => {
+		editMode = false;
+		selectedChatIds.clear();
+		selectedChatIds = selectedChatIds;
+		showBulkDeleteConfirm = false;
+	};
+
+	const toggleChatSelection = (chatId: string) => {
+		if (selectedChatIds.has(chatId)) {
+			selectedChatIds.delete(chatId);
+		} else {
+			selectedChatIds.add(chatId);
+		}
+		selectedChatIds = selectedChatIds;
+	};
+
+	const selectAllChats = () => {
+		if (selectedChatIds.size === $chats.length) {
+			selectedChatIds.clear();
+		} else {
+			$chats.forEach((chat) => selectedChatIds.add(chat.id));
+		}
+		selectedChatIds = selectedChatIds;
+	};
+
+	const bulkDeleteHandler = async () => {
+		showBulkDeleteConfirm = false;
+		deleting = true;
+
+		try {
+			const result = await deleteChatsByIds(localStorage.token, Array.from(selectedChatIds));
+
+			if (result.failed.length > 0) {
+				toast.error(
+					$i18n.t('{{count}} of {{total}} chats could not be deleted', {
+						count: result.failed.length,
+						total: result.total
+					})
+				);
+			} else {
+				toast.success(
+					$i18n.t('{{count}} chats deleted successfully', {
+						count: result.deleted
+					})
+				);
+			}
+
+			await initChatList();
+		} catch (error) {
+			console.error('Failed to delete chats:', error);
+			toast.error($i18n.t('Failed to delete chats: {{error}}', { error: error.message }));
+		} finally {
+			deleting = false;
+			exitEditMode();
+		}
+	};
+
 	const inputFilesHandler = async (files) => {
 		console.log(files);
 
@@ -359,6 +438,9 @@
 	const onKeyDown = (e) => {
 		if (e.key === 'Shift') {
 			shiftKey = true;
+		}
+		if (e.key === 'Escape' && editMode) {
+			exitEditMode();
 		}
 	};
 
@@ -493,6 +575,20 @@
 		await initChatList();
 	}}
 />
+
+<ConfirmDialog bind:show={showBulkDeleteConfirm} on:confirm={bulkDeleteHandler}>
+	<div class="flex flex-col gap-2">
+		<div class="text-lg font-medium">
+			{$i18n.t('Delete {{count}} chats?', { count: selectedCount })}
+		</div>
+		<div class="text-sm text-gray-500">
+			{$i18n.t(
+				'This will permanently delete {{count}} conversations. This action cannot be undone.',
+				{ count: selectedCount }
+			)}
+		</div>
+	</div>
+</ConfirmDialog>
 
 <ChannelModal
 	bind:show={showCreateChannel}
@@ -1005,11 +1101,14 @@
 
 				<Folder
 					id="sidebar-chats"
-					className="px-2 mt-0.5"
+					className="px-2 mt-0.5 relative"
 					name={$i18n.t('Chats')}
 					chevron={false}
 					on:change={async (e) => {
 						selectedFolder.set(null);
+						if (editMode) {
+							exitEditMode();
+						}
 					}}
 					on:import={(e) => {
 						importChatHandler(e.detail);
@@ -1071,6 +1170,23 @@
 						}
 					}}
 				>
+					{#if $user?.role === 'admin' || ($user?.permissions?.chat?.delete ?? false)}
+						<button
+							class="absolute z-20 right-2 top-[5px] text-xs px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition"
+							on:click={() => {
+								if (editMode) {
+									exitEditMode();
+								} else {
+									enterEditMode();
+								}
+							}}
+							aria-pressed={editMode}
+							aria-label={editMode ? $i18n.t('Cancel') : $i18n.t('Edit')}
+						>
+							{editMode ? $i18n.t('Cancel') : $i18n.t('Edit')}
+						</button>
+					{/if}
+
 					{#if $pinnedChats.length > 0}
 						<div class="mb-1">
 							<div class="flex flex-col space-y-1 rounded-xl">
@@ -1191,6 +1307,9 @@
 										title={chat.title}
 										{shiftKey}
 										selected={selectedChatId === chat.id}
+										{editMode}
+										isSelected={selectedChatIds.has(chat.id)}
+										onToggleSelect={toggleChatSelection}
 										on:select={() => {
 											selectedChatId = chat.id;
 										}}
@@ -1234,6 +1353,46 @@
 						</div>
 					</div>
 				</Folder>
+
+				{#if editMode && selectedCount > 0}
+					<div
+						class="px-2 py-2 sticky bottom-[60px] z-10 -mt-3 sidebar bg-gray-50/95 dark:bg-gray-950/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-800"
+						transition:slide={{ duration: 200 }}
+						role="region"
+						aria-label={$i18n.t('Chat selection actions')}
+					>
+						<div class="flex items-center justify-between gap-2">
+							<div
+								class="text-sm text-gray-600 dark:text-gray-400"
+								role="status"
+								aria-live="polite"
+							>
+								{$i18n.t('{{count}} chats selected', { count: selectedCount })}
+							</div>
+							<div class="flex gap-1.5">
+								<button
+									class="text-sm px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-900 transition"
+									on:click={selectAllChats}
+									aria-label={selectedChatIds.size === $chats.length
+										? $i18n.t('Deselect all chats')
+										: $i18n.t('Select all chats')}
+								>
+									{selectedChatIds.size === $chats.length
+										? $i18n.t('Deselect All')
+										: $i18n.t('Select All')}
+								</button>
+								<button
+									class="text-sm px-3 py-1.5 rounded-xl bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+									on:click={() => (showBulkDeleteConfirm = true)}
+									disabled={deleting || !canDelete}
+									aria-label={$i18n.t('Delete selected chats')}
+								>
+									{deleting ? $i18n.t('Deleting...') : $i18n.t('Delete')}
+								</button>
+							</div>
+						</div>
+					</div>
+				{/if}
 			</div>
 
 			<div class="px-1.5 pt-1.5 pb-2 sticky bottom-0 z-10 -mt-3 sidebar">

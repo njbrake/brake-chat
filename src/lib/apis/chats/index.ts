@@ -91,6 +91,15 @@ export const deleteChatById = async (token: string, id: string) => {
 	return api.delete(`/chats/${id}`, token);
 };
 
+export const deleteChatsByIds = async (token: string, chatIds: string[]) => {
+	const results = await Promise.allSettled(chatIds.map((id) => deleteChatById(token, id)));
+
+	const deleted = results.filter((r) => r.status === 'fulfilled').length;
+	const failed = chatIds.filter((_, i) => results[i].status === 'rejected');
+
+	return { deleted, failed, total: chatIds.length };
+};
+
 export const cloneChatById = async (token: string, id: string) => {
 	return api.get(`/chats/${id}/clone`, token);
 };
