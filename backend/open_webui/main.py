@@ -92,7 +92,6 @@ from open_webui.models.users import UserModel, Users
 from open_webui.models.chats import Chats
 
 from open_webui.config import (
-    LICENSE_KEY,
     # Ollama
     ENABLE_OLLAMA_API,
     OLLAMA_BASE_URLS,
@@ -430,10 +429,6 @@ async def lifespan(app: FastAPI):
     start_logger()
     if RESET_CONFIG_ON_START:
         reset_config()
-
-    if LICENSE_KEY:
-        get_license_data(app, LICENSE_KEY)
-
     asyncio.create_task(periodic_usage_pool_cleanup())
     yield
 
