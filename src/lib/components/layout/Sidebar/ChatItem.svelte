@@ -39,6 +39,7 @@
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import Document from '$lib/components/icons/Document.svelte';
 	import Sparkles from '$lib/components/icons/Sparkles.svelte';
+	import Checkbox from '$lib/components/common/Checkbox.svelte';
 	import { generateTitle } from '$lib/apis';
 
 	export let className = '';
@@ -48,6 +49,10 @@
 
 	export let selected = false;
 	export let shiftKey = false;
+
+	export let editMode = false;
+	export let isSelected = false;
+	export let onToggleSelect = (id: string) => {};
 
 	export let onDragEnd = () => {};
 
@@ -399,22 +404,27 @@
 	{:else}
 		<a
 			id="sidebar-chat-item"
-			class=" w-full flex justify-between rounded-xl px-[11px] py-[6px] {id === $chatId ||
-			confirmEdit
+			class=" w-full flex items-center gap-2 justify-between rounded-xl px-[11px] py-[6px] {id ===
+				$chatId || confirmEdit
 				? 'bg-gray-100 dark:bg-gray-900 selected'
 				: selected
 					? 'bg-gray-100 dark:bg-gray-950 selected'
 					: ' group-hover:bg-gray-100 dark:group-hover:bg-gray-950'}  whitespace-nowrap text-ellipsis"
-			href="/c/{id}"
-			on:click={() => {
-				dispatch('select');
+			href={editMode ? null : `/c/${id}`}
+			on:click={(e) => {
+				if (editMode) {
+					e.preventDefault();
+					onToggleSelect(id);
+				} else {
+					dispatch('select');
 
-				if ($selectedFolder) {
-					selectedFolder.set(null);
-				}
+					if ($selectedFolder) {
+						selectedFolder.set(null);
+					}
 
-				if ($mobile) {
-					showSidebar.set(false);
+					if ($mobile) {
+						showSidebar.set(false);
+					}
 				}
 			}}
 			on:dblclick={async (e) => {
@@ -433,6 +443,10 @@
 			on:focus={(e) => {}}
 			draggable="false"
 		>
+			{#if editMode}
+				<Checkbox checked={isSelected} aria-label={$i18n.t('Select chat: {{title}}', { title })} />
+			{/if}
+
 			<div class=" flex self-center flex-1 w-full">
 				<div dir="auto" class=" text-left self-center overflow-hidden w-full h-[20px] truncate">
 					{title}
