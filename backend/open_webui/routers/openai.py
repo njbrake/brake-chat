@@ -39,6 +39,7 @@ from open_webui.utils.misc import (
 from open_webui.utils.payload import (
     apply_model_params_to_body_openai,
     apply_system_prompt_to_body,
+    remove_open_webui_params,
 )
 from pydantic import BaseModel
 from starlette.background import BackgroundTask
@@ -845,6 +846,7 @@ async def generate_chat_completion(
     else:
         request_url = f"{url}/chat/completions"
 
+    payload = remove_open_webui_params(payload)
     payload = json.dumps(payload)
 
     r = None
@@ -911,6 +913,7 @@ async def embeddings(request: Request, form_data: dict, user):
     """
     idx = 0
     # Prepare payload/body
+    form_data = remove_open_webui_params(form_data)
     body = json.dumps(form_data)
     # Find correct backend url/key based on model
     await get_all_models(request, user=user)
@@ -1004,12 +1007,17 @@ async def proxy(path: str, request: Request, user=Depends(get_verified_user)):
             headers["api-version"] = api_version
 
             payload = json.loads(body)
+            payload = remove_open_webui_params(payload)
             url, payload = convert_to_azure_payload(url, payload, api_version)
             body = json.dumps(payload).encode()
 
             request_url = f"{url}/{path}?api-version={api_version}"
         else:
             request_url = f"{url}/{path}"
+            if body:
+                payload = json.loads(body)
+                payload = remove_open_webui_params(payload)
+                body = json.dumps(payload).encode()
 
         session = aiohttp.ClientSession(trust_env=True)
         r = await session.request(
