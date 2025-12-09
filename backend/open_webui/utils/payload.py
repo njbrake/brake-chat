@@ -70,6 +70,7 @@ def remove_open_webui_params(params: dict) -> dict:
         "function_calling": str,
         "reasoning_tags": list,
         "system": str,
+        "tool_servers": list,
     }
 
     for key in list(params.keys()):
