@@ -156,6 +156,7 @@ def parse_section(section):
         items.append({"title": title, "content": content, "raw": raw_html})
     return items
 
+
 ####################################
 # SAFE_MODE
 ####################################

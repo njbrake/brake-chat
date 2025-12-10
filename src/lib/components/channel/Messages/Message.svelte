@@ -178,14 +178,14 @@
 				>
 					{#if message?.reply_to_message?.meta?.model_id}
 						<img
-							src={`${'WEBUI_API_BASE_URL'}/models/model/profile/image?id=${message.reply_to_message.meta.model_id}`}
+							src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${message.reply_to_message.meta.model_id}`}
 							alt={message.reply_to_message.meta.model_name ??
 								message.reply_to_message.meta.model_id}
 							class="size-4 ml-0.5 rounded-full object-cover"
 						/>
 					{:else}
 						<img
-							src={`${'WEBUI_API_BASE_URL'}/users/${message.reply_to_message.user?.id}/profile/image`}
+							src={`${WEBUI_API_BASE_URL}/users/${message.reply_to_message.user?.id}/profile/image`}
 							alt={message.reply_to_message.user?.name ?? 'Unknown User'}
 							class="size-4 ml-0.5 rounded-full object-cover"
 						/>
@@ -212,14 +212,14 @@
 				{#if showUserProfile}
 					{#if message?.meta?.model_id}
 						<img
-							src={`${'WEBUI_API_BASE_URL'}/models/model/profile/image?id=${message.meta.model_id}`}
+							src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${message.meta.model_id}`}
 							alt={message.meta.model_name ?? message.meta.model_id}
 							class="size-8 translate-y-1 ml-0.5 object-cover rounded-full"
 						/>
 					{:else}
 						<ProfilePreview user={message.user}>
 							<ProfileImage
-								src={`${'WEBUI_API_BASE_URL'}/users/${message.user.id}/profile/image`}
+								src={`${WEBUI_API_BASE_URL}/users/${message.user.id}/profile/image`}
 								className={'size-8 ml-0.5'}
 							/>
 						</ProfilePreview>
