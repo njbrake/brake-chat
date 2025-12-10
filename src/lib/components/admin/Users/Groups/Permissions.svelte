@@ -784,21 +784,5 @@
 				</div>
 			{/if}
 		</div>
-
-		<div class="flex flex-col w-full">
-			<div class="flex w-full justify-between my-1">
-				<div class=" self-center text-xs font-medium">
-					{'Notes'}
-				</div>
-				<Switch bind:state={permissions.features.notes} />
-			</div>
-			{#if defaultPermissions?.features?.notes && !permissions.features.notes}
-				<div>
-					<div class="text-xs text-gray-500">
-						{'This is a default user permission and will remain enabled.'}
-					</div>
-				</div>
-			{/if}
-		</div>
 	</div>
 </div>
