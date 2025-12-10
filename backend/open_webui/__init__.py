@@ -2,7 +2,7 @@ import base64
 import os
 import random
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 import uvicorn
@@ -65,7 +65,7 @@ def serve(
             os.environ["USE_CUDA_DOCKER"] = "false"
             os.environ["LD_LIBRARY_PATH"] = ":".join(LD_LIBRARY_PATH)
 
-    import open_webui.main  # we need set environment variables before importing main
+    import open_webui.main  # noqa: F401 # we need set environment variables before importing main
     from open_webui.env import UVICORN_WORKERS  # Import the workers setting
 
     uvicorn.run(

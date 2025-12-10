@@ -1245,7 +1245,6 @@ def get_elevenlabs_voices(api_key: str) -> dict:
     AUDIO_TTS_MODEL=eleven_multilingual_v2
     """
     try:
-        # TODO: Add retries
         response = requests.get(
             f"{ELEVENLABS_API_BASE_URL}/v1/voices",
             headers={

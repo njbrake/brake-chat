@@ -228,7 +228,6 @@ class ModelsTable:
 
                 tag = filter.get("tag")
                 if tag:
-                    # TODO: This is a simple implementation and should be improved for performance
                     like_pattern = f'%"{tag.lower()}"%'  # `"tag"` inside JSON array
                     meta_text = func.lower(cast(Model.meta, String))
 
@@ -307,7 +306,7 @@ class ModelsTable:
             with get_db() as db:
                 # update only the fields that are present in the model
                 data = model.model_dump(exclude={"id"})
-                result = db.query(Model).filter_by(id=id).update(data)
+                db.query(Model).filter_by(id=id).update(data)
 
                 db.commit()
 
