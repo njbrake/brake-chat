@@ -163,7 +163,6 @@ async def periodic_usage_pool_cleanup():
                 raise Exception("Unable to renew usage pool cleanup lock.")
 
             now = int(time.time())
-            send_usage = False
             for model_id, connections in list(USAGE_POOL.items()):
                 # Creating a list of sids to remove if they have timed out
                 expired_sids = [
@@ -179,7 +178,6 @@ async def periodic_usage_pool_cleanup():
                 else:
                     USAGE_POOL[model_id] = connections
 
-                send_usage = True
             await asyncio.sleep(TIMEOUT_DURATION)
     finally:
         release_func()

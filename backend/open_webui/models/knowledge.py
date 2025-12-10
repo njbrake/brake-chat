@@ -172,7 +172,7 @@ class KnowledgeTable:
     ) -> KnowledgeModel | None:
         try:
             with get_db() as db:
-                knowledge = self.get_knowledge_by_id(id=id)
+                self.get_knowledge_by_id(id=id)
                 db.query(Knowledge).filter_by(id=id).update(
                     {
                         **form_data.model_dump(),
@@ -188,7 +188,7 @@ class KnowledgeTable:
     def update_knowledge_data_by_id(self, id: str, data: dict) -> KnowledgeModel | None:
         try:
             with get_db() as db:
-                knowledge = self.get_knowledge_by_id(id=id)
+                self.get_knowledge_by_id(id=id)
                 db.query(Knowledge).filter_by(id=id).update(
                     {
                         "data": data,

@@ -103,7 +103,7 @@ async def get_tools(request: Request, tool_ids: list[str], user: UserModel, extr
                 server_id_splits = server_id.split("|")
                 if len(server_id_splits) == 2:
                     server_id = server_id_splits[0]
-                    function_names = server_id_splits[1].split(",")
+                    server_id_splits[1].split(",")
 
                 if type == "openapi":
                     tool_server_data = None
@@ -227,7 +227,6 @@ async def get_tools(request: Request, tool_ids: list[str], user: UserModel, extr
                 )
 
             for spec in tool.specs:
-                # TODO: Fix hack for OpenAI API
                 # Some times breaks OpenAI but others don't. Leaving the comment
                 for val in spec.get("parameters", {}).get("properties", {}).values():
                     if val.get("type") == "str":
@@ -250,7 +249,6 @@ async def get_tools(request: Request, tool_ids: list[str], user: UserModel, extr
                     },
                 )
 
-                # TODO: Support Pydantic models as parameters
                 if callable.__doc__ and callable.__doc__.strip() != "":
                     s = re.split(":(param|return)", callable.__doc__, 1)
                     spec["description"] = s[0]

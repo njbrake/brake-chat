@@ -175,7 +175,6 @@ from open_webui.config import (
     # Retrieval (Web Search)
     ENABLE_WEB_SEARCH,
     # Misc
-    ENV,
     EVALUATION_ARENA_MODELS,
     EXA_API_KEY,
     EXTERNAL_DOCUMENT_LOADER_API_KEY,
@@ -356,6 +355,7 @@ from open_webui.env import (
     ENABLE_STAR_SESSIONS_MIDDLEWARE,
     ENABLE_VERSION_UPDATE_CHECK,
     ENABLE_WEBSOCKET_SUPPORT,
+    ENV,
     EXTERNAL_PWA_MANIFEST_URL,
     GLOBAL_LOG_LEVEL,
     INSTANCE_ID,

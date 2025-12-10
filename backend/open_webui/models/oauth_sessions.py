@@ -233,7 +233,7 @@ class OAuthSessionTable:
         """Delete all OAuth sessions for a user"""
         try:
             with get_db() as db:
-                result = db.query(OAuthSession).filter_by(user_id=user_id).delete()
+                db.query(OAuthSession).filter_by(user_id=user_id).delete()
                 db.commit()
                 return True
         except Exception as e:

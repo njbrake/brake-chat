@@ -435,7 +435,6 @@ class MinerULoader:
 
                 # Find markdown file - search recursively for any .md file
                 markdown_content = None
-                found_md_path = None
 
                 # First, list all files in the ZIP for debugging
                 all_files = []
@@ -445,7 +444,6 @@ class MinerULoader:
                         all_files.append(full_path)
                         # Look for any .md file
                         if file.endswith(".md"):
-                            found_md_path = full_path
                             log.info(f"Found markdown file at: {full_path}")
                             try:
                                 with open(full_path, encoding="utf-8") as f:
