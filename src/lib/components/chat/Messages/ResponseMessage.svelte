@@ -5,9 +5,6 @@
 	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { onMount, tick, getContext } from 'svelte';
 	import type { Writable } from 'svelte/store';
-	import type { i18n as i18nType, t } from 'i18next';
-
-	const i18n = getContext<Writable<i18nType>>('i18n');
 
 	const dispatch = createEventDispatcher();
 
@@ -183,7 +180,7 @@
 
 		const res = await _copyToClipboard(text, null, $settings?.copyFormatted ?? false);
 		if (res) {
-			toast.success($i18n.t('Copying to clipboard was successful!'));
+			toast.success('Copying to clipboard was successful!');
 		}
 	};
 
@@ -201,7 +198,7 @@
 
 	const speak = async () => {
 		if (!(message?.content ?? '').trim().length) {
-			toast.info($i18n.t('No content to speak'));
+			toast.info('No content to speak');
 			return;
 		}
 
@@ -259,7 +256,7 @@
 
 			if (!messageContentParts.length) {
 				console.log('No content to speak');
-				toast.info($i18n.t('No content to speak'));
+				toast.info('No content to speak');
 
 				speaking = false;
 				loadingSpeech = false;
@@ -612,7 +609,7 @@
 
 <DeleteConfirmDialog
 	bind:show={showDeleteConfirm}
-	title={$i18n.t('Delete message?')}
+	title={'Delete message?'}
 	on:confirm={() => {
 		deleteMessageHandler();
 	}}
@@ -626,7 +623,7 @@
 	>
 		<div class={`shrink-0 ltr:mr-3 rtl:ml-3 hidden @lg:flex mt-1 `}>
 			<ProfileImage
-				src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${model?.id}&lang=${$i18n.language}`}
+				src={`${'WEBUI_API_BASE_URL'}/models/model/profile/image?id=${model?.id}&lang=${'en-US'}`}
 				className={'size-8 assistant-message-profile-image'}
 			/>
 		</div>
@@ -647,12 +644,7 @@
 							: 'invisible group-hover:visible transition text-gray-400'}"
 					>
 						<Tooltip content={dayjs(message.timestamp * 1000).format('LLLL')}>
-							<span class="line-clamp-1"
-								>{$i18n.t(formatDate(message.timestamp * 1000), {
-									LOCALIZED_TIME: dayjs(message.timestamp * 1000).format('LT'),
-									LOCALIZED_DATE: dayjs(message.timestamp * 1000).format('L')
-								})}</span
-							>
+							<span class="line-clamp-1">{dayjs(message.timestamp * 1000).fromNow()}</span>
 						</Tooltip>
 					</div>
 				{/if}
@@ -736,7 +728,7 @@
 												saveAsCopyHandler();
 											}}
 										>
-											{$i18n.t('Save As Copy')}
+											{'Save As Copy'}
 										</button>
 									</div>
 
@@ -748,7 +740,7 @@
 												cancelEditMessage();
 											}}
 										>
-											{$i18n.t('Cancel')}
+											{'Cancel'}
 										</button>
 
 										<button
@@ -758,7 +750,7 @@
 												editMessageConfirmHandler();
 											}}
 										>
-											{$i18n.t('Save')}
+											{'Save'}
 										</button>
 									</div>
 								</div>
@@ -845,7 +837,7 @@
 							{#if siblings.length > 1}
 								<div class="flex self-center min-w-fit" dir="ltr">
 									<button
-										aria-label={$i18n.t('Previous message')}
+										aria-label={'Previous message'}
 										class="self-center p-1 hover:bg-black/5 dark:hover:bg-white/5 dark:hover:text-white hover:text-black rounded-md transition"
 										on:click={() => {
 											showPreviousMessage(message);
@@ -918,7 +910,7 @@
 										on:click={() => {
 											showNextMessage(message);
 										}}
-										aria-label={$i18n.t('Next message')}
+										aria-label={'Next message'}
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
@@ -942,9 +934,9 @@
 							{#if message.done}
 								{#if !readOnly}
 									{#if $user?.role === 'user' ? ($user?.permissions?.chat?.edit ?? true) : true}
-										<Tooltip content={$i18n.t('Edit')} placement="bottom">
+										<Tooltip content={'Edit'} placement="bottom">
 											<button
-												aria-label={$i18n.t('Edit')}
+												aria-label={'Edit'}
 												class="{isLastMessage || ($settings?.highContrastMode ?? false)
 													? 'visible'
 													: 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
@@ -972,9 +964,9 @@
 									{/if}
 								{/if}
 
-								<Tooltip content={$i18n.t('Copy')} placement="bottom">
+								<Tooltip content={'Copy'} placement="bottom">
 									<button
-										aria-label={$i18n.t('Copy')}
+										aria-label={'Copy'}
 										class="{isLastMessage || ($settings?.highContrastMode ?? false)
 											? 'visible'
 											: 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition copy-response-button"
@@ -1001,9 +993,9 @@
 								</Tooltip>
 
 								{#if $user?.role === 'admin' || ($user?.permissions?.chat?.tts ?? true)}
-									<Tooltip content={$i18n.t('Read Aloud')} placement="bottom">
+									<Tooltip content={'Read Aloud'} placement="bottom">
 										<button
-											aria-label={$i18n.t('Read Aloud')}
+											aria-label={'Read Aloud'}
 											id="speak-button-{message.id}"
 											class="{isLastMessage || ($settings?.highContrastMode ?? false)
 												? 'visible'
@@ -1089,9 +1081,9 @@
 								{/if}
 
 								{#if $config?.features.enable_image_generation && ($user?.role === 'admin' || $user?.permissions?.features?.image_generation) && !readOnly}
-									<Tooltip content={$i18n.t('Generate Image')} placement="bottom">
+									<Tooltip content={'Generate Image'} placement="bottom">
 										<button
-											aria-label={$i18n.t('Generate Image')}
+											aria-label={'Generate Image'}
 											class="{isLastMessage || ($settings?.highContrastMode ?? false)
 												? 'visible'
 												: 'invisible group-hover:visible'}  p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
@@ -1201,9 +1193,9 @@
 
 								{#if !readOnly}
 									{#if !$temporaryChatEnabled && ($config?.features.enable_message_rating ?? true) && ($user?.role === 'admin' || ($user?.permissions?.chat?.rate_response ?? true))}
-										<Tooltip content={$i18n.t('Good Response')} placement="bottom">
+										<Tooltip content={'Good Response'} placement="bottom">
 											<button
-												aria-label={$i18n.t('Good Response')}
+												aria-label={'Good Response'}
 												class="{isLastMessage || ($settings?.highContrastMode ?? false)
 													? 'visible'
 													: 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg {(
@@ -1239,9 +1231,9 @@
 											</button>
 										</Tooltip>
 
-										<Tooltip content={$i18n.t('Bad Response')} placement="bottom">
+										<Tooltip content={'Bad Response'} placement="bottom">
 											<button
-												aria-label={$i18n.t('Bad Response')}
+												aria-label={'Bad Response'}
 												class="{isLastMessage || ($settings?.highContrastMode ?? false)
 													? 'visible'
 													: 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg {(
@@ -1279,9 +1271,9 @@
 									{/if}
 
 									{#if isLastMessage && ($user?.role === 'admin' || ($user?.permissions?.chat?.continue_response ?? true))}
-										<Tooltip content={$i18n.t('Continue Response')} placement="bottom">
+										<Tooltip content={'Continue Response'} placement="bottom">
 											<button
-												aria-label={$i18n.t('Continue Response')}
+												aria-label={'Continue Response'}
 												type="button"
 												id="continue-response-button"
 												class="{isLastMessage || ($settings?.highContrastMode ?? false)
@@ -1356,9 +1348,9 @@
 													});
 												}}
 											>
-												<Tooltip content={$i18n.t('Regenerate')} placement="bottom">
+												<Tooltip content={'Regenerate'} placement="bottom">
 													<div
-														aria-label={$i18n.t('Regenerate')}
+														aria-label={'Regenerate'}
 														class="{isLastMessage
 															? 'visible'
 															: 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition"
@@ -1382,10 +1374,10 @@
 												</Tooltip>
 											</RegenerateMenu>
 										{:else}
-											<Tooltip content={$i18n.t('Regenerate')} placement="bottom">
+											<Tooltip content={'Regenerate'} placement="bottom">
 												<button
 													type="button"
-													aria-label={$i18n.t('Regenerate')}
+													aria-label={'Regenerate'}
 													class="{isLastMessage
 														? 'visible'
 														: 'invisible group-hover:visible'} p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg dark:hover:text-white hover:text-black transition regenerate-response-button"
@@ -1428,10 +1420,10 @@
 
 									{#if $user?.role === 'admin' || ($user?.permissions?.chat?.delete_message ?? true)}
 										{#if siblings.length > 1}
-											<Tooltip content={$i18n.t('Delete')} placement="bottom">
+											<Tooltip content={'Delete'} placement="bottom">
 												<button
 													type="button"
-													aria-label={$i18n.t('Delete')}
+													aria-label={'Delete'}
 													id="delete-response-button"
 													class="{isLastMessage || ($settings?.highContrastMode ?? false)
 														? 'visible'

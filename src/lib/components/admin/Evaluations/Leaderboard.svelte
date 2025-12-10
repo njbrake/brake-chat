@@ -11,9 +11,6 @@
 	import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
 	import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
 	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
-
-	const i18n = getContext('i18n');
-
 	const EMBEDDING_MODEL = 'TaylorAI/bge-micro-v2';
 
 	let tokenizer = null;
@@ -341,7 +338,7 @@
 >
 	<div class="flex items-center md:self-center text-xl font-medium px-0.5 gap-2 shrink-0">
 		<div>
-			{$i18n.t('Leaderboard')}
+			{'Leaderboard'}
 		</div>
 
 		<div class="text-lg font-medium text-gray-500 dark:text-gray-500">
@@ -350,7 +347,7 @@
 	</div>
 
 	<div class=" flex space-x-2">
-		<Tooltip content={$i18n.t('Re-rank models by topic similarity')}>
+		<Tooltip content={'Re-rank models by topic similarity'}>
 			<div class="flex flex-1">
 				<div class=" self-center ml-1 mr-3">
 					<Search className="size-3" />
@@ -358,7 +355,7 @@
 				<input
 					class=" w-full text-sm pr-4 py-1 rounded-r-xl outline-hidden bg-transparent"
 					bind:value={query}
-					placeholder={$i18n.t('Search')}
+					placeholder={'Search'}
 					on:focus={() => {
 						loadEmbeddingModel();
 					}}
@@ -378,7 +375,7 @@
 	{/if}
 	{#if (rankedModels ?? []).length === 0}
 		<div class="text-center text-xs text-gray-500 dark:text-gray-400 py-1">
-			{$i18n.t('No models found')}
+			{'No models found'}
 		</div>
 	{:else}
 		<table
@@ -394,7 +391,7 @@
 						on:click={() => setSortKey('rating')}
 					>
 						<div class="flex gap-1.5 items-center">
-							{$i18n.t('RK')}
+							{'RK'}
 							{#if orderBy === 'rating'}
 								<span class="font-normal">
 									{#if direction === 'asc'}
@@ -416,7 +413,7 @@
 						on:click={() => setSortKey('name')}
 					>
 						<div class="flex gap-1.5 items-center">
-							{$i18n.t('Model')}
+							{'Model'}
 							{#if orderBy === 'name'}
 								<span class="font-normal">
 									{#if direction === 'asc'}
@@ -438,7 +435,7 @@
 						on:click={() => setSortKey('rating')}
 					>
 						<div class="flex gap-1.5 items-center justify-end">
-							{$i18n.t('Rating')}
+							{'Rating'}
 							{#if orderBy === 'rating'}
 								<span class="font-normal">
 									{#if direction === 'asc'}
@@ -460,7 +457,7 @@
 						on:click={() => setSortKey('won')}
 					>
 						<div class="flex gap-1.5 items-center justify-end">
-							{$i18n.t('Won')}
+							{'Won'}
 							{#if orderBy === 'won'}
 								<span class="font-normal">
 									{#if direction === 'asc'}
@@ -482,7 +479,7 @@
 						on:click={() => setSortKey('lost')}
 					>
 						<div class="flex gap-1.5 items-center justify-end">
-							{$i18n.t('Lost')}
+							{'Lost'}
 							{#if orderBy === 'lost'}
 								<span class="font-normal">
 									{#if direction === 'asc'}
@@ -565,12 +562,8 @@
 <div class=" text-gray-500 text-xs mt-1.5 w-full flex justify-end">
 	<div class=" text-right">
 		<div class="line-clamp-1">
-			ⓘ {$i18n.t(
-				'The evaluation leaderboard is based on the Elo rating system and is updated in real-time.'
-			)}
+			ⓘ {'The evaluation leaderboard is based on the Elo rating system and is updated in real-time.'}
 		</div>
-		{$i18n.t(
-			'The leaderboard is currently in beta, and we may adjust the rating calculations as we refine the algorithm.'
-		)}
+		{'The leaderboard is currently in beta, and we may adjust the rating calculations as we refine the algorithm.'}
 	</div>
 </div>

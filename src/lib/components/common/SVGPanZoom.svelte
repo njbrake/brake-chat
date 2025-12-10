@@ -8,8 +8,6 @@
 	import DOMPurify from 'dompurify';
 
 	import { onMount, getContext } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import { copyToClipboard } from '$lib/utils';
 
 	import DocumentDuplicate from '../icons/DocumentDuplicate.svelte';
@@ -93,7 +91,7 @@
 	{#if content}
 		<div class=" absolute top-2.5 right-2.5">
 			<div class="flex gap-1">
-				<Tooltip content={$i18n.t('Download as SVG')}>
+				<Tooltip content={'Download as SVG'}>
 					<button
 						class="p-1.5 rounded-lg border border-gray-100 dark:border-none dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
 						on:click={() => {
@@ -104,7 +102,7 @@
 					</button>
 				</Tooltip>
 
-				<Tooltip content={$i18n.t('Reset view')}>
+				<Tooltip content={'Reset view'}>
 					<button
 						class="p-1.5 rounded-lg border border-gray-100 dark:border-none dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
 						on:click={() => {
@@ -115,12 +113,12 @@
 					</button>
 				</Tooltip>
 
-				<Tooltip content={$i18n.t('Copy to clipboard')}>
+				<Tooltip content={'Copy to clipboard'}>
 					<button
 						class="p-1.5 rounded-lg border border-gray-100 dark:border-none dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
 						on:click={() => {
 							copyToClipboard(content);
-							toast.success($i18n.t('Copied to clipboard'));
+							toast.success('Copied to clipboard');
 						}}
 					>
 						<Clipboard className=" size-4" strokeWidth="1.5" />

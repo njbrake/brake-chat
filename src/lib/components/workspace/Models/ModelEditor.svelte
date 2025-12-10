@@ -23,9 +23,6 @@
 	import DefaultFiltersSelector from './DefaultFiltersSelector.svelte';
 	import DefaultFeatures from './DefaultFeatures.svelte';
 	import PromptSuggestions from './PromptSuggestions.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let onSubmit: Function;
 	export let onBack: null | Function = null;
 
@@ -124,21 +121,21 @@
 		info.name = name;
 
 		if (id === '') {
-			toast.error($i18n.t('Model ID is required.'));
+			toast.error('Model ID is required.');
 			loading = false;
 
 			return;
 		}
 
 		if (name === '') {
-			toast.error($i18n.t('Model Name is required.'));
+			toast.error('Model Name is required.');
 			loading = false;
 
 			return;
 		}
 
 		if (knowledge.some((item) => item.status === 'uploading')) {
-			toast.error($i18n.t('Please wait until all files are uploaded.'));
+			toast.error('Please wait until all files are uploaded.');
 			loading = false;
 
 			return;
@@ -338,7 +335,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center text-sm font-medium">{$i18n.t('Back')}</div>
+			<div class=" self-center text-sm font-medium">{'Back'}</div>
 		</button>
 	{/if}
 
@@ -478,7 +475,7 @@
 								}}
 								type="button"
 							>
-								{$i18n.t('Reset Image')}</button
+								{'Reset Image'}</button
 							>
 						</div>
 					</div>
@@ -490,7 +487,7 @@
 							<div>
 								<input
 									class="text-3xl font-medium w-full bg-transparent outline-hidden"
-									placeholder={$i18n.t('Model Name')}
+									placeholder={'Model Name'}
 									bind:value={name}
 									required
 								/>
@@ -501,7 +498,7 @@
 							<div>
 								<input
 									class="text-xs w-full bg-transparent text-gray-500 outline-hidden"
-									placeholder={$i18n.t('Model ID')}
+									placeholder={'Model ID'}
 									bind:value={id}
 									disabled={edit}
 									required
@@ -512,21 +509,19 @@
 
 					{#if preset}
 						<div class="my-1">
-							<div class=" text-sm font-medium mb-1">{$i18n.t('Base Model (From)')}</div>
+							<div class=" text-sm font-medium mb-1">{'Base Model (From)'}</div>
 
 							<div>
 								<select
 									class="text-sm w-full bg-transparent outline-hidden"
-									placeholder={$i18n.t('Select a base model (e.g. llama3, gpt-4o)')}
+									placeholder={'Select a base model (e.g. llama3, gpt-4o)'}
 									bind:value={info.base_model_id}
 									on:change={(e) => {
 										addUsage(e.target.value);
 									}}
 									required
 								>
-									<option value={null} class=" text-gray-900"
-										>{$i18n.t('Select a base model')}</option
-									>
+									<option value={null} class=" text-gray-900">{'Select a base model'}</option>
 									{#each $models.filter((m) => (model ? m.id !== model.id : true) && !m?.preset && m?.owned_by !== 'arena' && !(m?.direct ?? false)) as model}
 										<option value={model.id} class=" text-gray-900">{model.name}</option>
 									{/each}
@@ -537,23 +532,23 @@
 
 					<div class="my-1">
 						<div class="mb-1 flex w-full justify-between items-center">
-							<div class=" self-center text-sm font-medium">{$i18n.t('Description')}</div>
+							<div class=" self-center text-sm font-medium">{'Description'}</div>
 
 							<button
 								class="p-1 text-xs flex rounded-sm transition"
 								type="button"
 								aria-pressed={enableDescription ? 'true' : 'false'}
 								aria-label={enableDescription
-									? $i18n.t('Custom description enabled')
-									: $i18n.t('Default description enabled')}
+									? 'Custom description enabled'
+									: 'Default description enabled'}
 								on:click={() => {
 									enableDescription = !enableDescription;
 								}}
 							>
 								{#if !enableDescription}
-									<span class="ml-2 self-center">{$i18n.t('Default')}</span>
+									<span class="ml-2 self-center">{'Default'}</span>
 								{:else}
-									<span class="ml-2 self-center">{$i18n.t('Custom')}</span>
+									<span class="ml-2 self-center">{'Custom'}</span>
 								{/if}
 							</button>
 						</div>
@@ -561,7 +556,7 @@
 						{#if enableDescription}
 							<Textarea
 								className=" text-sm w-full bg-transparent outline-hidden resize-none overflow-y-hidden "
-								placeholder={$i18n.t('Add a short description about what this model does')}
+								placeholder={'Add a short description about what this model does'}
 								bind:value={info.meta.description}
 							/>
 						{/if}
@@ -602,18 +597,16 @@
 
 					<div class="my-2">
 						<div class="flex w-full justify-between">
-							<div class=" self-center text-sm font-medium">{$i18n.t('Model Params')}</div>
+							<div class=" self-center text-sm font-medium">{'Model Params'}</div>
 						</div>
 
 						<div class="mt-2">
 							<div class="my-1">
-								<div class=" text-xs font-medium mb-2">{$i18n.t('System Prompt')}</div>
+								<div class=" text-xs font-medium mb-2">{'System Prompt'}</div>
 								<div>
 									<Textarea
 										className=" text-sm w-full bg-transparent outline-hidden resize-none overflow-y-hidden "
-										placeholder={$i18n.t(
-											'Write your model system prompt content here\ne.g.) You are Mario from Super Mario Bros, acting as an assistant.'
-										)}
+										placeholder={'Write your model system prompt content here\ne.g.) You are Mario from Super Mario Bros, acting as an assistant.'}
 										rows={4}
 										bind:value={system}
 									/>
@@ -622,7 +615,7 @@
 
 							<div class="flex w-full justify-between">
 								<div class=" self-center text-xs font-medium">
-									{$i18n.t('Advanced Params')}
+									{'Advanced Params'}
 								</div>
 
 								<button
@@ -633,9 +626,9 @@
 									}}
 								>
 									{#if showAdvanced}
-										<span class="ml-2 self-center">{$i18n.t('Hide')}</span>
+										<span class="ml-2 self-center">{'Hide'}</span>
 									{:else}
-										<span class="ml-2 self-center">{$i18n.t('Show')}</span>
+										<span class="ml-2 self-center">{'Show'}</span>
 									{/if}
 								</button>
 							</div>
@@ -654,7 +647,7 @@
 						<div class="flex w-full justify-between items-center">
 							<div class="flex w-full justify-between items-center">
 								<div class=" self-center text-sm font-medium">
-									{$i18n.t('Prompts')}
+									{'Prompts'}
 								</div>
 
 								<button
@@ -669,9 +662,9 @@
 									}}
 								>
 									{#if (info?.meta?.suggestion_prompts ?? null) === null}
-										<span class="ml-2 self-center">{$i18n.t('Default')}</span>
+										<span class="ml-2 self-center">{'Default'}</span>
 									{:else}
-										<span class="ml-2 self-center">{$i18n.t('Custom')}</span>
+										<span class="ml-2 self-center">{'Custom'}</span>
 									{/if}
 								</button>
 							</div>
@@ -745,7 +738,7 @@
 
 					<div class="my-2 text-gray-300 dark:text-gray-700">
 						<div class="flex w-full justify-between mb-2">
-							<div class=" self-center text-sm font-medium">{$i18n.t('JSON Preview')}</div>
+							<div class=" self-center text-sm font-medium">{'JSON Preview'}</div>
 
 							<button
 								class="p-1 px-3 text-xs flex rounded-sm transition"
@@ -755,9 +748,9 @@
 								}}
 							>
 								{#if showPreview}
-									<span class="ml-2 self-center">{$i18n.t('Hide')}</span>
+									<span class="ml-2 self-center">{'Hide'}</span>
 								{:else}
-									<span class="ml-2 self-center">{$i18n.t('Show')}</span>
+									<span class="ml-2 self-center">{'Show'}</span>
 								{/if}
 							</button>
 						</div>
@@ -785,9 +778,9 @@
 						>
 							<div class=" self-center font-medium">
 								{#if edit}
-									{$i18n.t('Save & Update')}
+									{'Save & Update'}
 								{:else}
-									{$i18n.t('Save & Create')}
+									{'Save & Create'}
 								{/if}
 							</div>
 

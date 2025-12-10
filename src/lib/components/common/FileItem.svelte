@@ -8,8 +8,6 @@
 	import Tooltip from './Tooltip.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import { settings } from '$lib/stores';
-
-	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
 
 	export let className = 'w-60';
@@ -100,14 +98,14 @@
 			{#if !loading}
 				<Tooltip
 					content={type === 'collection'
-						? $i18n.t('Collection')
+						? 'Collection'
 						: type === 'note'
-							? $i18n.t('Note')
+							? 'Note'
 							: type === 'chat'
-								? $i18n.t('Chat')
+								? 'Chat'
 								: type === 'file'
-									? $i18n.t('File')
-									: $i18n.t('Document')}
+									? 'File'
+									: 'Document'}
 					placement="top"
 				>
 					{#if type === 'collection'}
@@ -140,13 +138,13 @@
 					: 'text-gray-500'}"
 			>
 				{#if type === 'file'}
-					{$i18n.t('File')}
+					{'File'}
 				{:else if type === 'note'}
-					{$i18n.t('Note')}
+					{'Note'}
 				{:else if type === 'doc'}
-					{$i18n.t('Document')}
+					{'Document'}
 				{:else if type === 'collection'}
-					{$i18n.t('Collection')}
+					{'Collection'}
 				{:else}
 					<span class=" capitalize line-clamp-1">{type}</span>
 				{/if}
@@ -173,7 +171,7 @@
 	{#if dismissible}
 		<div class=" absolute -top-1 -right-1">
 			<button
-				aria-label={$i18n.t('Remove File')}
+				aria-label={'Remove File'}
 				class=" bg-white text-black border border-gray-50 rounded-full {($settings?.highContrastMode ??
 				false)
 					? ''

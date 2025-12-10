@@ -2,8 +2,6 @@
 	import { getContext } from 'svelte';
 	import { saveAs } from 'file-saver';
 	import { toast } from 'svelte-sonner';
-	const i18n = getContext('i18n');
-
 	export let promptSuggestions = [];
 
 	let _promptSuggestions = [];
@@ -27,7 +25,7 @@
 <div class=" space-y-3">
 	<div class="flex w-full justify-between mb-2">
 		<div class=" self-center text-xs">
-			{$i18n.t('Default Prompt Suggestions')}
+			{'Default Prompt Suggestions'}
 		</div>
 
 		<button
@@ -62,13 +60,13 @@
 						<div class="py-1 gap-1">
 							<input
 								class="px-3 text-sm font-medium w-full bg-transparent outline-hidden"
-								placeholder={$i18n.t('Title (e.g. Tell me a fun fact)')}
+								placeholder={'Title (e.g. Tell me a fun fact)'}
 								bind:value={prompt.title[0]}
 							/>
 
 							<input
 								class="px-3 text-xs w-full bg-transparent outline-hidden text-gray-600 dark:text-gray-400"
-								placeholder={$i18n.t('Subtitle (e.g. about the Roman Empire)')}
+								placeholder={'Subtitle (e.g. about the Roman Empire)'}
 								bind:value={prompt.title[1]}
 							/>
 						</div>
@@ -77,7 +75,7 @@
 
 						<textarea
 							class="px-3 py-1.5 text-xs w-full bg-transparent outline-hidden resize-none"
-							placeholder={$i18n.t('Prompt (e.g. Tell me a fun fact about the Roman Empire)')}
+							placeholder={'Prompt (e.g. Tell me a fun fact about the Roman Empire)'}
 							rows="4"
 							bind:value={prompt.content}
 						/>
@@ -108,7 +106,7 @@
 			{/each}
 		</div>
 	{:else}
-		<div class="text-xs text-center w-full py-2">{$i18n.t('No suggestion prompts')}</div>
+		<div class="text-xs text-center w-full py-2">{'No suggestion prompts'}</div>
 	{/if}
 
 	<div class="flex items-center justify-end space-x-2 mt-2">
@@ -142,7 +140,7 @@
 
 						promptSuggestions = [...promptSuggestions, ...suggestions];
 					} catch (error) {
-						toast.error($i18n.t('Invalid JSON file'));
+						toast.error('Invalid JSON file');
 						return;
 					}
 				};
@@ -164,7 +162,7 @@
 			}}
 		>
 			<div class=" self-center mr-2 font-medium line-clamp-1">
-				{$i18n.t('Import Prompt Suggestions')}
+				{'Import Prompt Suggestions'}
 			</div>
 
 			<div class=" self-center">
@@ -195,7 +193,7 @@
 				}}
 			>
 				<div class=" self-center mr-2 font-medium line-clamp-1">
-					{$i18n.t('Export Prompt Suggestions')} ({promptSuggestions.length})
+					{'Export Prompt Suggestions'} ({promptSuggestions.length})
 				</div>
 
 				<div class=" self-center">

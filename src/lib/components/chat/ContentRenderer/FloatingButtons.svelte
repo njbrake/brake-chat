@@ -5,8 +5,6 @@
 	import { marked } from 'marked';
 
 	import { getContext, tick, onDestroy } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import { chatCompletion } from '$lib/apis/openai';
 
 	import ChatBubble from '$lib/components/icons/ChatBubble.svelte';
@@ -41,16 +39,16 @@
 	const DEFAULT_ACTIONS = [
 		{
 			id: 'ask',
-			label: $i18n.t('Ask'),
+			label: 'Ask',
 			icon: ChatBubble,
 			input: true,
 			prompt: `{{SELECTED_CONTENT}}\n\n\n{{INPUT_CONTENT}}`
 		},
 		{
 			id: 'explain',
-			label: $i18n.t('Explain'),
+			label: 'Explain',
 			icon: LightBulb,
-			prompt: `{{SELECTED_CONTENT}}\n\n\n${$i18n.t('Explain')}`
+			prompt: `{{SELECTED_CONTENT}}\n\n\n${'Explain'}`
 		}
 	];
 
@@ -69,7 +67,7 @@
 
 	const actionHandler = async (actionId) => {
 		if (!model) {
-			toast.error($i18n.t('Model not selected'));
+			toast.error('Model not selected');
 			return;
 		}
 
@@ -80,7 +78,7 @@
 
 		let selectedAction = actions.find((action) => action.id === actionId);
 		if (!selectedAction) {
-			toast.error($i18n.t('Action not found'));
+			toast.error('Action not found');
 			return;
 		}
 
@@ -199,7 +197,7 @@
 				}
 			}
 		} else {
-			toast.error($i18n.t('An error occurred while fetching the explanation'));
+			toast.error('An error occurred while fetching the explanation');
 		}
 	};
 
@@ -290,7 +288,7 @@
 					type="text"
 					id="floating-message-input"
 					class="ml-5 bg-transparent outline-hidden w-full flex-1 text-sm"
-					placeholder={$i18n.t('Ask a question')}
+					placeholder={'Ask a question'}
 					bind:value={floatingInputValue}
 					on:keydown={(e) => {
 						if (e.key === 'Enter') {
@@ -353,7 +351,7 @@
 								class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
 								on:click={addHandler}
 							>
-								{$i18n.t('Add')}
+								{'Add'}
 							</button>
 						</div>
 					{/if}

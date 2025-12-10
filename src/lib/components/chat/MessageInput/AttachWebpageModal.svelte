@@ -2,7 +2,6 @@
 	import { toast } from 'svelte-sonner';
 
 	import { getContext } from 'svelte';
-	const i18n = getContext('i18n');
 	import { settings } from '$lib/stores';
 
 	import Modal from '$lib/components/common/Modal.svelte';
@@ -24,7 +23,7 @@
 			show = false;
 			url = '';
 		} else {
-			toast.error($i18n.t('Please enter a valid URL.'));
+			toast.error('Please enter a valid URL.');
 		}
 	};
 </script>
@@ -33,11 +32,11 @@
 	<div class="flex flex-col h-full">
 		<div class="flex justify-between items-center dark:text-gray-100 px-5 pt-4 pb-1.5">
 			<h1 class="text-lg font-medium self-center font-primary">
-				{$i18n.t('Attach Webpage')}
+				{'Attach Webpage'}
 			</h1>
 			<button
 				class="self-center"
-				aria-label={$i18n.t('Close modal')}
+				aria-label={'Close modal'}
 				on:click={() => {
 					show = false;
 				}}
@@ -57,7 +56,7 @@
 					<label
 						for="webpage-url"
 						class={`text-xs ${($settings?.highContrastMode ?? false) ? 'text-gray-800 dark:text-gray-100' : 'text-gray-500'}`}
-						>{$i18n.t('Webpage URL')}</label
+						>{'Webpage URL'}</label
 					>
 				</div>
 
@@ -76,7 +75,7 @@
 						class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-800 text-white dark:bg-white dark:text-black dark:hover:bg-gray-200 transition rounded-full"
 						type="submit"
 					>
-						{$i18n.t('Add')}
+						{'Add'}
 					</button>
 				</div>
 			</form>

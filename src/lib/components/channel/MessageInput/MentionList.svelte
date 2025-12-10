@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { getContext, onDestroy, onMount } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import { channels, models, user } from '$lib/stores';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Hashtag from '$lib/components/icons/Hashtag.svelte';
@@ -139,11 +137,11 @@
 				{#if i === 0 || item?.type !== filteredItems[i - 1]?.type}
 					<div class="px-2 text-xs text-gray-500 py-1">
 						{#if item?.type === 'user'}
-							{$i18n.t('Users')}
+							{'Users'}
 						{:else if item?.type === 'model'}
-							{$i18n.t('Models')}
+							{'Models'}
 						{:else if item?.type === 'channel'}
-							{$i18n.t('Channels')}
+							{'Channels'}
 						{/if}
 					</div>
 				{/if}
@@ -171,7 +169,7 @@
 							</div>
 						{:else if item.type === 'model'}
 							<img
-								src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${item.id}&lang=${$i18n.language}`}
+								src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${item.id}&lang=${'en-US'}`}
 								alt={item?.data?.name ?? item.id}
 								class="rounded-full size-5 items-center mr-2"
 							/>
@@ -189,11 +187,11 @@
 
 						<div class="shrink-0 text-xs text-gray-500">
 							{#if item.type === 'user'}
-								{$i18n.t('User')}
+								{'User'}
 							{:else if item.type === 'model'}
-								{$i18n.t('Model')}
+								{'Model'}
 							{:else if item.type === 'channel'}
-								{$i18n.t('Channel')}
+								{'Channel'}
 							{/if}
 						</div>
 					</button>

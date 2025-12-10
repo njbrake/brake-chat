@@ -7,8 +7,6 @@
 	import { WEBUI_BASE_URL } from '$lib/constants';
 
 	const dispatch = createEventDispatcher();
-	const i18n = getContext('i18n');
-
 	export let banner: Banner = {
 		id: '',
 		type: 'info',
@@ -56,13 +54,13 @@
 							classNames['info']}  w-fit px-2 rounded-sm uppercase line-clamp-1 mr-0.5"
 					>
 						{#if banner.type.toLowerCase() === 'info'}
-							{$i18n.t('Info')}
+							{'Info'}
 						{:else if banner.type.toLowerCase() === 'warning'}
-							{$i18n.t('Warning')}
+							{'Warning'}
 						{:else if banner.type.toLowerCase() === 'error'}
-							{$i18n.t('Error')}
+							{'Error'}
 						{:else if banner.type.toLowerCase() === 'success'}
-							{$i18n.t('Success')}
+							{'Success'}
 						{:else}
 							{banner.type}
 						{/if}
@@ -75,7 +73,7 @@
 								href="{WEBUI_BASE_URL}/assets/files/whitepaper.pdf"
 								target="_blank"
 							>
-								{$i18n.t('Learn More')}
+								{'Learn More'}
 							</a>
 
 							<div
@@ -111,7 +109,7 @@
 						href="/"
 						target="_blank"
 					>
-						{$i18n.t('Learn More')}
+						{'Learn More'}
 					</a>
 
 					<div class=" ml-1 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-white">
@@ -134,7 +132,7 @@
 			{/if}
 			<div class="flex self-start">
 				<button
-					aria-label={$i18n.t('Close Banner')}
+					aria-label={'Close Banner'}
 					on:click={() => {
 						dismiss(banner.id);
 					}}

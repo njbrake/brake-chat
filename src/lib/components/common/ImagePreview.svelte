@@ -10,9 +10,6 @@
 	export let show = false;
 	export let src = '';
 	export let alt = '';
-
-	const i18n = getContext('i18n');
-
 	let mounted = false;
 
 	let previewElement = null;
@@ -102,8 +99,7 @@
 
 							const mimeType = blob.type || 'image/png';
 							// create file name based on the MIME type, alt should be a valid file name with extension
-							const fileName = `${$i18n
-								.t('Generated Image')
+							const fileName = `${'Generated Image'
 								.toLowerCase()
 								.replace(/ /g, '_')}.${mimeType.split('/')[1]}`;
 
@@ -122,8 +118,7 @@
 									const blobWithType = new Blob([blob], { type: mimeType });
 
 									// create file name based on the MIME type, alt should be a valid file name with extension
-									const fileName = `${$i18n
-										.t('Generated Image')
+									const fileName = `${'Generated Image'
 										.toLowerCase()
 										.replace(/ /g, '_')}.${mimeType.split('/')[1]}`;
 
@@ -150,8 +145,7 @@
 									const blobWithType = new Blob([blob], { type: mimeType });
 
 									// create file name based on the MIME type, alt should be a valid file name with extension
-									const fileName = `${$i18n
-										.t('Generated Image')
+									const fileName = `${'Generated Image'
 										.toLowerCase()
 										.replace(/ /g, '_')}.${mimeType.split('/')[1]}`;
 

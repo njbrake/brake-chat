@@ -5,11 +5,8 @@
 	import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
 	import Check from '$lib/components/icons/Check.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let value = '';
-	export let placeholder = $i18n.t('Tag');
+	export let placeholder = 'Tag';
 	export let onChange: (value: string) => void = () => {};
 
 	export let items = [];
@@ -85,7 +82,7 @@
 		selectedTag = '';
 	}}
 >
-	{$i18n.t('All')}
+	{'All'}
 </button>
 
 <button
@@ -96,7 +93,7 @@
 		selectedTag = '';
 	}}
 >
-	{$i18n.t('Created by you')}
+	{'Created by you'}
 </button>
 
 <button
@@ -107,5 +104,5 @@
 		selectedTag = '';
 	}}
 >
-	{$i18n.t('Shared with you')}
+	{'Shared with you'}
 </button> -->

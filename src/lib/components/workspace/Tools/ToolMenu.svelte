@@ -13,9 +13,6 @@
 	import DocumentDuplicate from '$lib/components/icons/DocumentDuplicate.svelte';
 	import Download from '$lib/components/icons/Download.svelte';
 	import { config, user } from '$lib/stores';
-
-	const i18n = getContext('i18n');
-
 	export let editHandler: Function;
 	export let shareHandler: Function;
 	export let cloneHandler: Function;
@@ -34,7 +31,7 @@
 		}
 	}}
 >
-	<Tooltip content={$i18n.t('More')}>
+	<Tooltip content={'More'}>
 		<slot />
 	</Tooltip>
 
@@ -67,7 +64,7 @@
 					/>
 				</svg>
 
-				<div class="flex items-center">{$i18n.t('Edit')}</div>
+				<div class="flex items-center">{'Edit'}</div>
 			</DropdownMenu.Item>
 
 			{#if $config.features.enable_community_sharing}
@@ -78,7 +75,7 @@
 					}}
 				>
 					<Share />
-					<div class="flex items-center">{$i18n.t('Share')}</div>
+					<div class="flex items-center">{'Share'}</div>
 				</DropdownMenu.Item>
 			{/if}
 
@@ -90,7 +87,7 @@
 			>
 				<DocumentDuplicate />
 
-				<div class="flex items-center">{$i18n.t('Clone')}</div>
+				<div class="flex items-center">{'Clone'}</div>
 			</DropdownMenu.Item>
 
 			{#if $user?.role === 'admin' || $user?.permissions?.workspace?.tools_export}
@@ -102,7 +99,7 @@
 				>
 					<Download />
 
-					<div class="flex items-center">{$i18n.t('Export')}</div>
+					<div class="flex items-center">{'Export'}</div>
 				</DropdownMenu.Item>
 			{/if}
 
@@ -115,7 +112,7 @@
 				}}
 			>
 				<GarbageBin />
-				<div class="flex items-center">{$i18n.t('Delete')}</div>
+				<div class="flex items-center">{'Delete'}</div>
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</div>

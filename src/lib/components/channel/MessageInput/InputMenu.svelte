@@ -15,9 +15,6 @@
 	import CameraSolid from '$lib/components/icons/CameraSolid.svelte';
 	import Camera from '$lib/components/icons/Camera.svelte';
 	import Clip from '$lib/components/icons/Clip.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let screenCaptureHandler: Function;
 	export let uploadFilesHandler: Function;
 
@@ -40,7 +37,7 @@
 		}
 	}}
 >
-	<Tooltip content={$i18n.t('More')}>
+	<Tooltip content={'More'}>
 		<slot />
 	</Tooltip>
 
@@ -60,7 +57,7 @@
 				}}
 			>
 				<Clip />
-				<div class="line-clamp-1">{$i18n.t('Upload Files')}</div>
+				<div class="line-clamp-1">{'Upload Files'}</div>
 			</DropdownMenu.Item>
 
 			<DropdownMenu.Item
@@ -70,7 +67,7 @@
 				}}
 			>
 				<Camera />
-				<div class=" line-clamp-1">{$i18n.t('Capture')}</div>
+				<div class=" line-clamp-1">{'Capture'}</div>
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</div>

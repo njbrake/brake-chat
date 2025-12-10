@@ -15,9 +15,6 @@
 	import { goto } from '$app/navigation';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Sidebar from '$lib/components/icons/Sidebar.svelte';
-
-	const i18n = getContext('i18n');
-
 	let loaded = false;
 
 	onMount(async () => {
@@ -45,7 +42,7 @@
 
 <svelte:head>
 	<title>
-		{$i18n.t('Workspace')} • {$WEBUI_NAME}
+		{'Workspace'} • {$WEBUI_NAME}
 	</title>
 </svelte:head>
 
@@ -59,10 +56,7 @@
 			<div class=" flex items-center gap-1">
 				{#if $mobile}
 					<div class="{$showSidebar ? 'md:hidden' : ''} self-center flex flex-none items-center">
-						<Tooltip
-							content={$showSidebar ? $i18n.t('Close Sidebar') : $i18n.t('Open Sidebar')}
-							interactive={true}
-						>
+						<Tooltip content={$showSidebar ? 'Close Sidebar' : 'Open Sidebar'} interactive={true}>
 							<button
 								id="sidebar-toggle-button"
 								class=" cursor-pointer flex rounded-lg hover:bg-gray-100 dark:hover:bg-gray-850 transition cursor-"
@@ -87,7 +81,7 @@
 								class="min-w-fit p-1.5 {$page.url.pathname.includes('/workspace/models')
 									? ''
 									: 'text-gray-300 dark:text-gray-600 hover:text-gray-700 dark:hover:text-white'} transition"
-								href="/workspace/models">{$i18n.t('Models')}</a
+								href="/workspace/models">{'Models'}</a
 							>
 						{/if}
 
@@ -98,7 +92,7 @@
 									: 'text-gray-300 dark:text-gray-600 hover:text-gray-700 dark:hover:text-white'} transition"
 								href="/workspace/knowledge"
 							>
-								{$i18n.t('Knowledge')}
+								{'Knowledge'}
 							</a>
 						{/if}
 
@@ -107,7 +101,7 @@
 								class="min-w-fit p-1.5 {$page.url.pathname.includes('/workspace/prompts')
 									? ''
 									: 'text-gray-300 dark:text-gray-600 hover:text-gray-700 dark:hover:text-white'} transition"
-								href="/workspace/prompts">{$i18n.t('Prompts')}</a
+								href="/workspace/prompts">{'Prompts'}</a
 							>
 						{/if}
 
@@ -118,13 +112,13 @@
 									: 'text-gray-300 dark:text-gray-600 hover:text-gray-700 dark:hover:text-white'} transition"
 								href="/workspace/tools"
 							>
-								{$i18n.t('Tools')}
+								{'Tools'}
 							</a>
 						{/if}
 					</div>
 				</div>
 
-				<!-- <div class="flex items-center text-xl font-medium">{$i18n.t('Workspace')}</div> -->
+				<!-- <div class="flex items-center text-xl font-medium">{'Workspace'}</div> -->
 			</div>
 		</nav>
 

@@ -21,9 +21,6 @@
 	import Terminal from '$lib/components/icons/Terminal.svelte';
 	import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
 	import ChevronLeft from '$lib/components/icons/ChevronLeft.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let selectedToolIds: string[] = [];
 
 	export let selectedModels: string[] = [];
@@ -100,7 +97,7 @@
 		}
 	}}
 >
-	<Tooltip content={$i18n.t('Integrations')} placement="top">
+	<Tooltip content={'Integrations'} placement="top">
 		<slot />
 	</Tooltip>
 	<div slot="content">
@@ -126,7 +123,7 @@
 
 								<div class="flex items-center w-full justify-between">
 									<div class=" line-clamp-1">
-										{$i18n.t('Tools')}
+										{'Tools'}
 										<span class="ml-0.5 text-gray-500">{Object.keys(tools).length}</span>
 									</div>
 
@@ -180,7 +177,7 @@
 
 									{#if filter?.has_user_valves}
 										<div class=" shrink-0">
-											<Tooltip content={$i18n.t('Valves')}>
+											<Tooltip content={'Valves'}>
 												<button
 													class="self-center w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition rounded-full"
 													type="button"
@@ -214,7 +211,7 @@
 					{/if}
 
 					{#if showWebSearchButton}
-						<Tooltip content={$i18n.t('Search the internet')} placement="top-start">
+						<Tooltip content={'Search the internet'} placement="top-start">
 							<button
 								class="flex w-full justify-between gap-2 items-center px-3 py-1.5 text-sm cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50"
 								on:click={() => {
@@ -227,7 +224,7 @@
 											<GlobeAlt />
 										</div>
 
-										<div class=" truncate">{$i18n.t('Web Search')}</div>
+										<div class=" truncate">{'Web Search'}</div>
 									</div>
 								</div>
 
@@ -245,7 +242,7 @@
 					{/if}
 
 					{#if showImageGenerationButton}
-						<Tooltip content={$i18n.t('Generate an image')} placement="top-start">
+						<Tooltip content={'Generate an image'} placement="top-start">
 							<button
 								class="flex w-full justify-between gap-2 items-center px-3 py-1.5 text-sm cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50"
 								on:click={() => {
@@ -258,7 +255,7 @@
 											<Photo className="size-4" strokeWidth="1.5" />
 										</div>
 
-										<div class=" truncate">{$i18n.t('Image')}</div>
+										<div class=" truncate">{'Image'}</div>
 									</div>
 								</div>
 
@@ -276,13 +273,13 @@
 					{/if}
 
 					{#if showCodeInterpreterButton}
-						<Tooltip content={$i18n.t('Execute code for analysis')} placement="top-start">
+						<Tooltip content={'Execute code for analysis'} placement="top-start">
 							<button
 								class="flex w-full justify-between gap-2 items-center px-3 py-1.5 text-sm cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50"
 								aria-pressed={codeInterpreterEnabled}
 								aria-label={codeInterpreterEnabled
-									? $i18n.t('Disable Code Interpreter')
-									: $i18n.t('Enable Code Interpreter')}
+									? 'Disable Code Interpreter'
+									: 'Enable Code Interpreter'}
 								on:click={() => {
 									codeInterpreterEnabled = !codeInterpreterEnabled;
 								}}
@@ -293,7 +290,7 @@
 											<Terminal className="size-3.5" strokeWidth="1.75" />
 										</div>
 
-										<div class=" truncate">{$i18n.t('Code Interpreter')}</div>
+										<div class=" truncate">{'Code Interpreter'}</div>
 									</div>
 								</div>
 
@@ -322,7 +319,7 @@
 
 						<div class="flex items-center w-full justify-between">
 							<div>
-								{$i18n.t('Tools')}
+								{'Tools'}
 								<span class="ml-0.5 text-gray-500">{Object.keys(tools).length}</span>
 							</div>
 						</div>
@@ -373,7 +370,7 @@
 
 							{#if tools[toolId]?.has_user_valves}
 								<div class=" shrink-0">
-									<Tooltip content={$i18n.t('Valves')}>
+									<Tooltip content={'Valves'}>
 										<button
 											class="self-center w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition rounded-full"
 											type="button"

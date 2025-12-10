@@ -5,8 +5,6 @@
 
 	export let shortcut: Shortcut;
 	export let isMac: boolean;
-
-	const i18n = getContext('i18n');
 	let keyboardLayoutMap: Map<string, string> | undefined;
 
 	onMount(async () => {
@@ -75,13 +73,13 @@
 <div class="w-full flex justify-between">
 	<div class="text-sm whitespace-pre-line">
 		{#if shortcut.tooltip}
-			<Tooltip content={$i18n.t(shortcut.tooltip)}>
+			<Tooltip content={shortcut.tooltip}>
 				<span class="whitespace-nowrap">
-					{$i18n.t(shortcut.name)}<span class="text-xs">&nbsp;*</span>
+					{shortcut.name}<span class="text-xs">&nbsp;*</span>
 				</span>
 			</Tooltip>
 		{:else}
-			{$i18n.t(shortcut.name)}
+			{shortcut.name}
 		{/if}
 	</div>
 	<div class="flex-shrink-0 flex justify-end self-start h-full space-x-1 text-xs">

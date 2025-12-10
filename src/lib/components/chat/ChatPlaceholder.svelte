@@ -11,9 +11,6 @@
 	import { sanitizeResponseContent } from '$lib/utils';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import EyeSlash from '$lib/components/icons/EyeSlash.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let modelIds = [];
 	export let models = [];
 	export let atSelectedModel;
@@ -53,7 +50,7 @@
 							placement="right"
 						>
 							<img
-								src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${model?.id}&lang=${$i18n.language}`}
+								src={`${'WEBUI_API_BASE_URL'}/models/model/profile/image?id=${model?.id}&lang=${'en-US'}`}
 								class=" size-[2.7rem] rounded-full border-[1px] border-gray-100 dark:border-none"
 								alt="logo"
 								draggable="false"
@@ -66,12 +63,12 @@
 
 		{#if $temporaryChatEnabled}
 			<Tooltip
-				content={$i18n.t("This chat won't appear in history and your messages will not be saved.")}
+				content={"This chat won't appear in history and your messages will not be saved."}
 				className="w-full flex justify-start mb-0.5"
 				placement="top"
 			>
 				<div class="flex items-center gap-2 text-gray-500 text-lg mt-2 w-fit">
-					<EyeSlash strokeWidth="2.5" className="size-5" />{$i18n.t('Temporary Chat')}
+					<EyeSlash strokeWidth="2.5" className="size-5" />{'Temporary Chat'}
 				</div>
 			</Tooltip>
 		{/if}
@@ -84,7 +81,7 @@
 					{#if models[selectedModelIdx]?.name}
 						{models[selectedModelIdx]?.name}
 					{:else}
-						{$i18n.t('Hello, {{name}}', { name: $user?.name })}
+						{`Hello, ${$user?.name}`}
 					{/if}
 				</div>
 
@@ -117,7 +114,7 @@
 						{/if}
 					{:else}
 						<div class=" text-gray-400 dark:text-gray-500 line-clamp-1 font-p">
-							{$i18n.t('How can I help you today?')}
+							{'How can I help you today?'}
 						</div>
 					{/if}
 				</div>

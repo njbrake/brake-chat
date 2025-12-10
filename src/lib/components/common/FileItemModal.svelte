@@ -3,9 +3,6 @@
 	import { formatFileSize, getLineCount } from '$lib/utils';
 	import { WEBUI_API_BASE_URL } from '$lib/constants';
 	import { getKnowledgeById } from '$lib/apis/knowledge';
-
-	const i18n = getContext('i18n');
-
 	import Modal from './Modal.svelte';
 	import XMark from '../icons/XMark.svelte';
 	import Info from '../icons/Info.svelte';
@@ -143,19 +140,17 @@
 
 						{#if item?.file?.data?.content}
 							<div class="capitalize shrink-0">
-								{$i18n.t('{{COUNT}} extracted lines', {
-									COUNT: getLineCount(item?.file?.data?.content ?? '')
-								})}
+								{`${getLineCount(item?.file?.data?.content ?? '')} extracted lines`}
 							</div>
 
 							<div class="flex items-center gap-1 shrink-0">
-								• {$i18n.t('Formatting may be inconsistent from source.')}
+								• {'Formatting may be inconsistent from source.'}
 							</div>
 						{/if}
 
 						{#if item?.knowledge}
 							<div class="capitalize shrink-0">
-								{$i18n.t('Knowledge Base')}
+								{'Knowledge Base'}
 							</div>
 						{/if}
 					</div>
@@ -164,18 +159,14 @@
 						<div class=" self-end">
 							<Tooltip
 								content={enableFullContent
-									? $i18n.t(
-											'Inject the entire content as context for comprehensive processing, this is recommended for complex queries.'
-										)
-									: $i18n.t(
-											'Default to segmented retrieval for focused and relevant content extraction, this is recommended for most cases.'
-										)}
+									? 'Inject the entire content as context for comprehensive processing, this is recommended for complex queries.'
+									: 'Default to segmented retrieval for focused and relevant content extraction, this is recommended for most cases.'}
 							>
 								<div class="flex items-center gap-1.5 text-xs">
 									{#if enableFullContent}
-										{$i18n.t('Using Entire Document')}
+										{'Using Entire Document'}
 									{:else}
-										{$i18n.t('Using Focused Retrieval')}
+										{'Using Focused Retrieval'}
 									{/if}
 									<Switch
 										bind:state={enableFullContent}
@@ -214,7 +205,7 @@
 							type="button"
 							on:click={() => {
 								selectedTab = '';
-							}}>{$i18n.t('Content')}</button
+							}}>{'Content'}</button
 						>
 
 						<button
@@ -224,7 +215,7 @@
 							type="button"
 							on:click={() => {
 								selectedTab = 'preview';
-							}}>{$i18n.t('Preview')}</button
+							}}>{'Preview'}</button
 						>
 					</div>
 

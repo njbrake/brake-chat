@@ -28,9 +28,6 @@
 	import Face from '../icons/Face.svelte';
 	import AppNotification from '../icons/AppNotification.svelte';
 	import UserBadgeCheck from '../icons/UserBadgeCheck.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 
 	$: if (show) {
@@ -576,9 +573,9 @@
 <Modal size="xl" bind:show>
 	<div class="text-gray-700 dark:text-gray-100 mx-1">
 		<div class=" flex justify-between dark:text-gray-300 px-4 md:px-4.5 pt-4.5 pb-0.5 md:pb-2.5">
-			<div class=" text-lg font-medium self-center">{$i18n.t('Settings')}</div>
+			<div class=" text-lg font-medium self-center">{'Settings'}</div>
 			<button
-				aria-label={$i18n.t('Close settings modal')}
+				aria-label={'Close settings modal'}
 				class="self-center"
 				on:click={() => {
 					show = false;
@@ -604,14 +601,14 @@
 							strokeWidth={($settings?.highContrastMode ?? false) ? '3' : '1.5'}
 						/>
 					</div>
-					<label class="sr-only" for="search-input-settings-modal">{$i18n.t('Search')}</label>
+					<label class="sr-only" for="search-input-settings-modal">{'Search'}</label>
 					<input
 						class={`w-full py-1 text-sm bg-transparent dark:text-gray-300 outline-hidden
 								${($settings?.highContrastMode ?? false) ? 'placeholder-gray-800' : ''}`}
 						bind:value={search}
 						id="search-input-settings-modal"
 						on:input={searchDebounceHandler}
-						placeholder={$i18n.t('Search')}
+						placeholder={'Search'}
 					/>
 				</div>
 				{#if filteredSettings.length > 0}
@@ -638,7 +635,7 @@
 								<div class=" self-center mr-2">
 									<SettingsAlt strokeWidth="2" />
 								</div>
-								<div class=" self-center">{$i18n.t('General')}</div>
+								<div class=" self-center">{'General'}</div>
 							</button>
 						{:else if tabId === 'interface'}
 							<button
@@ -662,7 +659,7 @@
 								<div class=" self-center mr-2">
 									<AppNotification strokeWidth="2" />
 								</div>
-								<div class=" self-center">{$i18n.t('Interface')}</div>
+								<div class=" self-center">{'Interface'}</div>
 							</button>
 						{:else if tabId === 'connections'}
 							{#if $user?.role === 'admin' || ($user?.role === 'user' && $config?.features?.enable_direct_connections)}
@@ -687,7 +684,7 @@
 									<div class=" self-center mr-2">
 										<Link strokeWidth="2" />
 									</div>
-									<div class=" self-center">{$i18n.t('Connections')}</div>
+									<div class=" self-center">{'Connections'}</div>
 								</button>
 							{/if}
 						{:else if tabId === 'tools'}
@@ -713,7 +710,7 @@
 									<div class=" self-center mr-2">
 										<WrenchAlt strokeWidth="2" />
 									</div>
-									<div class=" self-center">{$i18n.t('External Tools')}</div>
+									<div class=" self-center">{'External Tools'}</div>
 								</button>
 							{/if}
 						{:else if tabId === 'personalization'}
@@ -738,7 +735,7 @@
 								<div class=" self-center mr-2">
 									<Face strokeWidth="2" />
 								</div>
-								<div class=" self-center">{$i18n.t('Personalization')}</div>
+								<div class=" self-center">{'Personalization'}</div>
 							</button>
 						{:else if tabId === 'audio'}
 							<button
@@ -762,7 +759,7 @@
 								<div class=" self-center mr-2">
 									<SoundHigh strokeWidth="2" />
 								</div>
-								<div class=" self-center">{$i18n.t('Audio')}</div>
+								<div class=" self-center">{'Audio'}</div>
 							</button>
 						{:else if tabId === 'data_controls'}
 							<button
@@ -786,7 +783,7 @@
 								<div class=" self-center mr-2">
 									<DatabaseSettings strokeWidth="2" />
 								</div>
-								<div class=" self-center">{$i18n.t('Data Controls')}</div>
+								<div class=" self-center">{'Data Controls'}</div>
 							</button>
 						{:else if tabId === 'account'}
 							<button
@@ -810,7 +807,7 @@
 								<div class=" self-center mr-2">
 									<UserCircle strokeWidth="2" />
 								</div>
-								<div class=" self-center">{$i18n.t('Account')}</div>
+								<div class=" self-center">{'Account'}</div>
 							</button>
 						{:else if tabId === 'about'}
 							<button
@@ -834,13 +831,13 @@
 								<div class=" self-center mr-2">
 									<InfoCircle strokeWidth="2" />
 								</div>
-								<div class=" self-center">{$i18n.t('About')}</div>
+								<div class=" self-center">{'About'}</div>
 							</button>
 						{/if}
 					{/each}
 				{:else}
 					<div class="text-center text-gray-500 mt-4">
-						{$i18n.t('No results found')}
+						{'No results found'}
 					</div>
 				{/if}
 				{#if $user?.role === 'admin'}
@@ -858,7 +855,7 @@
 						<div class=" self-center mr-2">
 							<UserBadgeCheck strokeWidth="2" />
 						</div>
-						<div class=" self-center">{$i18n.t('Admin Settings')}</div>
+						<div class=" self-center">{'Admin Settings'}</div>
 					</a>
 				{/if}
 			</div>
@@ -868,42 +865,42 @@
 						{getModels}
 						{saveSettings}
 						on:save={() => {
-							toast.success($i18n.t('Settings saved successfully!'));
+							toast.success('Settings saved successfully!');
 						}}
 					/>
 				{:else if selectedTab === 'interface'}
 					<Interface
 						{saveSettings}
 						on:save={() => {
-							toast.success($i18n.t('Settings saved successfully!'));
+							toast.success('Settings saved successfully!');
 						}}
 					/>
 				{:else if selectedTab === 'connections'}
 					<Connections
 						saveSettings={async (updated) => {
 							await saveSettings(updated);
-							toast.success($i18n.t('Settings saved successfully!'));
+							toast.success('Settings saved successfully!');
 						}}
 					/>
 				{:else if selectedTab === 'tools'}
 					<Tools
 						saveSettings={async (updated) => {
 							await saveSettings(updated);
-							toast.success($i18n.t('Settings saved successfully!'));
+							toast.success('Settings saved successfully!');
 						}}
 					/>
 				{:else if selectedTab === 'personalization'}
 					<Personalization
 						{saveSettings}
 						on:save={() => {
-							toast.success($i18n.t('Settings saved successfully!'));
+							toast.success('Settings saved successfully!');
 						}}
 					/>
 				{:else if selectedTab === 'audio'}
 					<Audio
 						{saveSettings}
 						on:save={() => {
-							toast.success($i18n.t('Settings saved successfully!'));
+							toast.success('Settings saved successfully!');
 						}}
 					/>
 				{:else if selectedTab === 'data_controls'}
@@ -912,7 +909,7 @@
 					<Account
 						{saveSettings}
 						saveHandler={() => {
-							toast.success($i18n.t('Settings saved successfully!'));
+							toast.success('Settings saved successfully!');
 						}}
 					/>
 				{:else if selectedTab === 'about'}

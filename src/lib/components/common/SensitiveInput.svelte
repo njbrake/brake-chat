@@ -1,5 +1,4 @@
 <script lang="ts">
-	const i18n = getContext('i18n');
 	import { getContext } from 'svelte';
 	import { settings } from '$lib/stores';
 	export let id = 'password-input';
@@ -16,7 +15,7 @@
 </script>
 
 <div class={outerClassName}>
-	<label class="sr-only" for={id}>{placeholder || $i18n.t('Password')}</label>
+	<label class="sr-only" for={id}>{placeholder || 'Password'}</label>
 	<input
 		{id}
 		class={`${inputClassName} ${show ? '' : 'password'} ${($settings?.highContrastMode ?? false) ? 'placeholder:text-gray-700 dark:placeholder:text-gray-100' : ' outline-hidden placeholder:text-gray-300 dark:placeholder:text-gray-600'}`}
@@ -34,7 +33,7 @@
 		class={showButtonClassName}
 		type="button"
 		aria-pressed={show}
-		aria-label={$i18n.t('Make password visible in the user interface')}
+		aria-label={'Make password visible in the user interface'}
 		on:click={(e) => {
 			e.preventDefault();
 			show = !show;

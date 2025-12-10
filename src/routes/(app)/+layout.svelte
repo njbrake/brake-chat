@@ -48,9 +48,6 @@
 	import UpdateInfoToast from '$lib/components/layout/UpdateInfoToast.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import { Shortcut, shortcuts } from '$lib/shortcuts';
-
-	const i18n = getContext('i18n');
-
 	let loaded = false;
 	let DB = null;
 	let localDBChats = [];
@@ -130,11 +127,7 @@
 		let toolServersData = await getToolServersData($settings?.toolServers ?? []);
 		toolServersData = toolServersData.filter((data) => {
 			if (!data || data.error) {
-				toast.error(
-					$i18n.t(`Failed to connect to {{URL}} OpenAPI tool server`, {
-						URL: data?.url
-					})
-				);
+				toast.error(`Failed to connect to ${data?.url} OpenAPI tool server`);
 				return false;
 			}
 			return true;
@@ -350,19 +343,15 @@
 							<div class="m-auto pb-44 flex flex-col justify-center">
 								<div class="max-w-md">
 									<div class="text-center dark:text-white text-2xl font-medium z-50">
-										{$i18n.t('Important Update')}<br />
-										{$i18n.t('Action Required for Chat Log Storage')}
+										{'Important Update'}<br />
+										{'Action Required for Chat Log Storage'}
 									</div>
 
 									<div class=" mt-4 text-center text-sm dark:text-gray-200 w-full">
-										{$i18n.t(
-											"Saving chat logs directly to your browser's storage is no longer supported. Please take a moment to download and delete your chat logs by clicking the button below. Don't worry, you can easily re-import your chat logs to the backend through"
-										)}
+										{"Saving chat logs directly to your browser's storage is no longer supported. Please take a moment to download and delete your chat logs by clicking the button below. Don't worry, you can easily re-import your chat logs to the backend through"}
 										<span class="font-medium dark:text-white"
-											>{$i18n.t('Settings')} > {$i18n.t('Chats')} > {$i18n.t('Import Chats')}</span
-										>. {$i18n.t(
-											'This ensures that your valuable conversations are securely saved to your backend database. Thank you!'
-										)}
+											>{'Settings'} > {'Chats'} > {'Import Chats'}</span
+										>. {'This ensures that your valuable conversations are securely saved to your backend database. Thank you!'}
 									</div>
 
 									<div class=" mt-6 mx-auto relative group w-fit">
@@ -381,14 +370,14 @@
 												localDBChats = [];
 											}}
 										>
-											{$i18n.t('Download & Delete')}
+											{'Download & Delete'}
 										</button>
 
 										<button
 											class="text-xs text-center w-full mt-2 text-gray-400 underline"
 											on:click={async () => {
 												localDBChats = [];
-											}}>{$i18n.t('Close')}</button
+											}}>{'Close'}</button
 										>
 									</div>
 								</div>

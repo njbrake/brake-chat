@@ -1,7 +1,5 @@
 <script>
 	import { getContext, createEventDispatcher, onMount, onDestroy, tick } from 'svelte';
-
-	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
 
 	import DOMPurify from 'dompurify';
@@ -296,14 +294,14 @@
 		);
 
 		if (res) {
-			toast.success($i18n.t('Folder deleted successfully'));
+			toast.success('Folder deleted successfully');
 			onDelete(folderId);
 		}
 	};
 
 	const updateHandler = async ({ name, meta, data }) => {
 		if (name === '') {
-			toast.error($i18n.t('Folder name cannot be empty.'));
+			toast.error('Folder name cannot be empty.');
 			return;
 		}
 
@@ -329,8 +327,8 @@
 				folders[folderId].data = data;
 			}
 
-			// toast.success($i18n.t('Folder name updated successfully'));
-			toast.success($i18n.t('Folder updated successfully'));
+			// toast.success('Folder name updated successfully');
+			toast.success('Folder updated successfully');
 
 			if ($selectedFolder?.id === folderId) {
 				const folder = await getFolderById(localStorage.token, folderId).catch((error) => {
@@ -418,26 +416,25 @@
 
 <DeleteConfirmDialog
 	bind:show={showDeleteConfirm}
-	title={$i18n.t('Delete folder?')}
+	title={'Delete folder?'}
 	on:confirm={() => {
 		deleteHandler();
 	}}
 >
 	<div class=" text-sm text-gray-700 dark:text-gray-300 flex-1 line-clamp-3 mb-2">
-		<!-- {$i18n.t('This will delete <strong>{{NAME}}</strong> and <strong>all its contents</strong>.', {
-				NAME: folders[folderId].name
-			})} -->
+		<!-- {`This will delete <strong>${folders[folderId].name}</strong> and <strong>all its contents</strong>.`} -->
 
-		{$i18n.t(`Are you sure you want to delete "{{NAME}}"?`, {
-			NAME: folders[folderId].name
-		})}
+		{`Are you sure you want to delete "{{NAME}}"?`.replace(
+			'{{' + 'NAME' + '}}',
+			folders[folderId].name
+		)}
 	</div>
 
 	<div class="flex items-center gap-1.5">
 		<input type="checkbox" bind:checked={deleteFolderContents} />
 
 		<div class="text-xs text-gray-500">
-			{$i18n.t('Delete all contents inside this folder')}
+			{'Delete all contents inside this folder'}
 		</div>
 	</div>
 </DeleteConfirmDialog>

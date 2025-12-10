@@ -9,9 +9,6 @@
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	const dispatch = createEventDispatcher();
-
-	const i18n = getContext('i18n');
-
 	export let saveSettings: Function;
 
 	// Audio
@@ -177,37 +174,35 @@
 >
 	<div class=" space-y-3 overflow-y-scroll max-h-[28rem] md:max-h-full">
 		<div>
-			<div class=" mb-1 text-sm font-medium">{$i18n.t('STT Settings')}</div>
+			<div class=" mb-1 text-sm font-medium">{'STT Settings'}</div>
 
 			{#if $config.audio.stt.engine !== 'web'}
 				<div class=" py-0.5 flex w-full justify-between">
-					<div class=" self-center text-xs font-medium">{$i18n.t('Speech-to-Text Engine')}</div>
+					<div class=" self-center text-xs font-medium">{'Speech-to-Text Engine'}</div>
 					<div class="flex items-center relative">
 						<select
 							class="dark:bg-gray-900 w-fit pr-8 rounded-sm px-2 p-1 text-xs bg-transparent outline-hidden text-right"
 							bind:value={STTEngine}
-							placeholder={$i18n.t('Select an engine')}
+							placeholder={'Select an engine'}
 						>
-							<option value="">{$i18n.t('Default')}</option>
-							<option value="web">{$i18n.t('Web API')}</option>
+							<option value="">{'Default'}</option>
+							<option value="web">{'Web API'}</option>
 						</select>
 					</div>
 				</div>
 
 				<div class=" py-0.5 flex w-full justify-between">
-					<div class=" self-center text-xs font-medium">{$i18n.t('Language')}</div>
+					<div class=" self-center text-xs font-medium">{'Language'}</div>
 
 					<div class="flex items-center relative text-xs px-3">
 						<Tooltip
-							content={$i18n.t(
-								'The language of the input audio. Supplying the input language in ISO-639-1 (e.g. en) format will improve accuracy and latency. Leave blank to automatically detect the language.'
-							)}
+							content={'The language of the input audio. Supplying the input language in ISO-639-1 (e.g. en) format will improve accuracy and latency. Leave blank to automatically detect the language.'}
 							placement="top"
 						>
 							<input
 								type="text"
 								bind:value={STTLanguage}
-								placeholder={$i18n.t('e.g. en')}
+								placeholder={'e.g. en'}
 								class=" text-sm text-right bg-transparent dark:text-gray-300 outline-hidden"
 							/>
 						</Tooltip>
@@ -217,7 +212,7 @@
 
 			<div class=" py-0.5 flex w-full justify-between">
 				<div class=" self-center text-xs font-medium">
-					{$i18n.t('Instant Auto-Send After Voice Transcription')}
+					{'Instant Auto-Send After Voice Transcription'}
 				</div>
 
 				<button
@@ -228,41 +223,41 @@
 					type="button"
 				>
 					{#if speechAutoSend === true}
-						<span class="ml-2 self-center">{$i18n.t('On')}</span>
+						<span class="ml-2 self-center">{'On'}</span>
 					{:else}
-						<span class="ml-2 self-center">{$i18n.t('Off')}</span>
+						<span class="ml-2 self-center">{'Off'}</span>
 					{/if}
 				</button>
 			</div>
 		</div>
 
 		<div>
-			<div class=" mb-1 text-sm font-medium">{$i18n.t('TTS Settings')}</div>
+			<div class=" mb-1 text-sm font-medium">{'TTS Settings'}</div>
 
 			<div class=" py-0.5 flex w-full justify-between">
-				<div class=" self-center text-xs font-medium">{$i18n.t('Text-to-Speech Engine')}</div>
+				<div class=" self-center text-xs font-medium">{'Text-to-Speech Engine'}</div>
 				<div class="flex items-center relative">
 					<select
 						class="dark:bg-gray-900 w-fit pr-8 rounded-sm px-2 p-1 text-xs bg-transparent outline-hidden text-right"
 						bind:value={TTSEngine}
-						placeholder={$i18n.t('Select an engine')}
+						placeholder={'Select an engine'}
 					>
-						<option value="">{$i18n.t('Default')}</option>
-						<option value="browser-kokoro">{$i18n.t('Kokoro.js (Browser)')}</option>
+						<option value="">{'Default'}</option>
+						<option value="browser-kokoro">{'Kokoro.js (Browser)'}</option>
 					</select>
 				</div>
 			</div>
 
 			{#if TTSEngine === 'browser-kokoro'}
 				<div class=" py-0.5 flex w-full justify-between">
-					<div class=" self-center text-xs font-medium">{$i18n.t('Kokoro.js Dtype')}</div>
+					<div class=" self-center text-xs font-medium">{'Kokoro.js Dtype'}</div>
 					<div class="flex items-center relative">
 						<select
 							class="dark:bg-gray-900 w-fit pr-8 rounded-sm px-2 p-1 text-xs bg-transparent outline-hidden text-right"
 							bind:value={TTSEngineConfig.dtype}
-							placeholder={$i18n.t('Select dtype')}
+							placeholder={'Select dtype'}
 						>
-							<option value="" disabled selected>{$i18n.t('Select dtype')}</option>
+							<option value="" disabled selected>{'Select dtype'}</option>
 							<option value="fp32">fp32</option>
 							<option value="fp16">fp16</option>
 							<option value="q8">q8</option>
@@ -273,7 +268,7 @@
 			{/if}
 
 			<div class=" py-0.5 flex w-full justify-between">
-				<div class=" self-center text-xs font-medium">{$i18n.t('Auto-playback response')}</div>
+				<div class=" self-center text-xs font-medium">{'Auto-playback response'}</div>
 
 				<button
 					class="p-1 px-3 text-xs flex rounded-sm transition"
@@ -283,15 +278,15 @@
 					type="button"
 				>
 					{#if responseAutoPlayback === true}
-						<span class="ml-2 self-center">{$i18n.t('On')}</span>
+						<span class="ml-2 self-center">{'On'}</span>
 					{:else}
-						<span class="ml-2 self-center">{$i18n.t('Off')}</span>
+						<span class="ml-2 self-center">{'Off'}</span>
 					{/if}
 				</button>
 			</div>
 
 			<div class=" py-0.5 flex w-full justify-between">
-				<div class=" self-center text-xs font-medium">{$i18n.t('Speech Playback Speed')}</div>
+				<div class=" self-center text-xs font-medium">{'Speech Playback Speed'}</div>
 
 				<div class="flex items-center relative text-xs px-3">
 					<input
@@ -311,14 +306,14 @@
 		{#if TTSEngine === 'browser-kokoro'}
 			{#if TTSModel}
 				<div>
-					<div class=" mb-2.5 text-sm font-medium">{$i18n.t('Set Voice')}</div>
+					<div class=" mb-2.5 text-sm font-medium">{'Set Voice'}</div>
 					<div class="flex w-full">
 						<div class="flex-1">
 							<input
 								list="voice-list"
 								class="w-full text-sm bg-transparent dark:text-gray-300 outline-hidden"
 								bind:value={voice}
-								placeholder={$i18n.t('Select a voice')}
+								placeholder={'Select a voice'}
 							/>
 
 							<datalist id="voice-list">
@@ -335,7 +330,7 @@
 						<Spinner className="size-4" />
 
 						<div class=" text-sm font-medium shimmer">
-							{$i18n.t('Loading Kokoro.js...')}
+							{'Loading Kokoro.js...'}
 							{TTSModelProgress && TTSModelProgress.status === 'progress'
 								? `(${Math.round(TTSModelProgress.progress * 10) / 10}%)`
 								: ''}
@@ -343,20 +338,20 @@
 					</div>
 
 					<div class="text-xs text-gray-500">
-						{$i18n.t('Please do not close the settings page while loading the model.')}
+						{'Please do not close the settings page while loading the model.'}
 					</div>
 				</div>
 			{/if}
 		{:else if $config.audio.tts.engine === ''}
 			<div>
-				<div class=" mb-2.5 text-sm font-medium">{$i18n.t('Set Voice')}</div>
+				<div class=" mb-2.5 text-sm font-medium">{'Set Voice'}</div>
 				<div class="flex w-full">
 					<div class="flex-1">
 						<select
 							class="w-full text-sm bg-transparent dark:text-gray-300 outline-hidden"
 							bind:value={voice}
 						>
-							<option value="" selected={voice !== ''}>{$i18n.t('Default')}</option>
+							<option value="" selected={voice !== ''}>{'Default'}</option>
 							{#each voices.filter((v) => nonLocalVoices || v.localService === true) as _voice}
 								<option
 									value={_voice.name}
@@ -369,7 +364,7 @@
 				</div>
 				<div class="flex items-center justify-between my-1.5">
 					<div class="text-xs">
-						{$i18n.t('Allow non-local voices')}
+						{'Allow non-local voices'}
 					</div>
 
 					<div class="mt-1">
@@ -379,14 +374,14 @@
 			</div>
 		{:else if $config.audio.tts.engine !== ''}
 			<div>
-				<div class=" mb-2.5 text-sm font-medium">{$i18n.t('Set Voice')}</div>
+				<div class=" mb-2.5 text-sm font-medium">{'Set Voice'}</div>
 				<div class="flex w-full">
 					<div class="flex-1">
 						<input
 							list="voice-list"
 							class="w-full text-sm bg-transparent dark:text-gray-300 outline-hidden"
 							bind:value={voice}
-							placeholder={$i18n.t('Select a voice')}
+							placeholder={'Select a voice'}
 						/>
 
 						<datalist id="voice-list">
@@ -405,7 +400,7 @@
 			class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
 			type="submit"
 		>
-			{$i18n.t('Save')}
+			{'Save'}
 		</button>
 	</div>
 </form>

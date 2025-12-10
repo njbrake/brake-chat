@@ -2,9 +2,6 @@
 	import { getContext } from 'svelte';
 	import CitationModal from './Citations/CitationModal.svelte';
 	import { embed, showControls, showEmbeds } from '$lib/stores';
-
-	const i18n = getContext('i18n');
-
 	export let id = '';
 	export let sources = [];
 	export let readOnly = false;
@@ -159,11 +156,9 @@
 			{/if}
 			<div>
 				{#if citations.length === 1}
-					{$i18n.t('1 Source')}
+					{'1 Source'}
 				{:else}
-					{$i18n.t('{{COUNT}} Sources', {
-						COUNT: citations.length
-					})}
+					{`${citations.length} Sources`}
 				{/if}
 			</div>
 		</button>

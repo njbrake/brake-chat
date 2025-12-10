@@ -12,9 +12,6 @@
 	import Modal from './common/Modal.svelte';
 	import { updateUserSettings } from '$lib/apis/users';
 	import XMark from '$lib/components/icons/XMark.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 
 	let changelog = null;
@@ -32,7 +29,7 @@
 	<div class="px-6 pt-5 dark:text-white text-black">
 		<div class="flex justify-between items-start">
 			<div class="text-xl font-medium">
-				{$i18n.t("What's New in")}
+				{"What's New in"}
 				{$WEBUI_NAME}
 				<Confetti x={[-1, -0.25]} y={[0, 0.5]} />
 			</div>
@@ -42,15 +39,15 @@
 					localStorage.version = $config.version;
 					show = false;
 				}}
-				aria-label={$i18n.t('Close')}
+				aria-label={'Close'}
 			>
 				<XMark className={'size-5'}>
-					<p class="sr-only">{$i18n.t('Close')}</p>
+					<p class="sr-only">{'Close'}</p>
 				</XMark>
 			</button>
 		</div>
 		<div class="flex items-center mt-1">
-			<div class="text-sm dark:text-gray-200">{$i18n.t('Release Notes')}</div>
+			<div class="text-sm dark:text-gray-200">{'Release Notes'}</div>
 			<div class="flex self-center w-[1px] h-6 mx-2.5 bg-gray-50/50 dark:bg-gray-850/50" />
 			<div class="text-sm dark:text-gray-200">
 				v{WEBUI_VERSION}
@@ -110,7 +107,7 @@
 				}}
 				class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
 			>
-				<span class="relative">{$i18n.t("Okay, Let's Go!")}</span>
+				<span class="relative">{"Okay, Let's Go!"}</span>
 			</button>
 		</div>
 	</div>

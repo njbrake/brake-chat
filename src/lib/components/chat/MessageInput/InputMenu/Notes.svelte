@@ -9,9 +9,6 @@
 	import PageEdit from '$lib/components/icons/PageEdit.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Loader from '$lib/components/common/Loader.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let onSelect = (e) => {};
 
 	let loaded = false;
@@ -68,7 +65,7 @@
 
 {#if loaded}
 	{#if items.length === 0}
-		<div class="text-center text-xs text-gray-500 py-3">{$i18n.t('No notes found')}</div>
+		<div class="text-center text-xs text-gray-500 py-3">{'No notes found'}</div>
 	{:else}
 		<div class="flex flex-col gap-0.5">
 			{#each items as item, idx}
@@ -92,7 +89,7 @@
 					data-selected={idx === selectedIdx}
 				>
 					<div class="text-black dark:text-gray-100 flex items-center gap-1.5">
-						<Tooltip content={$i18n.t('Note')} placement="top">
+						<Tooltip content={'Note'} placement="top">
 							<PageEdit className="size-4" />
 						</Tooltip>
 
@@ -115,7 +112,7 @@
 				>
 					<div class="w-full flex justify-center py-4 text-xs animate-pulse items-center gap-2">
 						<Spinner className=" size-4" />
-						<div class=" ">{$i18n.t('Loading...')}</div>
+						<div class=" ">{'Loading...'}</div>
 					</div>
 				</Loader>
 			{/if}

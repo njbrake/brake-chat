@@ -19,7 +19,6 @@
 	import localizedFormat from 'dayjs/plugin/localizedFormat';
 	import ProfileImage from './ProfileImage.svelte';
 	import { WEBUI_BASE_URL } from '$lib/constants';
-	const i18n = getContext('i18n');
 	dayjs.extend(localizedFormat);
 
 	export let chatId;
@@ -396,7 +395,7 @@
 
 							<div class="w-full rounded-xl pl-5 pr-2 py-2 mt-2">
 								<Name>
-									{$i18n.t('Merged Response')}
+									{'Merged Response'}
 
 									{#if message.timestamp}
 										<span
@@ -420,7 +419,7 @@
 
 					{#if isLastMessage}
 						<div class=" shrink-0 text-gray-600 dark:text-gray-500 mt-1">
-							<Tooltip content={$i18n.t('Merge Responses')} placement="bottom">
+							<Tooltip content={'Merge Responses'} placement="bottom">
 								<button
 									type="button"
 									id="merge-response-button"

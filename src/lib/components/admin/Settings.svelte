@@ -23,9 +23,6 @@
 	import Evaluations from './Settings/Evaluations.svelte';
 	import CodeExecution from './Settings/CodeExecution.svelte';
 	import Tools from './Settings/Tools.svelte';
-
-	const i18n = getContext('i18n');
-
 	let selectedTab = 'general';
 
 	// Get current tab from URL pathname, default to 'general'
@@ -109,7 +106,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('General')}</div>
+			<div class=" self-center">{'General'}</div>
 		</button>
 
 		<button
@@ -134,7 +131,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('Connections')}</div>
+			<div class=" self-center">{'Connections'}</div>
 		</button>
 
 		<button
@@ -161,7 +158,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('Models')}</div>
+			<div class=" self-center">{'Models'}</div>
 		</button>
 
 		<button
@@ -177,7 +174,7 @@
 			<div class=" self-center mr-2">
 				<DocumentChartBar />
 			</div>
-			<div class=" self-center">{$i18n.t('Evaluations')}</div>
+			<div class=" self-center">{'Evaluations'}</div>
 		</button>
 
 		<button
@@ -204,7 +201,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('External Tools')}</div>
+			<div class=" self-center">{'External Tools'}</div>
 		</button>
 
 		<button
@@ -235,7 +232,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('Documents')}</div>
+			<div class=" self-center">{'Documents'}</div>
 		</button>
 
 		<button
@@ -260,7 +257,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('Web Search')}</div>
+			<div class=" self-center">{'Web Search'}</div>
 		</button>
 
 		<button
@@ -287,7 +284,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('Code Execution')}</div>
+			<div class=" self-center">{'Code Execution'}</div>
 		</button>
 
 		<button
@@ -314,7 +311,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('Interface')}</div>
+			<div class=" self-center">{'Interface'}</div>
 		</button>
 
 		<button
@@ -342,7 +339,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('Audio')}</div>
+			<div class=" self-center">{'Audio'}</div>
 		</button>
 
 		<button
@@ -369,7 +366,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('Images')}</div>
+			<div class=" self-center">{'Images'}</div>
 		</button>
 
 		<button
@@ -400,7 +397,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('Pipelines')}</div>
+			<div class=" self-center">{'Pipelines'}</div>
 		</button>
 
 		<button
@@ -429,7 +426,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('Database')}</div>
+			<div class=" self-center">{'Database'}</div>
 		</button>
 	</div>
 
@@ -439,7 +436,7 @@
 		{#if selectedTab === 'general'}
 			<General
 				saveHandler={async () => {
-					toast.success($i18n.t('Settings saved successfully!'));
+					toast.success('Settings saved successfully!');
 
 					await tick();
 					await config.set(await getBackendConfig());
@@ -448,7 +445,7 @@
 		{:else if selectedTab === 'connections'}
 			<Connections
 				on:save={() => {
-					toast.success($i18n.t('Settings saved successfully!'));
+					toast.success('Settings saved successfully!');
 				}}
 			/>
 		{:else if selectedTab === 'models'}
@@ -460,7 +457,7 @@
 		{:else if selectedTab === 'documents'}
 			<Documents
 				on:save={async () => {
-					toast.success($i18n.t('Settings saved successfully!'));
+					toast.success('Settings saved successfully!');
 
 					await tick();
 					await config.set(await getBackendConfig());
@@ -469,7 +466,7 @@
 		{:else if selectedTab === 'web'}
 			<WebSearch
 				saveHandler={async () => {
-					toast.success($i18n.t('Settings saved successfully!'));
+					toast.success('Settings saved successfully!');
 
 					await tick();
 					await config.set(await getBackendConfig());
@@ -478,7 +475,7 @@
 		{:else if selectedTab === 'code-execution'}
 			<CodeExecution
 				saveHandler={async () => {
-					toast.success($i18n.t('Settings saved successfully!'));
+					toast.success('Settings saved successfully!');
 
 					await tick();
 					await config.set(await getBackendConfig());
@@ -487,31 +484,31 @@
 		{:else if selectedTab === 'interface'}
 			<Interface
 				on:save={() => {
-					toast.success($i18n.t('Settings saved successfully!'));
+					toast.success('Settings saved successfully!');
 				}}
 			/>
 		{:else if selectedTab === 'audio'}
 			<Audio
 				saveHandler={() => {
-					toast.success($i18n.t('Settings saved successfully!'));
+					toast.success('Settings saved successfully!');
 				}}
 			/>
 		{:else if selectedTab === 'images'}
 			<Images
 				on:save={() => {
-					toast.success($i18n.t('Settings saved successfully!'));
+					toast.success('Settings saved successfully!');
 				}}
 			/>
 		{:else if selectedTab === 'db'}
 			<Database
 				saveHandler={() => {
-					toast.success($i18n.t('Settings saved successfully!'));
+					toast.success('Settings saved successfully!');
 				}}
 			/>
 		{:else if selectedTab === 'pipelines'}
 			<Pipelines
 				saveHandler={() => {
-					toast.success($i18n.t('Settings saved successfully!'));
+					toast.success('Settings saved successfully!');
 				}}
 			/>
 		{/if}

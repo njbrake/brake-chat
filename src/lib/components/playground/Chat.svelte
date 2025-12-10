@@ -4,12 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount, tick, getContext } from 'svelte';
 
-	import {
-		OLLAMA_API_BASE_URL,
-		OPENAI_API_BASE_URL,
-		WEBUI_API_BASE_URL,
-		WEBUI_BASE_URL
-	} from '$lib/constants';
+	import { OPENAI_API_BASE_URL, WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
 	import { WEBUI_NAME, config, user, models, settings } from '$lib/stores';
 
 	import { chatCompletion } from '$lib/apis/openai';
@@ -24,9 +19,6 @@
 	import Cog6 from '../icons/Cog6.svelte';
 	import Sidebar from '../common/Sidebar.svelte';
 	import ArrowRight from '../icons/ArrowRight.svelte';
-
-	const i18n = getContext('i18n');
-
 	let loaded = false;
 
 	let selectedModelId = '';
@@ -73,7 +65,7 @@
 
 	const chatCompletionHandler = async () => {
 		if (selectedModelId === '') {
-			toast.error($i18n.t('Please select a model.'));
+			toast.error('Please select a model.');
 			return;
 		}
 
@@ -221,7 +213,7 @@
 				>
 					<div class="flex gap-2 justify-between items-center">
 						<div class=" shrink-0 font-medium ml-1.5">
-							{$i18n.t('System Instructions')}
+							{'System Instructions'}
 						</div>
 
 						{#if !showSystem && system.trim()}
@@ -247,7 +239,7 @@
 								bind:this={systemTextareaElement}
 								class="w-full h-full bg-transparent resize-none outline-hidden text-sm"
 								bind:value={system}
-								placeholder={$i18n.t("You're a helpful assistant.")}
+								placeholder={"You're a helpful assistant."}
 								on:input={() => {
 									resizeSystemTextarea();
 								}}
@@ -273,14 +265,12 @@
 			<div class="pb-3">
 				<div class="border border-gray-100 dark:border-gray-850 w-full px-3 py-2.5 rounded-xl">
 					<div class="py-0.5">
-						<!-- $i18n.t('a user') -->
-						<!-- $i18n.t('an assistant') -->
+						<!-- 'a user' -->
+						<!-- 'an assistant' -->
 						<textarea
 							bind:value={message}
 							class=" w-full h-full bg-transparent resize-none outline-hidden text-sm"
-							placeholder={$i18n.t(`Enter {{role}} message here`, {
-								role: role === 'user' ? $i18n.t('a user') : $i18n.t('an assistant')
-							})}
+							placeholder={`Enter ${role === 'user' ? 'a user' : 'an assistant'} message here`}
 							on:input={(e) => {
 								e.target.style.height = '';
 								e.target.style.height = Math.min(e.target.scrollHeight, 150) + 'px';
@@ -304,17 +294,15 @@
 									? ''
 									: 'outline-hidden'}"
 								aria-pressed={role === 'assistant'}
-								aria-label={$i18n.t(
-									role === 'user' ? 'Switch to Assistant role' : 'Switch to User role'
-								)}
+								aria-label={role === 'user' ? 'Switch to Assistant role' : 'Switch to User role'}
 								on:click={() => {
 									role = role === 'user' ? 'assistant' : 'user';
 								}}
 							>
 								{#if role === 'user'}
-									{$i18n.t('User')}
+									{'User'}
 								{:else}
-									{$i18n.t('Assistant')}
+									{'Assistant'}
 								{/if}
 							</button>
 						</div>
@@ -343,7 +331,7 @@
 											role = role === 'user' ? 'assistant' : 'user';
 										}}
 									>
-										{$i18n.t('Add')}
+										{'Add'}
 									</button>
 
 									<button
@@ -352,7 +340,7 @@
 											submitHandler();
 										}}
 									>
-										{$i18n.t('Run')}
+										{'Run'}
 									</button>
 								{:else}
 									<button
@@ -361,7 +349,7 @@
 											stopResponse();
 										}}
 									>
-										{$i18n.t('Cancel')}
+										{'Cancel'}
 									</button>
 								{/if}
 							</div>

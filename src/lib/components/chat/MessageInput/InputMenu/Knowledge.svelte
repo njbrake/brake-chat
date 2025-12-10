@@ -10,9 +10,6 @@
 	import Database from '$lib/components/icons/Database.svelte';
 	import DocumentPage from '$lib/components/icons/DocumentPage.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let onSelect = (e) => {};
 
 	let loaded = false;
@@ -39,7 +36,7 @@
 							legacy: true,
 							type: 'collection',
 							description: 'Deprecated (legacy collection), please create a new knowledge base.',
-							title: $i18n.t('All Documents'),
+							title: 'All Documents',
 							collection_names: legacy_documents.map((item) => item.id)
 						},
 
@@ -132,11 +129,11 @@
 				<div class="  text-black dark:text-gray-100 flex items-center gap-1">
 					<Tooltip
 						content={item?.legacy
-							? $i18n.t('Legacy')
+							? 'Legacy'
 							: item?.type === 'file'
-								? $i18n.t('File')
+								? 'File'
 								: item?.type === 'collection'
-									? $i18n.t('Collection')
+									? 'Collection'
 									: ''}
 						placement="top"
 					>

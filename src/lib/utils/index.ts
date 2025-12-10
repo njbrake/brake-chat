@@ -1589,7 +1589,7 @@ export const renderMermaidDiagram = async (mermaid, code: string) => {
 	return '';
 };
 
-export const renderVegaVisualization = async (spec: string, i18n?: any) => {
+export const renderVegaVisualization = async (spec: string) => {
 	const vega = await import('vega');
 	const parsedSpec = JSON.parse(spec);
 	let vegaSpec = parsedSpec;

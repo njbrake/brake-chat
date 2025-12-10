@@ -16,9 +16,6 @@
 
 	import { config } from '$lib/stores';
 	import Link from '$lib/components/icons/Link.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let user;
 	export let model;
 
@@ -40,7 +37,7 @@
 		}
 	}}
 >
-	<Tooltip content={$i18n.t('More')}>
+	<Tooltip content={'More'}>
 		<slot />
 	</Tooltip>
 
@@ -97,9 +94,9 @@
 
 				<div class="flex items-center">
 					{#if model?.meta?.hidden ?? false}
-						{$i18n.t('Show Model')}
+						{'Show Model'}
 					{:else}
-						{$i18n.t('Hide Model')}
+						{'Hide Model'}
 					{/if}
 				</div>
 			</DropdownMenu.Item>
@@ -112,7 +109,7 @@
 			>
 				<Link />
 
-				<div class="flex items-center">{$i18n.t('Copy Link')}</div>
+				<div class="flex items-center">{'Copy Link'}</div>
 			</DropdownMenu.Item>
 
 			<DropdownMenu.Item
@@ -123,7 +120,7 @@
 			>
 				<DocumentDuplicate />
 
-				<div class="flex items-center">{$i18n.t('Clone')}</div>
+				<div class="flex items-center">{'Clone'}</div>
 			</DropdownMenu.Item>
 
 			<DropdownMenu.Item
@@ -134,7 +131,7 @@
 			>
 				<Download />
 
-				<div class="flex items-center">{$i18n.t('Export')}</div>
+				<div class="flex items-center">{'Export'}</div>
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</div>

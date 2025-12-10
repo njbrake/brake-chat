@@ -4,8 +4,6 @@
 	import { getModels as _getModels } from '$lib/apis';
 
 	const dispatch = createEventDispatcher();
-	const i18n = getContext('i18n');
-
 	import { models, settings, user } from '$lib/stores';
 
 	import Switch from '$lib/components/common/Switch.svelte';
@@ -31,13 +29,13 @@
 		const res = await setToolServerConnections(localStorage.token, {
 			TOOL_SERVER_CONNECTIONS: servers
 		}).catch((err) => {
-			toast.error($i18n.t('Failed to save connections'));
+			toast.error('Failed to save connections');
 
 			return null;
 		});
 
 		if (res) {
-			toast.success($i18n.t('Connections saved successfully'));
+			toast.success('Connections saved successfully');
 		}
 	};
 
@@ -59,18 +57,16 @@
 		{#if servers !== null}
 			<div class="">
 				<div class="mb-3">
-					<div class=" mt-0.5 mb-2.5 text-base font-medium">{$i18n.t('General')}</div>
+					<div class=" mt-0.5 mb-2.5 text-base font-medium">{'General'}</div>
 
 					<hr class=" border-gray-100 dark:border-gray-850 my-2" />
 
 					<div class="mb-2.5 flex flex-col w-full justify-between">
-						<!-- {$i18n.t(`Failed to connect to {{URL}} OpenAPI tool server`, {
-							URL: 'server?.url'
-						})} -->
+						<!-- {`Failed to connect to ${'server?.url'} OpenAPI tool server`} -->
 						<div class="flex justify-between items-center mb-0.5">
-							<div class="font-medium">{$i18n.t('Manage Tool Servers')}</div>
+							<div class="font-medium">{'Manage Tool Servers'}</div>
 
-							<Tooltip content={$i18n.t(`Add Connection`)}>
+							<Tooltip content={'Add Connection'}>
 								<button
 									class="px-1"
 									on:click={() => {
@@ -100,15 +96,15 @@
 
 						<div class="my-1.5">
 							<div class="text-xs text-gray-500">
-								{$i18n.t('Connect to your own OpenAPI compatible external tool servers.')}
+								{'Connect to your own OpenAPI compatible external tool servers.'}
 							</div>
 						</div>
 					</div>
 
 					<!-- <div class="mb-2.5 flex w-full justify-between">
-						<div class=" text-xs font-medium">{$i18n.t('Arena Models')}</div>
+						<div class=" text-xs font-medium">{'Arena Models'}</div>
 
-						<Tooltip content={$i18n.t(`Message rating should be enabled to use this feature`)}>
+						<Tooltip content={'Message rating should be enabled to use this feature'}>
 							<Switch bind:state={evaluationConfig.ENABLE_EVALUATION_ARENA_MODELS} />
 						</Tooltip>
 					</div> -->
@@ -128,7 +124,7 @@
 			class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
 			type="submit"
 		>
-			{$i18n.t('Save')}
+			{'Save'}
 		</button>
 	</div>
 </form>

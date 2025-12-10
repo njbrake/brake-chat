@@ -6,9 +6,6 @@
 	import { onMount, getContext } from 'svelte';
 
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
-
-	const i18n = getContext('i18n');
-
 	let updateAvailable = null;
 	let version = {
 		current: '',
@@ -43,7 +40,7 @@
 			<div class=" mb-2.5 text-sm font-medium flex space-x-2 items-center">
 				<div>
 					{$WEBUI_NAME}
-					{$i18n.t('Version')}
+					{'Version'}
 				</div>
 			</div>
 			<div class="flex w-full justify-between items-center">
@@ -59,10 +56,10 @@
 								target="_blank"
 							>
 								{updateAvailable === null
-									? $i18n.t('Checking for updates...')
+									? 'Checking for updates...'
 									: updateAvailable
-										? `(v${version.latest} ${$i18n.t('available!')})`
-										: $i18n.t('(latest)')}
+										? `(v${version.latest} ${'available!'})`
+										: '(latest)'}
 							</a>
 						{/if}
 					</div>
@@ -73,7 +70,7 @@
 							showChangelog.set(true);
 						}}
 					>
-						<div>{$i18n.t("See what's new")}</div>
+						<div>{"See what's new"}</div>
 					</button>
 				</div>
 
@@ -84,7 +81,7 @@
 							checkForVersionUpdates();
 						}}
 					>
-						{$i18n.t('Check for updates')}
+						{'Check for updates'}
 					</button>
 				{/if}
 			</div>
@@ -180,7 +177,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 		</div>
 
 		<div class="mt-2 text-xs text-gray-400 dark:text-gray-500">
-			{$i18n.t('Created by')}
+			{'Created by'}
 			<a
 				class=" text-gray-500 dark:text-gray-300 font-medium"
 				href="https://github.com/tjbck"

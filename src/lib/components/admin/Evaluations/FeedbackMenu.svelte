@@ -7,8 +7,6 @@
 	const { saveAs } = fileSaver;
 
 	const dispatch = createEventDispatcher();
-	const i18n = getContext('i18n');
-
 	import Dropdown from '$lib/components/common/Dropdown.svelte';
 	import GarbageBin from '$lib/components/icons/GarbageBin.svelte';
 	import Pencil from '$lib/components/icons/Pencil.svelte';
@@ -19,7 +17,7 @@
 </script>
 
 <Dropdown bind:show on:change={(e) => {}}>
-	<Tooltip content={$i18n.t('More')}>
+	<Tooltip content={'More'}>
 		<slot />
 	</Tooltip>
 
@@ -39,7 +37,7 @@
 				}}
 			>
 				<GarbageBin strokeWidth="2" />
-				<div class="flex items-center">{$i18n.t('Delete')}</div>
+				<div class="flex items-center">{'Delete'}</div>
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</div>

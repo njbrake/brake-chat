@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { getContext, onMount } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import General from './General.svelte';
@@ -143,12 +141,12 @@
 			<div class=" text-lg font-medium self-center font-primary">
 				{#if custom}
 					{#if edit}
-						{$i18n.t('Edit User Group')}
+						{'Edit User Group'}
 					{:else}
-						{$i18n.t('Add User Group')}
+						{'Add User Group'}
 					{/if}
 				{:else}
-					{$i18n.t('Edit Default Permissions')}
+					{'Edit Default Permissions'}
 				{/if}
 			</div>
 			<button
@@ -200,7 +198,7 @@
 											/>
 										</svg>
 									</div>
-									<div class=" self-center">{$i18n.t('General')}</div>
+									<div class=" self-center">{'General'}</div>
 								</button>
 							{/if}
 
@@ -218,7 +216,7 @@
 									<div class=" self-center mr-2">
 										<WrenchSolid />
 									</div>
-									<div class=" self-center">{$i18n.t('Permissions')}</div>
+									<div class=" self-center">{'Permissions'}</div>
 								</button>
 							{/if}
 
@@ -236,7 +234,7 @@
 									<div class=" self-center mr-2">
 										<UserPlusSolid />
 									</div>
-									<div class=" self-center">{$i18n.t('Users')}</div>
+									<div class=" self-center">{'Users'}</div>
 								</button>
 							{/if}
 						</div>
@@ -269,7 +267,7 @@
 										type="submit"
 										disabled={loading}
 									>
-										{$i18n.t('Save')}
+										{'Save'}
 
 										{#if loading}
 											<div class="ml-2 self-center">
@@ -296,7 +294,7 @@
 								}}
 								type="button"
 							>
-								{$i18n.t('Display')}
+								{'Display'}
 							</button>
 						{/if}
 
@@ -311,7 +309,7 @@
 								}}
 								type="button"
 							>
-								{$i18n.t('Permissions')}
+								{'Permissions'}
 							</button>
 						{/if}
 
@@ -326,7 +324,7 @@
 								}}
 								type="button"
 							>
-								{$i18n.t('Users')} ({userIds.length})
+								{'Users'} ({userIds.length})
 							</button>
 						{/if}
 					</div> -->

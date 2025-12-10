@@ -10,9 +10,6 @@
 	import dayjs from 'dayjs';
 	import LocalizedFormat from 'dayjs/plugin/localizedFormat';
 	dayjs.extend(LocalizedFormat);
-
-	const i18n = getContext('i18n');
-
 	export let recording = false;
 	export let transcribe = true;
 	export let displayMedia = false;
@@ -204,7 +201,7 @@
 			}
 		} catch (err) {
 			console.error('Error accessing media devices.', err);
-			toast.error($i18n.t('Error accessing media devices.'));
+			toast.error('Error accessing media devices.');
 			loading = false;
 			recording = false;
 			return;
@@ -255,7 +252,7 @@
 			mediaRecorder.start();
 		} catch (error) {
 			console.error('Error starting recording:', error);
-			toast.error($i18n.t('Error starting recording.'));
+			toast.error('Error starting recording.');
 			loading = false;
 			recording = false;
 			return;
@@ -314,7 +311,7 @@
 					// Event triggered when an error occurs
 					speechRecognition.onerror = function (event) {
 						console.log(event);
-						toast.error($i18n.t(`Speech recognition error: {{error}}`, { error: event.error }));
+						toast.error(`Speech recognition error: ${event.error}`);
 						onCancel();
 
 						stopRecording();

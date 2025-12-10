@@ -11,9 +11,6 @@
 	import { onDestroy, onMount, tick, getContext } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import Spinner from '../common/Spinner.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let threadId = null;
 	export let channel = null;
 
@@ -167,7 +164,7 @@
 {#if channel}
 	<div class="flex flex-col w-full h-full bg-gray-50 dark:bg-gray-850">
 		<div class="sticky top-0 flex items-center justify-between px-3.5 py-3">
-			<div class=" font-medium text-lg">{$i18n.t('Thread')}</div>
+			<div class=" font-medium text-lg">{'Thread'}</div>
 
 			<div>
 				<button
@@ -225,8 +222,8 @@
 					id={threadId}
 					disabled={!channel?.write_access}
 					placeholder={!channel?.write_access
-						? $i18n.t('You do not have permission to send messages in this thread.')
-						: $i18n.t('Reply to thread...')}
+						? 'You do not have permission to send messages in this thread.'
+						: 'Reply to thread...'}
 					typingUsersClassName="from-gray-50 dark:from-gray-850"
 					{typingUsers}
 					userSuggestions={true}

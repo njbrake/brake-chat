@@ -17,14 +17,12 @@
 	let selectedTools = [];
 
 	$: selectedTools = ($tools ?? []).filter((tool) => selectedToolIds.includes(tool.id));
-
-	const i18n = getContext('i18n');
 </script>
 
 <Modal bind:show size="md">
 	<div>
 		<div class=" flex justify-between dark:text-gray-300 px-5 pt-4 pb-0.5">
-			<div class=" text-lg font-medium self-center">{$i18n.t('Available Tools')}</div>
+			<div class=" text-lg font-medium self-center">{'Available Tools'}</div>
 			<button
 				class="self-center"
 				on:click={() => {
@@ -38,7 +36,7 @@
 		{#if selectedTools.length > 0}
 			{#if $toolServers.length > 0}
 				<div class=" flex justify-between dark:text-gray-300 px-5 pb-1">
-					<div class=" text-base font-medium self-center">{$i18n.t('Tools')}</div>
+					<div class=" text-base font-medium self-center">{'Tools'}</div>
 				</div>
 			{/if}
 
@@ -69,15 +67,15 @@
 
 		{#if $toolServers.length > 0}
 			<div class=" flex justify-between dark:text-gray-300 px-5 pb-0.5">
-				<div class=" text-base font-medium self-center">{$i18n.t('Tool Servers')}</div>
+				<div class=" text-base font-medium self-center">{'Tool Servers'}</div>
 			</div>
 
 			<div class="px-5 pb-5 w-full flex flex-col justify-center">
 				<div class=" text-xs text-gray-600 dark:text-gray-300 mb-2">
-					{$i18n.t('Open WebUI can use tools provided by any OpenAPI server.')} <br /><a
+					{'Open WebUI can use tools provided by any OpenAPI server.'} <br /><a
 						class="underline"
 						href="https://github.com/open-webui/openapi-servers"
-						target="_blank">{$i18n.t('Learn more about OpenAPI tool servers.')}</a
+						target="_blank">{'Learn more about OpenAPI tool servers.'}</a
 					>
 				</div>
 				<div class=" text-sm dark:text-gray-300 mb-1">

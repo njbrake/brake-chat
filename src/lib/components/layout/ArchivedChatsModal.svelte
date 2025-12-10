@@ -9,9 +9,6 @@
 	import ChatsModal from './ChatsModal.svelte';
 	import UnarchiveAllConfirmDialog from '$lib/components/common/ConfirmDialog.svelte';
 	import Spinner from '../common/Spinner.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 	export let onUpdate = () => {};
 
@@ -94,7 +91,7 @@
 		let blob = new Blob([JSON.stringify(chats)], {
 			type: 'application/json'
 		});
-		saveAs(blob, `${$i18n.t('archived-chat-export')}-${Date.now()}.json`);
+		saveAs(blob, `${'archived-chat-export'}-${Date.now()}.json`);
 	};
 
 	const unarchiveHandler = async (chatId) => {
@@ -110,7 +107,7 @@
 		loading = true;
 		try {
 			await unarchiveAllChats(localStorage.token);
-			toast.success($i18n.t('All chats have been unarchived.'));
+			toast.success('All chats have been unarchived.');
 			onUpdate();
 			await init();
 		} catch (error) {
@@ -131,8 +128,8 @@
 
 <UnarchiveAllConfirmDialog
 	bind:show={showUnarchiveAllConfirmDialog}
-	message={$i18n.t('Are you sure you want to unarchive all archived chats?')}
-	confirmLabel={$i18n.t('Unarchive All')}
+	message={'Are you sure you want to unarchive all archived chats?'}
+	confirmLabel={'Unarchive All'}
 	on:confirm={() => {
 		unarchiveAllHandler();
 	}}
@@ -143,8 +140,8 @@
 	bind:query
 	bind:orderBy
 	bind:direction
-	title={$i18n.t('Archived Chats')}
-	emptyPlaceholder={$i18n.t('You have no archived conversations.')}
+	title={'Archived Chats'}
+	emptyPlaceholder={'You have no archived conversations.'}
 	{chatList}
 	{allChatsLoaded}
 	{chatListLoading}
@@ -166,7 +163,7 @@
 				{#if loading}
 					<Spinner className="size-4" />
 				{:else}
-					{$i18n.t('Unarchive All Archived Chats')}
+					{'Unarchive All Archived Chats'}
 				{/if}
 			</button>
 
@@ -177,7 +174,7 @@
 					exportChatsHandler();
 				}}
 			>
-				{$i18n.t('Export All Archived Chats')}
+				{'Export All Archived Chats'}
 			</button>
 		</div>
 	</div>

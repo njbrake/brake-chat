@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import Minus from '$lib/components/icons/Minus.svelte';
 
 	export let title = '';
@@ -30,7 +28,7 @@
 					selectedModelId = '';
 				}}
 			>
-				<option value="">{$i18n.t('Select a model')}</option>
+				<option value="">{'Select a model'}</option>
 				{#each models as model}
 					{#if !modelIds.includes(model.id)}
 						<option value={model.id} class="bg-gray-50 dark:bg-gray-700">{model.name}</option>
@@ -63,7 +61,7 @@
 			</div>
 		{:else}
 			<div class="text-gray-500 text-xs text-center py-2">
-				{$i18n.t('No models selected')}
+				{'No models selected'}
 			</div>
 		{/if}
 	</div>

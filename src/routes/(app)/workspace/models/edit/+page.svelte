@@ -3,8 +3,6 @@
 	import { goto } from '$app/navigation';
 
 	import { onMount, getContext } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import { page } from '$app/stores';
 	import { config, models, settings } from '$lib/stores';
 
@@ -44,7 +42,7 @@
 			} catch (error) {
 				console.error('Failed to refresh models list:', error);
 			}
-			toast.success($i18n.t('Model updated successfully'));
+			toast.success('Model updated successfully');
 			await goto('/workspace/models');
 		}
 	};

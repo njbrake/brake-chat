@@ -6,9 +6,6 @@
 	import ProfileImage from '../Messages/ProfileImage.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Heart from '$lib/components/icons/Heart.svelte';
-
-	const i18n = getContext('i18n');
-
 	type $$Props = NodeProps;
 	export let data: $$Props['data'];
 </script>
@@ -44,7 +41,7 @@
 		{:else}
 			<div class="flex w-full">
 				<ProfileImage
-					src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${data.model.id}&lang=${$i18n.language}`}
+					src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${data.model.id}&lang=${'en-US'}`}
 					className={'size-5 -translate-y-[1px]'}
 				/>
 

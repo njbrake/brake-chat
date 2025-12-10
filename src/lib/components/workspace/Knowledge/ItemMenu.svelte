@@ -15,9 +15,6 @@
 	import Download from '$lib/components/icons/Download.svelte';
 	import ArrowUpCircle from '$lib/components/icons/ArrowUpCircle.svelte';
 	import EllipsisHorizontal from '$lib/components/icons/EllipsisHorizontal.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let onClose: Function = () => {};
 
 	let show = false;
@@ -32,7 +29,7 @@
 	}}
 	align="end"
 >
-	<Tooltip content={$i18n.t('More')}>
+	<Tooltip content={'More'}>
 		<slot
 			><button
 				class="self-center w-fit text-sm p-1.5 dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
@@ -61,7 +58,7 @@
 				}}
 			>
 				<GarbageBin />
-				<div class="flex items-center">{$i18n.t('Delete')}</div>
+				<div class="flex items-center">{'Delete'}</div>
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</div>

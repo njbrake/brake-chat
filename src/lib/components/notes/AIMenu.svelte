@@ -8,9 +8,6 @@
 	import PencilSquare from '../icons/PencilSquare.svelte';
 	import ChatBubbleOval from '../icons/ChatBubbleOval.svelte';
 	import Sparkles from '../icons/Sparkles.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 	export let className = 'max-w-[170px]';
 
@@ -43,7 +40,7 @@
 				<div class=" self-center mr-2">
 					<Sparkles className="size-4" strokeWidth="2" />
 				</div>
-				<div class=" self-center truncate">{$i18n.t('Enhance')}</div>
+				<div class=" self-center truncate">{'Enhance'}</div>
 			</button>
 
 			<button
@@ -56,7 +53,7 @@
 				<div class=" self-center mr-2">
 					<ChatBubbleOval className="size-4" strokeWidth="2" />
 				</div>
-				<div class=" self-center truncate">{$i18n.t('Chat')}</div>
+				<div class=" self-center truncate">{'Chat'}</div>
 			</button>
 		</DropdownMenu.Content>
 	</slot>

@@ -17,9 +17,6 @@
 	import { getUserById } from '$lib/apis/users';
 	import User from '$lib/components/icons/User.svelte';
 	import UserProfileImage from './Account/UserProfileImage.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let saveHandler: Function;
 	export let saveSettings: Function;
 
@@ -84,9 +81,9 @@
 	const createAPIKeyHandler = async () => {
 		APIKey = await createAPIKey(localStorage.token);
 		if (APIKey) {
-			toast.success($i18n.t('API Key created.'));
+			toast.success('API Key created.');
 		} else {
-			toast.error($i18n.t('Failed to create API Key.'));
+			toast.error('Failed to create API Key.');
 		}
 	};
 
@@ -122,14 +119,14 @@
 	<div class=" overflow-y-scroll max-h-[28rem] md:max-h-full">
 		<div class="space-y-1">
 			<div>
-				<div class="text-base font-medium">{$i18n.t('Your Account')}</div>
+				<div class="text-base font-medium">{'Your Account'}</div>
 
 				<div class="text-xs text-gray-500 mt-0.5">
-					{$i18n.t('Manage your account information.')}
+					{'Manage your account information.'}
 				</div>
 			</div>
 
-			<!-- <div class=" text-sm font-medium">{$i18n.t('Account')}</div> -->
+			<!-- <div class=" text-sm font-medium">{'Account'}</div> -->
 
 			<div class="flex space-x-5 my-4">
 				<UserProfileImage bind:profileImageUrl user={$user} />
@@ -137,7 +134,7 @@
 				<div class="flex flex-1 flex-col">
 					<div class=" flex-1">
 						<div class="flex flex-col w-full">
-							<div class=" mb-1 text-xs font-medium">{$i18n.t('Name')}</div>
+							<div class=" mb-1 text-xs font-medium">{'Name'}</div>
 
 							<div class="flex-1">
 								<input
@@ -145,26 +142,26 @@
 									type="text"
 									bind:value={name}
 									required
-									placeholder={$i18n.t('Enter your name')}
+									placeholder={'Enter your name'}
 								/>
 							</div>
 						</div>
 
 						<div class="flex flex-col w-full mt-2">
-							<div class=" mb-1 text-xs font-medium">{$i18n.t('Bio')}</div>
+							<div class=" mb-1 text-xs font-medium">{'Bio'}</div>
 
 							<div class="flex-1">
 								<Textarea
 									className="w-full text-sm dark:text-gray-300 bg-transparent outline-hidden"
 									minSize={60}
 									bind:value={bio}
-									placeholder={$i18n.t('Share your background and interests')}
+									placeholder={'Share your background and interests'}
 								/>
 							</div>
 						</div>
 
 						<div class="flex flex-col w-full mt-2">
-							<div class=" mb-1 text-xs font-medium">{$i18n.t('Gender')}</div>
+							<div class=" mb-1 text-xs font-medium">{'Gender'}</div>
 
 							<div class="flex-1">
 								<select
@@ -181,10 +178,10 @@
 										}
 									}}
 								>
-									<option value="" selected>{$i18n.t('Prefer not to say')}</option>
-									<option value="male">{$i18n.t('Male')}</option>
-									<option value="female">{$i18n.t('Female')}</option>
-									<option value="custom">{$i18n.t('Custom')}</option>
+									<option value="" selected>{'Prefer not to say'}</option>
+									<option value="male">{'Male'}</option>
+									<option value="female">{'Female'}</option>
+									<option value="custom">{'Custom'}</option>
 								</select>
 							</div>
 
@@ -193,14 +190,14 @@
 									class="w-full text-sm dark:text-gray-300 bg-transparent outline-hidden mt-1"
 									type="text"
 									required
-									placeholder={$i18n.t('Enter your gender')}
+									placeholder={'Enter your gender'}
 									bind:value={gender}
 								/>
 							{/if}
 						</div>
 
 						<div class="flex flex-col w-full mt-2">
-							<div class=" mb-1 text-xs font-medium">{$i18n.t('Birth Date')}</div>
+							<div class=" mb-1 text-xs font-medium">{'Birth Date'}</div>
 
 							<div class="flex-1">
 								<input
@@ -219,13 +216,13 @@
 		{#if $config?.features?.enable_user_webhooks}
 			<div class="mt-2">
 				<div class="flex flex-col w-full">
-					<div class=" mb-1 text-xs font-medium">{$i18n.t('Notification Webhook')}</div>
+					<div class=" mb-1 text-xs font-medium">{'Notification Webhook'}</div>
 
 					<div class="flex-1">
 						<input
 							class="w-full text-sm outline-hidden"
 							type="url"
-							placeholder={$i18n.t('Enter your webhook URL')}
+							placeholder={'Enter your webhook URL'}
 							bind:value={webhookUrl}
 							required
 						/>
@@ -244,13 +241,13 @@
 
 		{#if ($config?.features?.enable_api_keys ?? true) && ($user?.role === 'admin' || ($user?.permissions?.features?.api_keys ?? false))}
 			<div class="flex justify-between items-center text-sm mt-2">
-				<div class="  font-medium">{$i18n.t('API keys')}</div>
+				<div class="  font-medium">{'API keys'}</div>
 				<button
 					class=" text-xs font-medium text-gray-500"
 					type="button"
 					on:click={() => {
 						showAPIKeys = !showAPIKeys;
-					}}>{showAPIKeys ? $i18n.t('Hide') : $i18n.t('Show')}</button
+					}}>{showAPIKeys ? 'Hide' : 'Show'}</button
 				>
 			</div>
 
@@ -259,7 +256,7 @@
 					{#if $user?.role === 'admin'}
 						<div class="justify-between w-full mt-2">
 							<div class="flex justify-between w-full">
-								<div class="self-center text-xs font-medium mb-1">{$i18n.t('JWT Token')}</div>
+								<div class="self-center text-xs font-medium mb-1">{'JWT Token'}</div>
 							</div>
 
 							<div class="flex">
@@ -316,7 +313,7 @@
 						<div class="justify-between w-full mt-2">
 							{#if $user?.role === 'admin'}
 								<div class="flex justify-between w-full">
-									<div class="self-center text-xs font-medium mb-1">{$i18n.t('API Key')}</div>
+									<div class="self-center text-xs font-medium mb-1">{'API Key'}</div>
 								</div>
 							{/if}
 							<div class="flex">
@@ -367,7 +364,7 @@
 										{/if}
 									</button>
 
-									<Tooltip content={$i18n.t('Create new key')}>
+									<Tooltip content={'Create new key'}>
 										<button
 											class=" px-1.5 py-1 dark:hover:bg-gray-850transition rounded-lg"
 											on:click={() => {
@@ -399,7 +396,7 @@
 									>
 										<Plus strokeWidth="2" className=" size-3.5" />
 
-										{$i18n.t('Create new secret key')}</button
+										{'Create new secret key'}</button
 									>
 								{/if}
 							</div>
@@ -421,7 +418,7 @@
 				}
 			}}
 		>
-			{$i18n.t('Save')}
+			{'Save'}
 		</button>
 	</div>
 </div>

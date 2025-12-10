@@ -12,9 +12,6 @@
 			right: Shortcut[];
 		};
 	};
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 
 	let categorizedShortcuts: CategorizedShortcuts = {};
@@ -46,7 +43,7 @@
 <Modal bind:show>
 	<div class="text-gray-700 dark:text-gray-100 px-5 py-4">
 		<div class="flex justify-between dark:text-gray-300 pb-2">
-			<div class="text-lg font-medium self-center">{$i18n.t('Keyboard Shortcuts')}</div>
+			<div class="text-lg font-medium self-center">{'Keyboard Shortcuts'}</div>
 			<button class="self-center" on:click={() => (show = false)}>
 				<XMark className={'size-5'} />
 			</button>
@@ -60,41 +57,41 @@
 			{/if}
 
 			<div class="flex justify-between dark:text-gray-300 pb-2">
-				<div class="text-base self-center">{$i18n.t(category)}</div>
+				<div class="text-base self-center">{category}</div>
 			</div>
 			<div class="flex flex-col md:flex-row w-full md:space-x-2 dark:text-gray-200">
 				<div class="flex flex-col w-full sm:flex-row sm:justify-center sm:space-x-6">
 					<div class=" grid grid-cols-1 sm:grid-cols-2 gap-2 gap-x-4 w-full">
-						<!-- {$i18n.t('Chat')} -->
-						<!-- {$i18n.t('Global')} -->
-						<!-- {$i18n.t('Input')} -->
-						<!-- {$i18n.t('Message')} -->
+						<!-- {'Chat'} -->
+						<!-- {'Global'} -->
+						<!-- {'Input'} -->
+						<!-- {'Message'} -->
 
-						<!-- {$i18n.t('New Chat')} -->
-						<!-- {$i18n.t('New Temporary Chat')} -->
-						<!-- {$i18n.t('Delete Chat')} -->
-						<!-- {$i18n.t('Search')} -->
-						<!-- {$i18n.t('Open Settings')} -->
-						<!-- {$i18n.t('Show Shortcuts')} -->
-						<!-- {$i18n.t('Toggle Sidebar')} -->
-						<!-- {$i18n.t('Close Modal')} -->
-						<!-- {$i18n.t('Focus Chat Input')} -->
-						<!-- {$i18n.t('Accept Autocomplete Generation\nJump to Prompt Variable')} -->
-						<!-- {$i18n.t('Prevent File Creation')} -->
-						<!-- {$i18n.t('Attach File From Knowledge')} -->
-						<!-- {$i18n.t('Add Custom Prompt')} -->
-						<!-- {$i18n.t('Talk to Model')} -->
-						<!-- {$i18n.t('Generate Message Pair')} -->
-						<!-- {$i18n.t('Regenerate Response')} -->
-						<!-- {$i18n.t('Stop Generating')} -->
-						<!-- {$i18n.t('Edit Last Message')} -->
-						<!-- {$i18n.t('Copy Last Response')} -->
-						<!-- {$i18n.t('Copy Last Code Block')} -->
+						<!-- {'New Chat'} -->
+						<!-- {'New Temporary Chat'} -->
+						<!-- {'Delete Chat'} -->
+						<!-- {'Search'} -->
+						<!-- {'Open Settings'} -->
+						<!-- {'Show Shortcuts'} -->
+						<!-- {'Toggle Sidebar'} -->
+						<!-- {'Close Modal'} -->
+						<!-- {'Focus Chat Input'} -->
+						<!-- {'Accept Autocomplete Generation\nJump to Prompt Variable'} -->
+						<!-- {'Prevent File Creation'} -->
+						<!-- {'Attach File From Knowledge'} -->
+						<!-- {'Add Custom Prompt'} -->
+						<!-- {'Talk to Model'} -->
+						<!-- {'Generate Message Pair'} -->
+						<!-- {'Regenerate Response'} -->
+						<!-- {'Stop Generating'} -->
+						<!-- {'Edit Last Message'} -->
+						<!-- {'Copy Last Response'} -->
+						<!-- {'Copy Last Code Block'} -->
 
-						<!-- {$i18n.t('Only active when "Paste Large Text as File" setting is toggled on.')} -->
-						<!-- {$i18n.t('Only active when the chat input is in focus.')} -->
-						<!-- {$i18n.t('Only active when the chat input is in focus and an LLM is generating a response.')} -->
-						<!-- {$i18n.t('Only can be triggered when the chat input is in focus.')} -->
+						<!-- {Only active when "Paste Large Text as File" setting is toggled on.} -->
+						<!-- {'Only active when the chat input is in focus.'} -->
+						<!-- {'Only active when the chat input is in focus and an LLM is generating a response.'} -->
+						<!-- {'Only can be triggered when the chat input is in focus.'} -->
 						{#each items as shortcut}
 							<div class="col-span-1 flex items-start">
 								<ShortcutItem {shortcut} {isMac} />

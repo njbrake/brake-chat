@@ -29,8 +29,6 @@
 	import Switch from '$lib/components/common/Switch.svelte';
 	import Valves from '$lib/components/common/Valves.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
-
-	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
 
 	export let show = false;
@@ -90,7 +88,7 @@
 			}
 
 			if (res) {
-				toast.success($i18n.t('Valves updated successfully'));
+				toast.success('Valves updated successfully');
 				dispatch('save');
 			}
 		}
@@ -155,7 +153,7 @@
 <Modal size="sm" bind:show>
 	<div>
 		<div class=" flex justify-between dark:text-gray-300 px-5 pt-4 pb-2">
-			<div class=" text-lg font-medium self-center">{$i18n.t('Valves')}</div>
+			<div class=" text-lg font-medium self-center">{'Valves'}</div>
 			<button
 				class="self-center"
 				on:click={() => {
@@ -190,7 +188,7 @@
 							type="submit"
 							disabled={saving}
 						>
-							{$i18n.t('Save')}
+							{'Save'}
 
 							{#if saving}
 								<div class="ml-2 self-center">

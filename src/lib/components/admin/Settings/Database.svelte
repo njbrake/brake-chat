@@ -9,9 +9,6 @@
 	import { getAllUserChats } from '$lib/apis/chats';
 	import { getAllUsers } from '$lib/apis/users';
 	import { exportConfig, importConfig } from '$lib/apis/configs';
-
-	const i18n = getContext('i18n');
-
 	export let saveHandler: Function;
 
 	const exportAllUserChats = async () => {
@@ -57,7 +54,7 @@
 >
 	<div class=" space-y-3 overflow-y-scroll scrollbar-hidden h-full">
 		<div>
-			<div class=" mb-2 text-sm font-medium">{$i18n.t('Database')}</div>
+			<div class=" mb-2 text-sm font-medium">{'Database'}</div>
 
 			<input
 				id="config-json-input"
@@ -76,7 +73,7 @@
 						);
 
 						if (res) {
-							toast.success($i18n.t('Config imported successfully'));
+							toast.success('Config imported successfully');
 						}
 						e.target.value = null;
 					};
@@ -108,7 +105,7 @@
 					</svg>
 				</div>
 				<div class=" self-center text-sm font-medium">
-					{$i18n.t('Import Config from JSON File')}
+					{'Import Config from JSON File'}
 				</div>
 			</button>
 
@@ -139,7 +136,7 @@
 					</svg>
 				</div>
 				<div class=" self-center text-sm font-medium">
-					{$i18n.t('Export Config to JSON File')}
+					{'Export Config to JSON File'}
 				</div>
 			</button>
 
@@ -147,7 +144,7 @@
 
 			{#if $config?.features.enable_admin_export ?? true}
 				<div class="  flex w-full justify-between">
-					<!-- <div class=" self-center text-xs font-medium">{$i18n.t('Allow Chat Deletion')}</div> -->
+					<!-- <div class=" self-center text-xs font-medium">{'Allow Chat Deletion'}</div> -->
 
 					<button
 						class=" flex rounded-md py-1.5 px-3 w-full hover:bg-gray-200 dark:hover:bg-gray-800 transition"
@@ -175,7 +172,7 @@
 								/>
 							</svg>
 						</div>
-						<div class=" self-center text-sm font-medium">{$i18n.t('Download Database')}</div>
+						<div class=" self-center text-sm font-medium">{'Download Database'}</div>
 					</button>
 				</div>
 
@@ -201,7 +198,7 @@
 						</svg>
 					</div>
 					<div class=" self-center text-sm font-medium">
-						{$i18n.t('Export All Chats (All Users)')}
+						{'Export All Chats (All Users)'}
 					</div>
 				</button>
 
@@ -227,7 +224,7 @@
 						</svg>
 					</div>
 					<div class=" self-center text-sm font-medium">
-						{$i18n.t('Export Users')}
+						{'Export Users'}
 					</div>
 				</button>
 			{/if}

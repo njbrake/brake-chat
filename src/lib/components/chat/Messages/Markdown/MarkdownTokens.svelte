@@ -2,8 +2,6 @@
 	import { decode } from 'html-entities';
 	import DOMPurify from 'dompurify';
 	import { onMount, getContext } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import fileSaver from 'file-saver';
 	const { saveAs } = fileSaver;
 
@@ -187,7 +185,7 @@
 			</div>
 
 			<div class=" absolute top-1 right-1.5 z-20 invisible group-hover:visible flex gap-0.5">
-				<Tooltip content={$i18n.t('Copy')}>
+				<Tooltip content={'Copy'}>
 					<button
 						class="p-1 rounded-lg bg-transparent transition"
 						on:click={(e) => {
@@ -199,7 +197,7 @@
 					</button>
 				</Tooltip>
 
-				<Tooltip content={$i18n.t('Export to CSV')}>
+				<Tooltip content={'Export to CSV'}>
 					<button
 						class="p-1 rounded-lg bg-transparent transition"
 						on:click={(e) => {

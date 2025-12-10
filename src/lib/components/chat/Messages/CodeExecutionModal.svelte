@@ -5,8 +5,6 @@
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Badge from '$lib/components/common/Badge.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
-	const i18n = getContext('i18n');
-
 	export let show = false;
 	export let codeExecution = null;
 </script>
@@ -36,9 +34,9 @@
 
 					<div>
 						{#if codeExecution?.name}
-							{$i18n.t('Code execution')}: {codeExecution?.name}
+							{'Code execution'}: {codeExecution?.name}
 						{:else}
-							{$i18n.t('Code execution')}
+							{'Code execution'}
 						{/if}
 					</div>
 				</div>
@@ -76,13 +74,13 @@
 					<div class="dark:bg-[#202123] dark:text-white px-4 py-4 rounded-b-lg flex flex-col gap-3">
 						{#if codeExecution?.result?.error}
 							<div>
-								<div class=" text-gray-500 text-xs mb-1">{$i18n.t('ERROR')}</div>
+								<div class=" text-gray-500 text-xs mb-1">{'ERROR'}</div>
 								<div class="text-sm">{codeExecution?.result?.error}</div>
 							</div>
 						{/if}
 						{#if codeExecution?.result?.output}
 							<div>
-								<div class=" text-gray-500 text-xs mb-1">{$i18n.t('OUTPUT')}</div>
+								<div class=" text-gray-500 text-xs mb-1">{'OUTPUT'}</div>
 								<div class="text-sm">{codeExecution?.result?.output}</div>
 							</div>
 						{/if}
@@ -92,7 +90,7 @@
 					<div class="flex flex-col w-full">
 						<hr class="border-gray-100 dark:border-gray-850 my-2" />
 						<div class=" text-sm font-medium dark:text-gray-300">
-							{$i18n.t('Files')}
+							{'Files'}
 						</div>
 						<ul class="mt-1 list-disc pl-4 text-xs">
 							{#each codeExecution?.result?.files as file}

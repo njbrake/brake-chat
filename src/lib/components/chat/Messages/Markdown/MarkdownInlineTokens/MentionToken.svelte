@@ -8,9 +8,6 @@
 	import { channels, models } from '$lib/stores';
 	import UserStatus from '$lib/components/channel/Messages/Message/UserStatus.svelte';
 	import UserStatusLinkPreview from '$lib/components/channel/Messages/Message/UserStatusLinkPreview.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let token: Token;
 
 	let triggerChar = '';
@@ -46,7 +43,7 @@
 				if (channel) {
 					label = channel.name;
 				} else {
-					label = $i18n.t('Unknown');
+					label = 'Unknown';
 				}
 			} else if (idType === 'T') {
 				// Thread
@@ -60,7 +57,7 @@
 				if (model) {
 					label = model.name;
 				} else {
-					label = $i18n.t('Unknown');
+					label = 'Unknown';
 				}
 			}
 		}

@@ -1,5 +1,7 @@
 x.py
 yarn.lock
+.ruff_cache/
+.claude
 .DS_Store
 node_modules
 /build

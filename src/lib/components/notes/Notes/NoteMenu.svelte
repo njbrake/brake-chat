@@ -14,9 +14,6 @@
 	import DocumentDuplicate from '$lib/components/icons/DocumentDuplicate.svelte';
 	import Share from '$lib/components/icons/Share.svelte';
 	import Link from '$lib/components/icons/Link.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 	export let className = 'max-w-[180px]';
 
@@ -53,7 +50,7 @@
 				>
 					<Download strokeWidth="2" />
 
-					<div class="flex items-center">{$i18n.t('Download')}</div>
+					<div class="flex items-center">{'Download'}</div>
 				</DropdownMenu.SubTrigger>
 				<DropdownMenu.SubContent
 					class="w-full rounded-xl p-1 z-50 bg-white dark:bg-gray-850 dark:text-white shadow-lg"
@@ -67,7 +64,7 @@
 							onDownload('txt');
 						}}
 					>
-						<div class="flex items-center line-clamp-1">{$i18n.t('Plain text (.txt)')}</div>
+						<div class="flex items-center line-clamp-1">{'Plain text (.txt)'}</div>
 					</DropdownMenu.Item>
 
 					<DropdownMenu.Item
@@ -76,7 +73,7 @@
 							onDownload('md');
 						}}
 					>
-						<div class="flex items-center line-clamp-1">{$i18n.t('Plain text (.md)')}</div>
+						<div class="flex items-center line-clamp-1">{'Plain text (.md)'}</div>
 					</DropdownMenu.Item>
 
 					<DropdownMenu.Item
@@ -85,7 +82,7 @@
 							onDownload('pdf');
 						}}
 					>
-						<div class="flex items-center line-clamp-1">{$i18n.t('PDF document (.pdf)')}</div>
+						<div class="flex items-center line-clamp-1">{'PDF document (.pdf)'}</div>
 					</DropdownMenu.Item>
 				</DropdownMenu.SubContent>
 			</DropdownMenu.Sub>
@@ -97,7 +94,7 @@
 					>
 						<Share strokeWidth="2" />
 
-						<div class="flex items-center">{$i18n.t('Share')}</div>
+						<div class="flex items-center">{'Share'}</div>
 					</DropdownMenu.SubTrigger>
 					<DropdownMenu.SubContent
 						class="w-full rounded-xl p-1 z-50 bg-white dark:bg-gray-850 dark:text-white shadow-lg"
@@ -113,7 +110,7 @@
 								}}
 							>
 								<Link />
-								<div class="flex items-center">{$i18n.t('Copy link')}</div>
+								<div class="flex items-center">{'Copy link'}</div>
 							</DropdownMenu.Item>
 						{/if}
 
@@ -125,7 +122,7 @@
 								}}
 							>
 								<DocumentDuplicate strokeWidth="2" />
-								<div class="flex items-center">{$i18n.t('Copy to clipboard')}</div>
+								<div class="flex items-center">{'Copy to clipboard'}</div>
 							</DropdownMenu.Item>
 						{/if}
 					</DropdownMenu.SubContent>
@@ -139,7 +136,7 @@
 				}}
 			>
 				<GarbageBin />
-				<div class="flex items-center">{$i18n.t('Delete')}</div>
+				<div class="flex items-center">{'Delete'}</div>
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</slot>

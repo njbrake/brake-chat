@@ -4,8 +4,6 @@
 	import { getModels as _getModels } from '$lib/apis';
 
 	const dispatch = createEventDispatcher();
-	const i18n = getContext('i18n');
-
 	import { models, settings, user } from '$lib/stores';
 
 	import Switch from '$lib/components/common/Switch.svelte';
@@ -82,9 +80,9 @@
 				<div class="pr-1.5">
 					<div class="">
 						<div class="flex justify-between items-center mb-0.5">
-							<div class="font-medium">{$i18n.t('Manage Direct Connections')}</div>
+							<div class="font-medium">{'Manage Direct Connections'}</div>
 
-							<Tooltip content={$i18n.t(`Add Connection`)}>
+							<Tooltip content={'Add Connection'}>
 								<button
 									class="px-1"
 									on:click={() => {
@@ -132,11 +130,9 @@
 								? 'text-gray-800 dark:text-gray-100'
 								: 'text-gray-500'}"
 						>
-							{$i18n.t('Connect to your own OpenAI compatible API endpoints.')}
+							{'Connect to your own OpenAI compatible API endpoints.'}
 							<br />
-							{$i18n.t(
-								'CORS must be properly configured by the provider to allow requests from Open WebUI.'
-							)}
+							{'CORS must be properly configured by the provider to allow requests from Open WebUI.'}
 						</div>
 					</div>
 				</div>
@@ -155,7 +151,7 @@
 			class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
 			type="submit"
 		>
-			{$i18n.t('Save')}
+			{'Save'}
 		</button>
 	</div>
 </form>

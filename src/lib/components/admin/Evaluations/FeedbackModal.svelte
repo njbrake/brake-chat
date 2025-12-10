@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Modal from '$lib/components/common/Modal.svelte';
 	import { getContext } from 'svelte';
-	const i18n = getContext('i18n');
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import { getFeedbackById } from '$lib/apis/evaluations';
 	import { toast } from 'svelte-sonner';
@@ -44,7 +43,7 @@
 		<div>
 			<div class="flex justify-between dark:text-gray-300 px-5 pt-4 pb-2">
 				<div class="text-lg font-medium self-center">
-					{$i18n.t('Feedback Details')}
+					{'Feedback Details'}
 				</div>
 				<button class="self-center" on:click={close} aria-label="Close">
 					<XMark className={'size-5'} />
@@ -55,7 +54,7 @@
 				{#if loaded}
 					<div class="flex flex-col w-full">
 						<div class="flex flex-col w-full mb-2">
-							<div class=" mb-1 text-xs text-gray-500">{$i18n.t('Chat ID')}</div>
+							<div class=" mb-1 text-xs text-gray-500">{'Chat ID'}</div>
 
 							<div class="flex-1 text-xs">
 								<a
@@ -74,7 +73,7 @@
 
 							{#if messages[messages[messageId]?.parentId]}
 								<div class="flex flex-col w-full mb-2">
-									<div class="mb-1 text-xs text-gray-500">{$i18n.t('Prompt')}</div>
+									<div class="mb-1 text-xs text-gray-500">{'Prompt'}</div>
 
 									<div class="flex-1 text-xs whitespace-pre-line break-words">
 										<span>{messages[messages[messageId]?.parentId]?.content || '-'}</span>
@@ -84,7 +83,7 @@
 
 							{#if messages[messageId]}
 								<div class="flex flex-col w-full mb-2">
-									<div class="mb-1 text-xs text-gray-500">{$i18n.t('Response')}</div>
+									<div class="mb-1 text-xs text-gray-500">{'Response'}</div>
 									<div
 										class="flex-1 text-xs whitespace-pre-line break-words max-h-32 overflow-y-auto"
 									>
@@ -95,14 +94,14 @@
 						{/if}
 
 						<div class="flex flex-col w-full mb-2">
-							<div class=" mb-1 text-xs text-gray-500">{$i18n.t('Rating')}</div>
+							<div class=" mb-1 text-xs text-gray-500">{'Rating'}</div>
 
 							<div class="flex-1 text-xs">
 								<span>{selectedFeedback?.data?.details?.rating ?? '-'}</span>
 							</div>
 						</div>
 						<div class="flex flex-col w-full mb-2">
-							<div class=" mb-1 text-xs text-gray-500">{$i18n.t('Reason')}</div>
+							<div class=" mb-1 text-xs text-gray-500">{'Reason'}</div>
 
 							<div class="flex-1 text-xs">
 								<span>{selectedFeedback?.data?.reason || '-'}</span>
@@ -110,7 +109,7 @@
 						</div>
 
 						<div class="flex flex-col w-full mb-2">
-							<div class=" mb-1 text-xs text-gray-500">{$i18n.t('Comment')}</div>
+							<div class=" mb-1 text-xs text-gray-500">{'Comment'}</div>
 
 							<div class="flex-1 text-xs">
 								<span>{selectedFeedback?.data?.comment || '-'}</span>
@@ -135,7 +134,7 @@
 								type="button"
 								on:click={close}
 							>
-								{$i18n.t('Close')}
+								{'Close'}
 							</button>
 						</div>
 					</div>

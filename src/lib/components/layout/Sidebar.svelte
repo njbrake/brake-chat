@@ -28,9 +28,6 @@
 		WEBUI_NAME
 	} from '$lib/stores';
 	import { onMount, getContext, tick, onDestroy } from 'svelte';
-
-	const i18n = getContext('i18n');
-
 	import {
 		getChatList,
 		getAllChatTags,
@@ -151,7 +148,7 @@
 	const createFolder = async ({ name, data }) => {
 		name = name?.trim();
 		if (!name) {
-			toast.error($i18n.t('Folder name cannot be empty.'));
+			toast.error('Folder name cannot be empty.');
 			return;
 		}
 
@@ -323,24 +320,15 @@
 			const result = await deleteChatsByIds(localStorage.token, Array.from(selectedChatIds));
 
 			if (result.failed.length > 0) {
-				toast.error(
-					$i18n.t('{{count}} of {{total}} chats could not be deleted', {
-						count: result.failed.length,
-						total: result.total
-					})
-				);
+				toast.error(`${result.failed.length} of ${result.total} chats could not be deleted`);
 			} else {
-				toast.success(
-					$i18n.t('{{count}} chats deleted successfully', {
-						count: result.deleted
-					})
-				);
+				toast.success(`${result.deleted} chats deleted successfully`);
 			}
 
 			await initChatList();
 		} catch (error) {
 			console.error('Failed to delete chats:', error);
-			toast.error($i18n.t('Failed to delete chats: {{error}}', { error: error.message }));
+			toast.error(`Failed to delete chats: ${error.message}`);
 		} finally {
 			deleting = false;
 			exitEditMode();
@@ -359,7 +347,7 @@
 					const chatItems = JSON.parse(content);
 					importChatHandler(chatItems);
 				} catch {
-					toast.error($i18n.t(`Invalid file format.`));
+					toast.error('Invalid file format.');
 				}
 			};
 
@@ -580,13 +568,10 @@
 <ConfirmDialog bind:show={showBulkDeleteConfirm} on:confirm={bulkDeleteHandler}>
 	<div class="flex flex-col gap-2">
 		<div class="text-lg font-medium">
-			{$i18n.t('Delete {{count}} chats?', { count: selectedCount })}
+			{`Delete ${selectedCount} chats?`}
 		</div>
 		<div class="text-sm text-gray-500">
-			{$i18n.t(
-				'This will permanently delete {{count}} conversations. This action cannot be undone.',
-				{ count: selectedCount }
-			)}
+			{`This will permanently delete ${selectedCount} conversations. This action cannot be undone.`}
 		</div>
 	</div>
 </ConfirmDialog>
@@ -596,7 +581,7 @@
 	onSubmit={async ({ name, access_control }) => {
 		name = name?.trim();
 		if (!name) {
-			toast.error($i18n.t('Channel name cannot be empty.'));
+			toast.error('Channel name cannot be empty.');
 			return;
 		}
 
@@ -667,15 +652,12 @@
 			}}
 		>
 			<div class="pb-1.5">
-				<Tooltip
-					content={$showSidebar ? $i18n.t('Close Sidebar') : $i18n.t('Open Sidebar')}
-					placement="right"
-				>
+				<Tooltip content={$showSidebar ? 'Close Sidebar' : 'Open Sidebar'} placement="right">
 					<button
 						class="flex rounded-xl hover:bg-gray-100 dark:hover:bg-gray-850 transition group {isWindows
 							? 'cursor-pointer'
 							: 'cursor-[e-resize]'}"
-						aria-label={$showSidebar ? $i18n.t('Close Sidebar') : $i18n.t('Open Sidebar')}
+						aria-label={$showSidebar ? 'Close Sidebar' : 'Open Sidebar'}
 					>
 						<div class=" self-center flex items-center justify-center size-9">
 							<img
@@ -692,7 +674,7 @@
 
 			<div class="-mt-[0.5px]">
 				<div class="">
-					<Tooltip content={$i18n.t('New Chat')} placement="right">
+					<Tooltip content={'New Chat'} placement="right">
 						<a
 							class=" cursor-pointer flex rounded-xl hover:bg-gray-100 dark:hover:bg-gray-850 transition group"
 							href="/"
@@ -704,7 +686,7 @@
 								goto('/');
 								newChatHandler();
 							}}
-							aria-label={$i18n.t('New Chat')}
+							aria-label={'New Chat'}
 						>
 							<div class=" self-center flex items-center justify-center size-9">
 								<PencilSquare className="size-4.5" />
@@ -714,7 +696,7 @@
 				</div>
 
 				<div>
-					<Tooltip content={$i18n.t('Search')} placement="right">
+					<Tooltip content={'Search'} placement="right">
 						<button
 							class=" cursor-pointer flex rounded-xl hover:bg-gray-100 dark:hover:bg-gray-850 transition group"
 							on:click={(e) => {
@@ -724,7 +706,7 @@
 								showSearch.set(true);
 							}}
 							draggable="false"
-							aria-label={$i18n.t('Search')}
+							aria-label={'Search'}
 						>
 							<div class=" self-center flex items-center justify-center size-9">
 								<Search className="size-4.5" />
@@ -735,7 +717,7 @@
 
 				{#if ($config?.features?.enable_notes ?? false) && ($user?.role === 'admin' || ($user?.permissions?.features?.notes ?? true))}
 					<div class="">
-						<Tooltip content={$i18n.t('Notes')} placement="right">
+						<Tooltip content={'Notes'} placement="right">
 							<a
 								class=" cursor-pointer flex rounded-xl hover:bg-gray-100 dark:hover:bg-gray-850 transition group"
 								href="/notes"
@@ -747,7 +729,7 @@
 									itemClickHandler();
 								}}
 								draggable="false"
-								aria-label={$i18n.t('Notes')}
+								aria-label={'Notes'}
 							>
 								<div class=" self-center flex items-center justify-center size-9">
 									<Note className="size-4.5" />
@@ -759,7 +741,7 @@
 
 				{#if $user?.role === 'admin' || $user?.permissions?.workspace?.models || $user?.permissions?.workspace?.knowledge || $user?.permissions?.workspace?.prompts || $user?.permissions?.workspace?.tools}
 					<div class="">
-						<Tooltip content={$i18n.t('Workspace')} placement="right">
+						<Tooltip content={'Workspace'} placement="right">
 							<a
 								class=" cursor-pointer flex rounded-xl hover:bg-gray-100 dark:hover:bg-gray-850 transition group"
 								href="/workspace"
@@ -770,7 +752,7 @@
 									goto('/workspace');
 									itemClickHandler();
 								}}
-								aria-label={$i18n.t('Workspace')}
+								aria-label={'Workspace'}
 								draggable="false"
 							>
 								<div class=" self-center flex items-center justify-center size-9">
@@ -815,8 +797,8 @@
 									<img
 										src={`${WEBUI_API_BASE_URL}/users/${$user?.id}/profile/image`}
 										class=" size-6 object-cover rounded-full"
-										alt={$i18n.t('Open User Profile Menu')}
-										aria-label={$i18n.t('Open User Profile Menu')}
+										alt={'Open User Profile Menu'}
+										aria-label={'Open User Profile Menu'}
 									/>
 								</div>
 							</div>
@@ -871,10 +853,7 @@
 						{$WEBUI_NAME}
 					</div>
 				</a>
-				<Tooltip
-					content={$showSidebar ? $i18n.t('Close Sidebar') : $i18n.t('Open Sidebar')}
-					placement="bottom"
-				>
+				<Tooltip content={$showSidebar ? 'Close Sidebar' : 'Open Sidebar'} placement="bottom">
 					<button
 						class="flex rounded-xl size-8.5 justify-center items-center hover:bg-gray-100/50 dark:hover:bg-gray-850/50 transition {isWindows
 							? 'cursor-pointer'
@@ -882,7 +861,7 @@
 						on:click={() => {
 							showSidebar.set(!$showSidebar);
 						}}
-						aria-label={$showSidebar ? $i18n.t('Close Sidebar') : $i18n.t('Open Sidebar')}
+						aria-label={$showSidebar ? 'Close Sidebar' : 'Open Sidebar'}
 					>
 						<div class=" self-center p-1.5">
 							<Sidebar />
@@ -918,14 +897,14 @@
 							href="/"
 							draggable="false"
 							on:click={newChatHandler}
-							aria-label={$i18n.t('New Chat')}
+							aria-label={'New Chat'}
 						>
 							<div class="self-center">
 								<PencilSquare className=" size-4.5" strokeWidth="2" />
 							</div>
 
 							<div class="flex flex-1 self-center translate-y-[0.5px]">
-								<div class=" self-center text-sm font-primary">{$i18n.t('New Chat')}</div>
+								<div class=" self-center text-sm font-primary">{'New Chat'}</div>
 							</div>
 
 							<HotkeyHint name="newChat" className=" group-hover:visible invisible" />
@@ -940,14 +919,14 @@
 								showSearch.set(true);
 							}}
 							draggable="false"
-							aria-label={$i18n.t('Search')}
+							aria-label={'Search'}
 						>
 							<div class="self-center">
 								<Search strokeWidth="2" className="size-4.5" />
 							</div>
 
 							<div class="flex flex-1 self-center translate-y-[0.5px]">
-								<div class=" self-center text-sm font-primary">{$i18n.t('Search')}</div>
+								<div class=" self-center text-sm font-primary">{'Search'}</div>
 							</div>
 							<HotkeyHint name="search" className=" group-hover:visible invisible" />
 						</button>
@@ -961,14 +940,14 @@
 								href="/notes"
 								on:click={itemClickHandler}
 								draggable="false"
-								aria-label={$i18n.t('Notes')}
+								aria-label={'Notes'}
 							>
 								<div class="self-center">
 									<Note className="size-4.5" strokeWidth="2" />
 								</div>
 
 								<div class="flex self-center translate-y-[0.5px]">
-									<div class=" self-center text-sm font-primary">{$i18n.t('Notes')}</div>
+									<div class=" self-center text-sm font-primary">{'Notes'}</div>
 								</div>
 							</a>
 						</div>
@@ -982,7 +961,7 @@
 								href="/workspace"
 								on:click={itemClickHandler}
 								draggable="false"
-								aria-label={$i18n.t('Workspace')}
+								aria-label={'Workspace'}
 							>
 								<div class="self-center">
 									<svg
@@ -1002,7 +981,7 @@
 								</div>
 
 								<div class="flex self-center translate-y-[0.5px]">
-									<div class=" self-center text-sm font-primary">{$i18n.t('Workspace')}</div>
+									<div class=" self-center text-sm font-primary">{'Workspace'}</div>
 								</div>
 							</a>
 						</div>
@@ -1013,7 +992,7 @@
 					<Folder
 						id="sidebar-models"
 						className="px-2 mt-0.5"
-						name={$i18n.t('Models')}
+						name={'Models'}
 						chevron={false}
 						dragAndDrop={false}
 					>
@@ -1025,7 +1004,7 @@
 					<Folder
 						id="sidebar-channels"
 						className="px-2 mt-0.5"
-						name={$i18n.t('Channels')}
+						name={'Channels'}
 						chevron={false}
 						dragAndDrop={false}
 						onAdd={async () => {
@@ -1037,7 +1016,7 @@
 								}, 0);
 							}
 						}}
-						onAddLabel={$i18n.t('Create Channel')}
+						onAddLabel={'Create Channel'}
 					>
 						{#each $channels as channel}
 							<ChannelItem
@@ -1054,12 +1033,12 @@
 					<Folder
 						id="sidebar-folders"
 						className="px-2 mt-0.5"
-						name={$i18n.t('Folders')}
+						name={'Folders'}
 						chevron={false}
 						onAdd={() => {
 							showCreateFolderModal = true;
 						}}
-						onAddLabel={$i18n.t('New Folder')}
+						onAddLabel={'New Folder'}
 						on:drop={async (e) => {
 							const { type, id, item } = e.detail;
 
@@ -1106,7 +1085,7 @@
 				<Folder
 					id="sidebar-chats"
 					className="px-2 mt-0.5 relative"
-					name={$i18n.t('Chats')}
+					name={'Chats'}
 					chevron={false}
 					on:change={async (e) => {
 						selectedFolder.set(null);
@@ -1185,9 +1164,9 @@
 								}
 							}}
 							aria-pressed={editMode}
-							aria-label={editMode ? $i18n.t('Cancel') : $i18n.t('Edit')}
+							aria-label={editMode ? 'Cancel' : 'Edit'}
 						>
-							{editMode ? $i18n.t('Cancel') : $i18n.t('Edit')}
+							{editMode ? 'Cancel' : 'Edit'}
 						</button>
 					{/if}
 
@@ -1239,7 +1218,7 @@
 											}
 										}
 									}}
-									name={$i18n.t('Pinned')}
+									name={'Pinned'}
 								>
 									<div
 										class="ml-3 pl-1 mt-[1px] flex flex-col overflow-y-auto scrollbar-hidden border-s border-gray-100 dark:border-gray-900 text-gray-900 dark:text-gray-200"
@@ -1283,25 +1262,7 @@
 												? ''
 												: 'pt-5'} pb-1.5"
 										>
-											{$i18n.t(chat.time_range)}
-											<!-- localisation keys for time_range to be recognized from the i18next parser (so they don't get automatically removed):
-							{$i18n.t('Today')}
-							{$i18n.t('Yesterday')}
-							{$i18n.t('Previous 7 days')}
-							{$i18n.t('Previous 30 days')}
-							{$i18n.t('January')}
-							{$i18n.t('February')}
-							{$i18n.t('March')}
-							{$i18n.t('April')}
-							{$i18n.t('May')}
-							{$i18n.t('June')}
-							{$i18n.t('July')}
-							{$i18n.t('August')}
-							{$i18n.t('September')}
-							{$i18n.t('October')}
-							{$i18n.t('November')}
-							{$i18n.t('December')}
-							-->
+											{chat.time_range}
 										</div>
 									{/if}
 
@@ -1342,7 +1303,7 @@
 											class="w-full flex justify-center py-1 text-xs animate-pulse items-center gap-2"
 										>
 											<Spinner className=" size-4" />
-											<div class=" ">{$i18n.t('Loading...')}</div>
+											<div class=" ">{'Loading...'}</div>
 										</div>
 									</Loader>
 								{/if}
@@ -1351,7 +1312,7 @@
 									class="w-full flex justify-center py-1 text-xs animate-pulse items-center gap-2"
 								>
 									<Spinner className=" size-4" />
-									<div class=" ">{$i18n.t('Loading...')}</div>
+									<div class=" ">{'Loading...'}</div>
 								</div>
 							{/if}
 						</div>
@@ -1363,7 +1324,7 @@
 						class="px-2 py-2 sticky bottom-[60px] z-10 -mt-3 sidebar bg-gray-50/95 dark:bg-gray-950/95 backdrop-blur-sm border-t border-gray-200 dark:border-gray-800"
 						transition:slide={{ duration: 200 }}
 						role="region"
-						aria-label={$i18n.t('Chat selection actions')}
+						aria-label={'Chat selection actions'}
 					>
 						<div class="flex items-center justify-between gap-2">
 							<div
@@ -1371,32 +1332,30 @@
 								role="status"
 								aria-live="polite"
 							>
-								{$i18n.t('{{count}} chats selected', { count: selectedCount })}
+								{`${selectedCount} chats selected`}
 							</div>
 							<div class="flex gap-1.5">
 								<button
 									class="text-sm px-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-900 transition"
 									on:click={selectAllChats}
 									aria-label={selectedChatIds.size === $chats.length
-										? $i18n.t('Deselect all chats')
-										: $i18n.t('Select all chats')}
+										? 'Deselect all chats'
+										: 'Select all chats'}
 								>
-									{selectedChatIds.size === $chats.length
-										? $i18n.t('Deselect All')
-										: $i18n.t('Select All')}
+									{selectedChatIds.size === $chats.length ? 'Deselect All' : 'Select All'}
 								</button>
 								<button
 									class="text-sm px-3 py-1.5 rounded-xl bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
 									on:click={() => (showBulkDeleteConfirm = true)}
 									disabled={deleting || !canDelete}
-									aria-label={$i18n.t('Delete selected chats')}
+									aria-label={'Delete selected chats'}
 								>
 									{#if deleting}
 										<Spinner className="size-3.5" />
-										<span class="whitespace-nowrap">{$i18n.t('Deleting...')}</span>
+										<span class="whitespace-nowrap">{'Deleting...'}</span>
 									{:else}
 										<GarbageBin className="size-4" strokeWidth="2" />
-										<span class="whitespace-nowrap">{$i18n.t('Delete')}</span>
+										<span class="whitespace-nowrap">{'Delete'}</span>
 									{/if}
 								</button>
 							</div>
@@ -1426,8 +1385,8 @@
 									<img
 										src={`${WEBUI_API_BASE_URL}/users/${$user?.id}/profile/image`}
 										class=" size-6 object-cover rounded-full"
-										alt={$i18n.t('Open User Profile Menu')}
-										aria-label={$i18n.t('Open User Profile Menu')}
+										alt={'Open User Profile Menu'}
+										aria-label={'Open User Profile Menu'}
 									/>
 								</div>
 								<div class=" self-center font-medium">{$user?.name}</div>

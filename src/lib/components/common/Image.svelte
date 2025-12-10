@@ -15,9 +15,6 @@
 
 	export let dismissible = false;
 	export let onDismiss = () => {};
-
-	const i18n = getContext('i18n');
-
 	let _src = '';
 	$: _src = src.startsWith('/') ? `${WEBUI_BASE_URL}${src}` : src;
 
@@ -32,7 +29,7 @@
 		on:click={() => {
 			showImagePreview = true;
 		}}
-		aria-label={$i18n.t('Show image preview')}
+		aria-label={'Show image preview'}
 		type="button"
 	>
 		<img src={_src} {alt} class={imageClassName} draggable="false" data-cy="image" />
@@ -41,7 +38,7 @@
 	{#if dismissible}
 		<div class=" absolute -top-1 -right-1">
 			<button
-				aria-label={$i18n.t('Remove image')}
+				aria-label={'Remove image'}
 				class=" bg-white text-black border border-white rounded-full group-hover:visible invisible transition"
 				type="button"
 				on:click={() => {

@@ -18,8 +18,6 @@
 	import { user } from '$lib/stores';
 
 	const dispatch = createEventDispatcher();
-	const i18n = getContext('i18n');
-
 	export let boilerplate = '';
 	export let value = '';
 
@@ -123,7 +121,7 @@
 				onChange(_value);
 				await tick();
 
-				toast.success($i18n.t('Code formatted successfully'));
+				toast.success('Code formatted successfully');
 				return true;
 			}
 			return false;
@@ -135,7 +133,7 @@
 		basicSetup,
 		keymap.of([{ key: 'Tab', run: acceptCompletion }, indentWithTab]),
 		indentUnit.of('    '),
-		placeholder($i18n.t('Enter your code here...')),
+		placeholder('Enter your code here...'),
 		EditorView.updateListener.of((e) => {
 			if (e.docChanged) {
 				_value = e.state.doc.toString();

@@ -21,9 +21,6 @@
 	import Code from '$lib/components/icons/Code.svelte';
 	import UserGroup from '$lib/components/icons/UserGroup.svelte';
 	import SignOut from '$lib/components/icons/SignOut.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 	export let role = '';
 	export let help = false;
@@ -86,7 +83,7 @@
 				<div class=" self-center mr-3">
 					<Settings className="w-5 h-5" strokeWidth="1.5" />
 				</div>
-				<div class=" self-center truncate">{$i18n.t('Settings')}</div>
+				<div class=" self-center truncate">{'Settings'}</div>
 			</DropdownMenu.Item>
 
 			<DropdownMenu.Item
@@ -106,7 +103,7 @@
 				<div class=" self-center mr-3">
 					<ArchiveBox className="size-5" strokeWidth="1.5" />
 				</div>
-				<div class=" self-center truncate">{$i18n.t('Archived Chats')}</div>
+				<div class=" self-center truncate">{'Archived Chats'}</div>
 			</DropdownMenu.Item>
 
 			{#if role === 'admin'}
@@ -125,7 +122,7 @@
 					<div class=" self-center mr-3">
 						<Code className="size-5" strokeWidth="1.5" />
 					</div>
-					<div class=" self-center truncate">{$i18n.t('Playground')}</div>
+					<div class=" self-center truncate">{'Playground'}</div>
 				</DropdownMenu.Item>
 				<DropdownMenu.Item
 					as="a"
@@ -142,14 +139,14 @@
 					<div class=" self-center mr-3">
 						<UserGroup className="w-5 h-5" strokeWidth="1.5" />
 					</div>
-					<div class=" self-center truncate">{$i18n.t('Admin Panel')}</div>
+					<div class=" self-center truncate">{'Admin Panel'}</div>
 				</DropdownMenu.Item>
 			{/if}
 
 			{#if help}
 				<hr class=" border-gray-50 dark:border-gray-800 my-1 p-0" />
 
-				<!-- {$i18n.t('Help')} -->
+				<!-- {'Help'} -->
 
 				{#if $user?.role === 'admin'}
 					<DropdownMenu.Item
@@ -163,7 +160,7 @@
 						href="https://docs.openwebui.com"
 					>
 						<QuestionMarkCircle className="size-5" />
-						<div class="flex items-center">{$i18n.t('Documentation')}</div>
+						<div class="flex items-center">{'Documentation'}</div>
 					</DropdownMenu.Item>
 
 					<!-- Releases -->
@@ -178,7 +175,7 @@
 						href="https://github.com/open-webui/open-webui/releases"
 					>
 						<Map className="size-5" />
-						<div class="flex items-center">{$i18n.t('Releases')}</div>
+						<div class="flex items-center">{'Releases'}</div>
 					</DropdownMenu.Item>
 				{/if}
 
@@ -196,7 +193,7 @@
 					}}
 				>
 					<Keyboard className="size-5" />
-					<div class="flex items-center">{$i18n.t('Keyboard shortcuts')}</div>
+					<div class="flex items-center">{'Keyboard shortcuts'}</div>
 				</DropdownMenu.Item>
 			{/if}
 
@@ -216,7 +213,7 @@
 				<div class=" self-center mr-3">
 					<SignOut className="w-5 h-5" strokeWidth="1.5" />
 				</div>
-				<div class=" self-center truncate">{$i18n.t('Sign Out')}</div>
+				<div class=" self-center truncate">{'Sign Out'}</div>
 			</DropdownMenu.Item>
 
 			{#if usage}
@@ -225,7 +222,7 @@
 
 					<Tooltip
 						content={usage?.model_ids && usage?.model_ids.length > 0
-							? `${$i18n.t('Running')}: ${usage.model_ids.join(', ')} ✨`
+							? `${'Running'}: ${usage.model_ids.join(', ')} ✨`
 							: ''}
 					>
 						<div
@@ -245,7 +242,7 @@
 
 							<div class=" ">
 								<span class="">
-									{$i18n.t('Active Users')}:
+									{'Active Users'}:
 								</span>
 								<span class=" font-semibold">
 									{usage?.user_ids?.length}

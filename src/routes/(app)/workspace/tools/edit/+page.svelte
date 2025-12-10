@@ -9,9 +9,6 @@
 	import { compareVersion, extractFrontmatter } from '$lib/utils';
 	import { onMount, getContext } from 'svelte';
 	import { toast } from 'svelte-sonner';
-
-	const i18n = getContext('i18n');
-
 	let tool = null;
 
 	const saveHandler = async (data) => {
@@ -21,13 +18,7 @@
 		if (compareVersion(manifest?.required_open_webui_version ?? '0.0.0', WEBUI_VERSION)) {
 			console.log('Version is lower than required');
 			toast.error(
-				$i18n.t(
-					'Open WebUI version (v{{OPEN_WEBUI_VERSION}}) is lower than required version (v{{REQUIRED_VERSION}})',
-					{
-						OPEN_WEBUI_VERSION: WEBUI_VERSION,
-						REQUIRED_VERSION: manifest?.required_open_webui_version ?? '0.0.0'
-					}
-				)
+				`Open WebUI version (v${WEBUI_VERSION}) is lower than required version (v${manifest?.required_open_webui_version ?? '0.0.0'})`
 			);
 			return;
 		}
@@ -44,7 +35,7 @@
 		});
 
 		if (res) {
-			toast.success($i18n.t('Tool updated successfully'));
+			toast.success('Tool updated successfully');
 			tools.set(await getTools(localStorage.token));
 
 			// await goto('/workspace/tools');

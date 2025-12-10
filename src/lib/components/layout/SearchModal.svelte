@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { getContext, onDestroy, onMount, tick } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import Modal from '$lib/components/common/Modal.svelte';
 	import SearchInput from './Sidebar/SearchInput.svelte';
 	import { getChatById, getChatList, searchChats } from '$lib/apis/chats';
@@ -26,7 +24,7 @@
 
 	let actions = [
 		{
-			label: $i18n.t('Start a new conversation'),
+			label: 'Start a new conversation',
 			onClick: async () => {
 				await goto(`/${query ? `?q=${query}` : ''}`);
 				show = false;
@@ -101,7 +99,7 @@
 				messages = [];
 			}
 		} else {
-			toast.error($i18n.t('Failed to load chat preview'));
+			toast.error('Failed to load chat preview');
 			selectedChat = null;
 			messages = null;
 			history = null;
@@ -231,7 +229,7 @@
 			($user?.role === 'admin' || ($user?.permissions?.features?.notes ?? true))
 				? [
 						{
-							label: $i18n.t('Create a new note'),
+							label: 'Create a new note',
 							onClick: async () => {
 								await goto(`/notes?content=${query}`);
 								show = false;
@@ -260,7 +258,7 @@
 			<SearchInput
 				bind:value={query}
 				on:input={searchHandler}
-				placeholder={$i18n.t('Search')}
+				placeholder={'Search'}
 				showClearButton={true}
 				onFocus={() => {
 					selectedIdx = null;
@@ -298,7 +296,7 @@
 				class="flex flex-col overflow-y-auto h-96 md:h-[40rem] max-h-full scrollbar-hidden w-full flex-1 pr-2"
 			>
 				<div class="w-full text-xs text-gray-500 dark:text-gray-500 font-medium pb-2 px-2">
-					{$i18n.t('Actions')}
+					{'Actions'}
 				</div>
 
 				{#each actions as action, idx (action.label)}
@@ -321,7 +319,7 @@
 						</div>
 						<div class=" flex-1 text-left">
 							<div class="text-ellipsis line-clamp-1 w-full">
-								{$i18n.t(action.label)}
+								{action.label}
 							</div>
 						</div>
 					</button>
@@ -332,7 +330,7 @@
 
 					{#if chatList.length === 0}
 						<div class="text-xs text-gray-500 dark:text-gray-400 text-center px-5 py-4">
-							{$i18n.t('No results found')}
+							{'No results found'}
 						</div>
 					{/if}
 
@@ -343,25 +341,7 @@
 									? ''
 									: 'pt-5'} pb-2 px-2"
 							>
-								{$i18n.t(chat.time_range)}
-								<!-- localisation keys for time_range to be recognized from the i18next parser (so they don't get automatically removed):
-							{$i18n.t('Today')}
-							{$i18n.t('Yesterday')}
-							{$i18n.t('Previous 7 days')}
-							{$i18n.t('Previous 30 days')}
-							{$i18n.t('January')}
-							{$i18n.t('February')}
-							{$i18n.t('March')}
-							{$i18n.t('April')}
-							{$i18n.t('May')}
-							{$i18n.t('June')}
-							{$i18n.t('July')}
-							{$i18n.t('August')}
-							{$i18n.t('September')}
-							{$i18n.t('October')}
-							{$i18n.t('November')}
-							{$i18n.t('December')}
-							-->
+								{chat.time_range}
 							</div>
 						{/if}
 
@@ -389,16 +369,14 @@
 							</div>
 
 							<div class=" pl-3 shrink-0 text-gray-500 dark:text-gray-400 text-xs">
-								{$i18n.t(
-									dayjs(chat?.updated_at * 1000).calendar(null, {
-										sameDay: '[Today]',
-										nextDay: '[Tomorrow]',
-										nextWeek: 'dddd',
-										lastDay: '[Yesterday]',
-										lastWeek: '[Last] dddd',
-										sameElse: 'L' // use localized format, otherwise dayjs.calendar() defaults to DD/MM/YYYY
-									})
-								)}
+								{dayjs(chat?.updated_at * 1000).calendar(null, {
+									sameDay: '[Today]',
+									nextDay: '[Tomorrow]',
+									nextWeek: 'dddd',
+									lastDay: '[Yesterday]',
+									lastWeek: '[Last] dddd',
+									sameElse: 'L'
+								})}
 							</div>
 						</a>
 					{/each}
@@ -413,7 +391,7 @@
 						>
 							<div class="w-full flex justify-center py-4 text-xs animate-pulse items-center gap-2">
 								<Spinner className=" size-4" />
-								<div class=" ">{$i18n.t('Loading...')}</div>
+								<div class=" ">{'Loading...'}</div>
 							</div>
 						</Loader>
 					{/if}
@@ -431,7 +409,7 @@
 					<div
 						class="w-full h-full flex justify-center items-center text-gray-500 dark:text-gray-400 text-sm"
 					>
-						{$i18n.t('Select a conversation to preview')}
+						{'Select a conversation to preview'}
 					</div>
 				{:else}
 					<div class="w-full h-full flex flex-col">

@@ -1,7 +1,5 @@
 <script>
 	import { getContext, onMount } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import { WEBUI_BASE_URL } from '$lib/constants';
 
 	import Marquee from './common/Marquee.svelte';
@@ -68,20 +66,20 @@
 					<Marquee
 						duration={5000}
 						words={[
-							$i18n.t('Explore the cosmos'),
-							$i18n.t('Unlock mysteries'),
-							$i18n.t('Chart new frontiers'),
-							$i18n.t('Dive into knowledge'),
-							$i18n.t('Discover wonders'),
-							$i18n.t('Ignite curiosity'),
-							$i18n.t('Forge new paths'),
-							$i18n.t('Unravel secrets'),
-							$i18n.t('Pioneer insights'),
-							$i18n.t('Embark on adventures')
+							'Explore the cosmos',
+							'Unlock mysteries',
+							'Chart new frontiers',
+							'Dive into knowledge',
+							'Discover wonders',
+							'Ignite curiosity',
+							'Forge new paths',
+							'Unravel secrets',
+							'Pioneer insights',
+							'Embark on adventures'
 						]}
 					/>
 
-					<div class="mt-0.5">{$i18n.t(`wherever you are`)}</div>
+					<div class="mt-0.5">{'wherever you are'}</div>
 				</div>
 
 				<div class="flex justify-center mt-8">
@@ -96,7 +94,7 @@
 							<ArrowRightCircle className="size-6" />
 						</button>
 						<div id="get-started" class="mt-1.5 font-primary text-base font-medium">
-							{$i18n.t(`Get started`)}
+							{'Get started'}
 						</div>
 					</div>
 				</div>

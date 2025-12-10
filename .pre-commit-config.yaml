@@ -37,21 +37,13 @@ repos:
         verbose: true
         exclude: alembic|migrations
 
-      - id: i18n-parse
-        name: i18n-parse
-        entry: npm run i18n:parse
-        language: system
-        types_or: [javascript, jsx, ts, tsx, svelte]
-        pass_filenames: false
-        verbose: false
-
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: "v4.0.0-alpha.8"
     hooks:
       - id: prettier
         args: ['--log-level=error']
         types_or: [javascript, jsx, ts, tsx, json, svelte, css, markdown, html]
-        exclude: '^(package-lock\.json|.*\.lock|src/lib/i18n/.*|CHANGELOG\.md)$'
+        exclude: '^(package-lock\.json|.*\.lock||CHANGELOG\.md)$'
         additional_dependencies:
           - prettier@3.3.3
           - prettier-plugin-svelte@3.2.6
@@ -60,4 +52,4 @@ repos:
     rev: "v2.4.1"
     hooks:
       - id: codespell
-        exclude: '^(CODE_OF_CONDUCT\.md|i18n/.*|.*\.lock|.*\.css|.*-bundle\.js|locales/.*|emoji-shortcodes\.json|CHANGELOG\.md)$|src/lib/i18n/.*'
+        exclude: '^(CODE_OF_CONDUCT\.md|.*\.lock|.*\.css|.*-bundle\.js|locales/.*|emoji-shortcodes\.json|CHANGELOG\.md)$'

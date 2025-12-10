@@ -34,15 +34,13 @@
 	import ChatBubbleOval from '$lib/components/icons/ChatBubbleOval.svelte';
 
 	import ModelItem from './ModelItem.svelte';
-
-	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
 
 	export let id = '';
 	export let value = '';
-	export let placeholder = $i18n.t('Select a model');
+	export let placeholder = 'Select a model';
 	export let searchEnabled = true;
-	export let searchPlaceholder = $i18n.t('Search a model');
+	export let searchPlaceholder = 'Search a model';
 
 	export let items: {
 		label: string;
@@ -253,7 +251,7 @@
 						class="w-full text-sm bg-transparent outline-hidden"
 						placeholder={searchPlaceholder}
 						autocomplete="off"
-						aria-label={$i18n.t('Search In Models')}
+						aria-label={'Search In Models'}
 						on:keydown={(e) => {
 							if (e.code === 'Enter' && filteredItems.length > 0) {
 								value = filteredItems[selectedModelIdx].value;
@@ -304,7 +302,7 @@
 										selectedTag = '';
 									}}
 								>
-									{$i18n.t('All')}
+									{'All'}
 								</button>
 							{/if}
 
@@ -319,7 +317,7 @@
 										selectedConnectionType = 'local';
 									}}
 								>
-									{$i18n.t('Local')}
+									{'Local'}
 								</button>
 							{/if}
 
@@ -334,7 +332,7 @@
 										selectedConnectionType = 'external';
 									}}
 								>
-									{$i18n.t('External')}
+									{'External'}
 								</button>
 							{/if}
 
@@ -349,7 +347,7 @@
 										selectedConnectionType = 'direct';
 									}}
 								>
-									{$i18n.t('Direct')}
+									{'Direct'}
 								</button>
 							{/if}
 
@@ -392,7 +390,7 @@
 				{:else}
 					<div class="">
 						<div class="block px-3 py-2 text-sm text-gray-700 dark:text-gray-100">
-							{$i18n.t('No results found')}
+							{'No results found'}
 						</div>
 					</div>
 				{/each}

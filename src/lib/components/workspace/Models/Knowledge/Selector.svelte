@@ -9,8 +9,6 @@
 	import Search from '$lib/components/icons/Search.svelte';
 	import { getNoteList } from '$lib/apis/notes';
 	import dayjs from 'dayjs';
-
-	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
 
 	export let onClose: Function = () => {};
@@ -68,7 +66,7 @@
 							legacy: true,
 							type: 'collection',
 							description: 'Deprecated (legacy collection), please create a new knowledge base.',
-							title: $i18n.t('All Documents'),
+							title: 'All Documents',
 							collection_names: legacy_documents.map((item) => item.id)
 						},
 
@@ -157,7 +155,7 @@
 					<input
 						class=" w-full text-sm pr-4 py-1 rounded-r-xl outline-hidden bg-transparent"
 						bind:value={query}
-						placeholder={$i18n.t('Search Knowledge')}
+						placeholder={'Search Knowledge'}
 					/>
 				</div>
 			</div>
@@ -165,7 +163,7 @@
 			<div class="max-h-56 overflow-y-scroll">
 				{#if filteredItems.length === 0}
 					<div class="text-center text-xs text-gray-500 dark:text-gray-400 py-4">
-						{$i18n.t('No knowledge found')}
+						{'No knowledge found'}
 					</div>
 				{:else}
 					{#each filteredItems as item}

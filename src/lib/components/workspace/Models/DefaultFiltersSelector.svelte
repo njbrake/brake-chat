@@ -2,9 +2,6 @@
 	import { getContext, onMount } from 'svelte';
 	import Checkbox from '$lib/components/common/Checkbox.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let filters = [];
 	export let selectedFilterIds = [];
 
@@ -24,7 +21,7 @@
 
 <div>
 	<div class="flex w-full justify-between mb-1">
-		<div class=" self-center text-sm font-medium">{$i18n.t('Default Filters')}</div>
+		<div class=" self-center text-sm font-medium">{'Default Filters'}</div>
 	</div>
 
 	<div class="flex flex-col">

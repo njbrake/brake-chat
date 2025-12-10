@@ -36,9 +36,6 @@
 	import ArchiveBox from '$lib/components/icons/ArchiveBox.svelte';
 	import Messages from '$lib/components/chat/Messages.svelte';
 	import Download from '$lib/components/icons/Download.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let shareEnabled: boolean = false;
 
 	export let shareHandler: Function;
@@ -310,7 +307,7 @@
 						d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
 					/>
 				</svg>
-				<div class="flex items-center">{$i18n.t('Settings')}</div>
+				<div class="flex items-center">{'Settings'}</div>
 			</DropdownMenu.Item> -->
 
 			{#if $mobile && ($user?.role === 'admin' || ($user?.permissions.chat?.controls ?? true))}
@@ -325,7 +322,7 @@
 					}}
 				>
 					<AdjustmentsHorizontal className=" size-4" strokeWidth="1.5" />
-					<div class="flex items-center">{$i18n.t('Controls')}</div>
+					<div class="flex items-center">{'Controls'}</div>
 				</DropdownMenu.Item>
 			{/if}
 
@@ -340,7 +337,7 @@
 				}}
 			>
 				<Map className=" size-4" strokeWidth="1.5" />
-				<div class="flex items-center">{$i18n.t('Overview')}</div>
+				<div class="flex items-center">{'Overview'}</div>
 			</DropdownMenu.Item>
 
 			{#if ($artifactContents ?? []).length > 0}
@@ -355,7 +352,7 @@
 					}}
 				>
 					<Cube className=" size-4" strokeWidth="1.5" />
-					<div class="flex items-center">{$i18n.t('Artifacts')}</div>
+					<div class="flex items-center">{'Artifacts'}</div>
 				</DropdownMenu.Item>
 			{/if}
 
@@ -370,7 +367,7 @@
 					}}
 				>
 					<Share strokeWidth="1.5" />
-					<div class="flex items-center">{$i18n.t('Share')}</div>
+					<div class="flex items-center">{'Share'}</div>
 				</DropdownMenu.Item>
 			{/if}
 
@@ -380,7 +377,7 @@
 				>
 					<Download strokeWidth="1.5" />
 
-					<div class="flex items-center">{$i18n.t('Download')}</div>
+					<div class="flex items-center">{'Download'}</div>
 				</DropdownMenu.SubTrigger>
 				<DropdownMenu.SubContent
 					class="w-full rounded-2xl p-1 z-50 bg-white dark:bg-gray-850 dark:text-white border border-gray-100  dark:border-gray-800 shadow-lg max-h-52 overflow-y-auto scrollbar-hidden"
@@ -394,7 +391,7 @@
 								downloadJSONExport();
 							}}
 						>
-							<div class="flex items-center line-clamp-1">{$i18n.t('Export chat (.json)')}</div>
+							<div class="flex items-center line-clamp-1">{'Export chat (.json)'}</div>
 						</DropdownMenu.Item>
 					{/if}
 					<DropdownMenu.Item
@@ -403,7 +400,7 @@
 							downloadTxt();
 						}}
 					>
-						<div class="flex items-center line-clamp-1">{$i18n.t('Plain text (.txt)')}</div>
+						<div class="flex items-center line-clamp-1">{'Plain text (.txt)'}</div>
 					</DropdownMenu.Item>
 
 					<DropdownMenu.Item
@@ -412,7 +409,7 @@
 							downloadPdf();
 						}}
 					>
-						<div class="flex items-center line-clamp-1">{$i18n.t('PDF document (.pdf)')}</div>
+						<div class="flex items-center line-clamp-1">{'PDF document (.pdf)'}</div>
 					</DropdownMenu.Item>
 				</DropdownMenu.SubContent>
 			</DropdownMenu.Sub>
@@ -426,12 +423,12 @@
 					});
 
 					if (res) {
-						toast.success($i18n.t('Copied to clipboard'));
+						toast.success('Copied to clipboard');
 					}
 				}}
 			>
 				<Clipboard className=" size-4" strokeWidth="1.5" />
-				<div class="flex items-center">{$i18n.t('Copy')}</div>
+				<div class="flex items-center">{'Copy'}</div>
 			</DropdownMenu.Item>
 
 			{#if !$temporaryChatEnabled && chat?.id}
@@ -443,7 +440,7 @@
 					>
 						<Folder strokeWidth="1.5" />
 
-						<div class="flex items-center">{$i18n.t('Move')}</div>
+						<div class="flex items-center">{'Move'}</div>
 					</DropdownMenu.SubTrigger>
 					<DropdownMenu.SubContent
 						class="w-full rounded-2xl p-1 z-50 bg-white dark:bg-gray-850 dark:text-white border border-gray-100  dark:border-gray-800 shadow-lg max-h-52 overflow-y-auto scrollbar-hidden"
@@ -472,7 +469,7 @@
 					}}
 				>
 					<ArchiveBox className="size-4" strokeWidth="1.5" />
-					<div class="flex items-center">{$i18n.t('Archive')}</div>
+					<div class="flex items-center">{'Archive'}</div>
 				</DropdownMenu.Item>
 
 				<hr class="border-gray-50 dark:border-gray-800 my-1" />

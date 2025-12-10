@@ -6,9 +6,6 @@
 	import Dropdown from '$lib/components/common/Dropdown.svelte';
 	import LineSpace from '$lib/components/icons/LineSpace.svelte';
 	import LineSpaceSmaller from '$lib/components/icons/LineSpaceSmaller.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let onRegenerate: Function = (prompt = null) => {};
 	export let onClose: Function = () => {};
 
@@ -40,7 +37,7 @@
 					type="text"
 					id="floating-message-input"
 					class="bg-transparent outline-hidden w-full flex-1 text-sm"
-					placeholder={$i18n.t('Suggest a change')}
+					placeholder={'Suggest a change'}
 					bind:value={inputValue}
 					autocomplete="off"
 					on:keydown={(e) => {
@@ -99,27 +96,27 @@
 						d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
 					/>
 				</svg>
-				<div class="flex items-center">{$i18n.t('Try Again')}</div>
+				<div class="flex items-center">{'Try Again'}</div>
 			</DropdownMenu.Item>
 
 			<DropdownMenu.Item
 				class="flex  gap-2  items-center px-3 py-1.5 text-sm  cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl"
 				on:click={() => {
-					onRegenerate($i18n.t('Add Details'));
+					onRegenerate('Add Details');
 				}}
 			>
 				<LineSpace strokeWidth="2" />
-				<div class="flex items-center">{$i18n.t('Add Details')}</div>
+				<div class="flex items-center">{'Add Details'}</div>
 			</DropdownMenu.Item>
 
 			<DropdownMenu.Item
 				class="flex  gap-2  items-center px-3 py-1.5 text-sm  cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl"
 				on:click={() => {
-					onRegenerate($i18n.t('More Concise'));
+					onRegenerate('More Concise');
 				}}
 			>
 				<LineSpaceSmaller strokeWidth="2" />
-				<div class="flex items-center">{$i18n.t('More Concise')}</div>
+				<div class="flex items-center">{'More Concise'}</div>
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</div>

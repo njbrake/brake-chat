@@ -2,8 +2,6 @@
 	import { DropdownMenu } from 'bits-ui';
 	import { flyAndScale } from '$lib/utils/transitions';
 	import { getContext, createEventDispatcher } from 'svelte';
-
-	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
 
 	import Dropdown from '$lib/components/common/Dropdown.svelte';
@@ -28,7 +26,7 @@
 		}
 	}}
 >
-	<Tooltip content={$i18n.t('More')}>
+	<Tooltip content={'More'}>
 		<button
 			on:click={(e) => {
 				e.stopPropagation();
@@ -54,7 +52,7 @@
 				}}
 			>
 				<Pencil />
-				<div class="flex items-center">{$i18n.t('Edit')}</div>
+				<div class="flex items-center">{'Edit'}</div>
 			</DropdownMenu.Item>
 
 			<DropdownMenu.Item
@@ -65,7 +63,7 @@
 			>
 				<Download />
 
-				<div class="flex items-center">{$i18n.t('Export')}</div>
+				<div class="flex items-center">{'Export'}</div>
 			</DropdownMenu.Item>
 
 			<DropdownMenu.Item
@@ -75,7 +73,7 @@
 				}}
 			>
 				<GarbageBin />
-				<div class="flex items-center">{$i18n.t('Delete')}</div>
+				<div class="flex items-center">{'Delete'}</div>
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</div>
