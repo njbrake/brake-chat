@@ -31,7 +31,6 @@ from open_webui.models.chats import Chats
 from open_webui.models.users import UserNameResponse, Users
 from open_webui.socket.utils import RedisDict, RedisLock, YdocManager
 from open_webui.tasks import create_task, stop_item_tasks
-from open_webui.utils.access_control import has_access
 from open_webui.utils.auth import decode_token
 from open_webui.utils.redis import (
     get_redis_connection,
@@ -347,7 +346,7 @@ async def channel_events(sid, data):
 @sio.on("ydoc:document:join")
 async def ydoc_document_join(sid, data):
     """Handle user joining a document"""
-    user = SESSION_POOL.get(sid)
+    SESSION_POOL.get(sid)
 
     try:
         document_id = data["document_id"]
