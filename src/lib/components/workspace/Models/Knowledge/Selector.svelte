@@ -7,8 +7,6 @@
 	import { knowledge } from '$lib/stores';
 	import Dropdown from '$lib/components/common/Dropdown.svelte';
 	import Search from '$lib/components/icons/Search.svelte';
-	import { getNoteList } from '$lib/apis/notes';
-	import dayjs from 'dayjs';
 	const dispatch = createEventDispatcher();
 
 	export let onClose: Function = () => {};
@@ -38,19 +36,6 @@
 	};
 
 	onMount(async () => {
-		let notes = await getNoteList(localStorage.token).catch(() => {
-			return [];
-		});
-
-		notes = notes.map((note) => {
-			return {
-				...note,
-				type: 'note',
-				name: note.title,
-				description: dayjs(note.updated_at / 1000000).fromNow()
-			};
-		});
-
 		let legacy_documents = knowledgeItems
 			.filter((item) => item?.meta?.document)
 			.map((item) => ({
@@ -116,7 +101,7 @@
 					]
 				: [];
 
-		items = [...notes, ...collections, ...legacy_collections].map((item) => {
+		items = [...collections, ...legacy_collections].map((item) => {
 			return {
 				...item,
 				...(item?.legacy || item?.meta?.legacy || item?.meta?.document ? { legacy: true } : {})
@@ -192,12 +177,6 @@
 											class="bg-gray-500/20 text-gray-700 dark:text-gray-200 rounded-sm uppercase text-xs font-semibold px-1 shrink-0"
 										>
 											File
-										</div>
-									{:else if item?.type === 'note'}
-										<div
-											class="bg-blue-500/20 text-blue-700 dark:text-blue-200 rounded-sm uppercase text-xs font-semibold px-1 shrink-0"
-										>
-											Note
 										</div>
 									{:else}
 										<div

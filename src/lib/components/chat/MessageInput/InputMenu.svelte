@@ -13,7 +13,6 @@
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import DocumentArrowUp from '$lib/components/icons/DocumentArrowUp.svelte';
 	import Camera from '$lib/components/icons/Camera.svelte';
-	import Note from '$lib/components/icons/Note.svelte';
 	import Clip from '$lib/components/icons/Clip.svelte';
 	import ChatBubbleOval from '$lib/components/icons/ChatBubbleOval.svelte';
 	import Refresh from '$lib/components/icons/Refresh.svelte';
@@ -24,7 +23,6 @@
 	import ChevronLeft from '$lib/components/icons/ChevronLeft.svelte';
 	import PageEdit from '$lib/components/icons/PageEdit.svelte';
 	import Chats from './InputMenu/Chats.svelte';
-	import Notes from './InputMenu/Notes.svelte';
 	import Knowledge from './InputMenu/Knowledge.svelte';
 	import AttachWebpageModal from './AttachWebpageModal.svelte';
 	import GlobeAlt from '$lib/components/icons/GlobeAlt.svelte';
@@ -213,38 +211,6 @@
 							<div class="line-clamp-1">{'Attach Webpage'}</div>
 						</DropdownMenu.Item>
 					</Tooltip>
-
-					{#if $config?.features?.enable_notes ?? false}
-						<Tooltip
-							content={fileUploadCapableModels.length !== selectedModels.length
-								? 'Model(s) do not support file upload'
-								: !fileUploadEnabled
-									? 'You do not have permission to upload files.'
-									: ''}
-							className="w-full"
-						>
-							<button
-								class="flex gap-2 w-full items-center px-3 py-1.5 text-sm cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-xl {!fileUploadEnabled
-									? 'opacity-50'
-									: ''}"
-								on:click={() => {
-									tab = 'notes';
-								}}
-							>
-								<PageEdit />
-
-								<div class="flex items-center w-full justify-between">
-									<div class=" line-clamp-1">
-										{'Attach Notes'}
-									</div>
-
-									<div class="text-gray-500">
-										<ChevronRight />
-									</div>
-								</div>
-							</button>
-						</Tooltip>
-					{/if}
 
 					{#if ($knowledge ?? []).length > 0}
 						<Tooltip
@@ -474,25 +440,6 @@
 					</button>
 
 					<Knowledge {onSelect} />
-				</div>
-			{:else if tab === 'notes'}
-				<div in:fly={{ x: 20, duration: 150 }}>
-					<button
-						class="flex w-full justify-between gap-2 items-center px-3 py-1.5 text-sm cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50"
-						on:click={() => {
-							tab = '';
-						}}
-					>
-						<ChevronLeft />
-
-						<div class="flex items-center w-full justify-between">
-							<div>
-								{'Notes'}
-							</div>
-						</div>
-					</button>
-
-					<Notes {onSelect} />
 				</div>
 			{:else if tab === 'chats'}
 				<div in:fly={{ x: 20, duration: 150 }}>
