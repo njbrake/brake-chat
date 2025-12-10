@@ -1138,7 +1138,7 @@ async def process_chat_payload(request, form_data, user, metadata, model):
         files.extend(knowledge_files)
         form_data["files"] = files
 
-    variables = form_data.pop("variables", None)
+    form_data.pop("variables", None)
 
     # Process the form_data through the pipeline
     try:
@@ -1199,7 +1199,6 @@ async def process_chat_payload(request, form_data, user, metadata, model):
     files = form_data.pop("files", None)
 
     prompt = get_last_user_message(form_data["messages"])
-    # TODO: re-enable URL extraction from prompt
     # urls = []
     # if prompt and len(prompt or "") < 500 and (not files or len(files) == 0):
     #     urls = extract_urls(prompt)
@@ -1855,7 +1854,7 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
 
     # Streaming response
     if event_emitter and event_caller:
-        task_id = str(uuid4())  # Create a unique task ID.
+        str(uuid4())  # Create a unique task ID.
         model_id = form_data.get("model", "")
 
         def split_content_and_whitespace(content):

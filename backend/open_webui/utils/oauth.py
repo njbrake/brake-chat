@@ -255,7 +255,7 @@ def get_discovery_urls(server_url) -> list[str]:
     return urls
 
 
-# TODO: Some OAuth providers require Initial Access Tokens (IATs) for dynamic client registration.
+# Some OAuth providers require Initial Access Tokens (IATs) for dynamic client registration.
 # This is not currently supported.
 async def get_oauth_client_info_with_dynamic_client_registration(
     request,
@@ -421,7 +421,6 @@ class OAuthClientManager:
         return True
 
     async def _preflight_authorization_url(self, client, client_info: OAuthClientInformationFull) -> bool:
-        # TODO: Replace this logic with a more robust OAuth client registration validation
         # Only perform preflight checks for Starlette OAuth clients
         if not hasattr(client, "create_authorization_url"):
             return True

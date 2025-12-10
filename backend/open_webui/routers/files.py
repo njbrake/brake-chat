@@ -602,7 +602,6 @@ async def get_file_content_by_id_and_name(id: str, user=Depends(get_verified_use
             )
         # File path doesn’t exist, return the content as .txt if possible
         file_content = file.content.get("content", "")
-        file_name = file.filename
 
         # Create a generator that encodes the file content
         def generator():

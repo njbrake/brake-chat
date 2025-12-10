@@ -184,7 +184,6 @@ async def ldap_auth(request: Request, response: Response, form_data: LdapForm):
         )
 
     # NOW load LDAP config variables
-    LDAP_SERVER_LABEL = request.app.state.config.LDAP_SERVER_LABEL
     LDAP_SERVER_HOST = request.app.state.config.LDAP_SERVER_HOST
     LDAP_SERVER_PORT = request.app.state.config.LDAP_SERVER_PORT
     LDAP_ATTRIBUTE_FOR_MAIL = request.app.state.config.LDAP_ATTRIBUTE_FOR_MAIL
@@ -467,7 +466,6 @@ async def signin(request: Request, response: Response, form_data: SigninForm):
     else:
         password_bytes = form_data.password.encode("utf-8")
         if len(password_bytes) > 72:
-            # TODO: Implement other hashing algorithms that support longer passwords
             log.info("Password too long, truncating to 72 bytes for bcrypt")
             password_bytes = password_bytes[:72]
 

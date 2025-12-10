@@ -18,7 +18,6 @@ from langchain_core.documents import Document
 from langchain_text_splitters import MarkdownHeaderTextSplitter
 from open_webui.config import (
     DEFAULT_LOCALE,
-    ENV,
     RAG_EMBEDDING_CONTENT_PREFIX,
     RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE,
     RAG_EMBEDDING_QUERY_PREFIX,
@@ -29,6 +28,7 @@ from open_webui.constants import ERROR_MESSAGES
 from open_webui.env import (
     DEVICE_TYPE,
     DOCKER,
+    ENV,
     SENTENCE_TRANSFORMERS_BACKEND,
     SENTENCE_TRANSFORMERS_CROSS_ENCODER_BACKEND,
     SENTENCE_TRANSFORMERS_CROSS_ENCODER_MODEL_KWARGS,
