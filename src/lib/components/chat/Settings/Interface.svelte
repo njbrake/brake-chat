@@ -83,7 +83,6 @@
 
 	// Admin - Show Update Available Toast
 	let showUpdateToast = true;
-	let showChangelog = true;
 
 	let showEmojiInCall = false;
 	let voiceInterruption = false;
@@ -201,7 +200,6 @@
 
 		showUsername = $settings?.showUsername ?? false;
 		showUpdateToast = $settings?.showUpdateToast ?? true;
-		showChangelog = $settings?.showChangelog ?? true;
 
 		showEmojiInCall = $settings?.showEmojiInCall ?? false;
 		voiceInterruption = $settings?.voiceInterruption ?? false;
@@ -551,25 +549,6 @@
 								bind:state={showUpdateToast}
 								on:change={() => {
 									saveSettings({ showUpdateToast });
-								}}
-							/>
-						</div>
-					</div>
-				</div>
-
-				<div>
-					<div class=" py-0.5 flex w-full justify-between">
-						<div id="whats-new-label" class=" self-center text-xs">
-							{`Show "What's New" modal on login`}
-						</div>
-
-						<div class="flex items-center gap-2 p-1">
-							<Switch
-								ariaLabelledbyId="whats-new-label"
-								tooltip={true}
-								bind:state={showChangelog}
-								on:change={() => {
-									saveSettings({ showChangelog });
 								}}
 							/>
 						</div>

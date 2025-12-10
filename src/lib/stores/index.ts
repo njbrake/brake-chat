@@ -78,7 +78,6 @@ export const showSearch = writable(false);
 export const showSettings = writable(false);
 export const showShortcuts = writable(false);
 export const showArchivedChats = writable(false);
-export const showChangelog = writable(false);
 
 export const showControls = writable(false);
 export const showEmbeds = writable(false);
@@ -118,7 +117,6 @@ type Settings = {
 	toolServers?: never[];
 	detectArtifacts?: boolean;
 	showUpdateToast?: boolean;
-	showChangelog?: boolean;
 	showEmojiInCall?: boolean;
 	voiceInterruption?: boolean;
 	collapseCodeBlocks?: boolean;
