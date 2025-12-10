@@ -3,8 +3,6 @@
 
 	import { onMount, getContext, createEventDispatcher, onDestroy, tick } from 'svelte';
 	import * as FocusTrap from 'focus-trap';
-
-	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
 
 	import { fade } from 'svelte/transition';
@@ -14,8 +12,8 @@
 	export let title = '';
 	export let message = '';
 
-	export let cancelLabel = $i18n.t('Cancel');
-	export let confirmLabel = $i18n.t('Confirm');
+	export let cancelLabel = 'Cancel';
+	export let confirmLabel = 'Confirm';
 
 	export let onConfirm = () => {};
 
@@ -113,7 +111,7 @@
 					{#if title !== ''}
 						{title}
 					{:else}
-						{$i18n.t('Confirm your action')}
+						{'Confirm your action'}
 					{/if}
 				</div>
 
@@ -123,13 +121,13 @@
 							{@const html = DOMPurify.sanitize(marked.parse(message))}
 							{@html html}
 						{:else}
-							{$i18n.t('This action cannot be undone. Do you wish to continue?')}
+							{'This action cannot be undone. Do you wish to continue?'}
 						{/if}
 
 						{#if input}
 							<textarea
 								bind:value={inputValue}
-								placeholder={inputPlaceholder ? inputPlaceholder : $i18n.t('Enter your message')}
+								placeholder={inputPlaceholder ? inputPlaceholder : 'Enter your message'}
 								class="w-full mt-2 rounded-lg px-4 py-2 text-sm dark:text-gray-300 dark:bg-gray-900 outline-hidden resize-none"
 								rows="3"
 								required

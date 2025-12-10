@@ -5,7 +5,6 @@
 	export let model = null;
 	export let feedbacks = [];
 	export let onClose: () => void = () => {};
-	const i18n = getContext('i18n');
 	import XMark from '$lib/components/icons/XMark.svelte';
 
 	const close = () => {
@@ -61,7 +60,7 @@
 					type="button"
 					on:click={close}
 				>
-					{$i18n.t('Close')}
+					{'Close'}
 				</button>
 			</div>
 		</div>

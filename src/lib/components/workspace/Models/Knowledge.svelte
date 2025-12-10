@@ -13,8 +13,6 @@
 	import { WEBUI_API_BASE_URL } from '$lib/constants';
 
 	export let selectedItems = [];
-	const i18n = getContext('i18n');
-
 	let loaded = false;
 
 	let filesInputElement = null;
@@ -22,7 +20,7 @@
 
 	const uploadFileHandler = async (file, fullContext: boolean = false) => {
 		if ($user?.role !== 'admin' && !($user?.permissions?.chat?.file_upload ?? true)) {
-			toast.error($i18n.t('You do not have permission to upload files.'));
+			toast.error('You do not have permission to upload files.');
 			return null;
 		}
 
@@ -42,7 +40,7 @@
 		};
 
 		if (fileItem.size == 0) {
-			toast.error($i18n.t('You cannot upload an empty file.'));
+			toast.error('You cannot upload an empty file.');
 			return null;
 		}
 
@@ -111,18 +109,14 @@
 					fileSize: file.size,
 					maxSize: ($config?.file?.max_size ?? 0) * 1024 * 1024
 				});
-				toast.error(
-					$i18n.t(`File size should not exceed {{maxSize}} MB.`, {
-						maxSize: $config?.file?.max_size
-					})
-				);
+				toast.error(`File size should not exceed ${$config?.file?.max_size} MB.`);
 				return;
 			}
 
 			if (!file['type'].startsWith('image/')) {
 				uploadFileHandler(file);
 			} else {
-				toast.error($i18n.t(`Unsupported file type.`));
+				toast.error('Unsupported file type.');
 			}
 		});
 	};
@@ -146,7 +140,7 @@
 			const _inputFiles = Array.from(inputFiles);
 			inputFilesHandler(_inputFiles);
 		} else {
-			toast.error($i18n.t(`File not found.`));
+			toast.error('File not found.');
 		}
 
 		filesInputElement.value = '';
@@ -158,12 +152,12 @@
 		<div class="mb-2">
 			<div class="flex w-full justify-between mb-1">
 				<div class=" self-center text-sm font-medium">
-					{$i18n.t('Knowledge')}
+					{'Knowledge'}
 				</div>
 			</div>
 
 			<div class=" text-xs dark:text-gray-500">
-				{$i18n.t('To attach knowledge base here, add them to the "Knowledge" workspace first.')}
+				{'To attach knowledge base here, add them to the "Knowledge" workspace first.'}
 			</div>
 		</div>
 	</slot>
@@ -211,7 +205,7 @@
 					<div
 						class=" px-3.5 py-1.5 font-medium hover:bg-black/5 dark:hover:bg-white/5 outline outline-1 outline-gray-100 dark:outline-gray-850 rounded-3xl"
 					>
-						{$i18n.t('Select Knowledge')}
+						{'Select Knowledge'}
 					</div>
 				</Selector>
 
@@ -221,7 +215,7 @@
 						type="button"
 						on:click={() => {
 							filesInputElement.click();
-						}}>{$i18n.t('Upload Files')}</button
+						}}>{'Upload Files'}</button
 					>
 				{/if}
 			</div>

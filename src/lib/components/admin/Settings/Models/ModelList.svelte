@@ -2,8 +2,6 @@
 	import Sortable from 'sortablejs';
 
 	import { createEventDispatcher, getContext, onMount } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import { models } from '$lib/stores';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import EllipsisVertical from '$lib/components/icons/EllipsisVertical.svelte';
@@ -64,6 +62,6 @@
 	</div>
 {:else}
 	<div class="text-gray-500 text-xs text-center py-2">
-		{$i18n.t('No models found')}
+		{'No models found'}
 	</div>
 {/if}

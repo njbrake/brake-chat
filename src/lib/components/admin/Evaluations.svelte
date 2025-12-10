@@ -7,9 +7,6 @@
 	import Feedbacks from './Evaluations/Feedbacks.svelte';
 
 	import { getAllFeedbacks } from '$lib/apis/evaluations';
-
-	const i18n = getContext('i18n');
-
 	let selectedTab;
 	$: {
 		const pathParts = $page.url.pathname.split('/');
@@ -84,7 +81,7 @@
 						/>
 					</svg>
 				</div>
-				<div class=" self-center">{$i18n.t('Leaderboard')}</div>
+				<div class=" self-center">{'Leaderboard'}</div>
 			</button>
 
 			<button
@@ -111,7 +108,7 @@
 						/>
 					</svg>
 				</div>
-				<div class=" self-center">{$i18n.t('Feedbacks')}</div>
+				<div class=" self-center">{'Feedbacks'}</div>
 			</button>
 		</div>
 

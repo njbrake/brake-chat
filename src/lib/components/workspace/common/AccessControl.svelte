@@ -1,8 +1,5 @@
 <script lang="ts">
 	import { getContext, onMount } from 'svelte';
-
-	const i18n = getContext('i18n');
-
 	import { getGroups } from '$lib/apis/groups';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Plus from '$lib/components/icons/Plus.svelte';
@@ -63,7 +60,7 @@
 
 <div class=" rounded-lg flex flex-col gap-2">
 	<div class="">
-		<div class=" text-sm font-medium mb-1.5">{$i18n.t('Visibility')}</div>
+		<div class=" text-sm font-medium mb-1.5">{'Visibility'}</div>
 
 		<div class="flex gap-2.5 items-center mb-1">
 			<div>
@@ -125,17 +122,17 @@
 						onChange(accessControl);
 					}}
 				>
-					<option class=" text-gray-700" value="private" selected>{$i18n.t('Private')}</option>
+					<option class=" text-gray-700" value="private" selected>{'Private'}</option>
 					{#if share && sharePublic}
-						<option class=" text-gray-700" value="public" selected>{$i18n.t('Public')}</option>
+						<option class=" text-gray-700" value="public" selected>{'Public'}</option>
 					{/if}
 				</select>
 
 				<div class=" text-xs text-gray-400 font-medium">
 					{#if accessControl !== null}
-						{$i18n.t('Only select users and groups with permission can access')}
+						{'Only select users and groups with permission can access'}
 					{:else}
-						{$i18n.t('Accessible to all users')}
+						{'Accessible to all users'}
 					{/if}
 				</div>
 			</div>
@@ -151,7 +148,7 @@
 				<div class="">
 					<div class="flex justify-between mb-1.5">
 						<div class="text-sm font-medium">
-							{$i18n.t('Groups')}
+							{'Groups'}
 						</div>
 					</div>
 
@@ -177,7 +174,7 @@
 										}}
 									>
 										<option class=" text-gray-700" value="" disabled selected
-											>{$i18n.t('Select a group')}</option
+											>{'Select a group'}</option
 										>
 										{#each groups.filter((group) => !(accessControl?.read?.group_ids ?? []).includes(group.id)) as group}
 											<option class=" text-gray-700" value={group.id}>{group.name}</option>
@@ -185,7 +182,7 @@
 									</select>
 								</div>
 								<!-- <div>
-								<Tooltip content={$i18n.t('Add Group')}>
+								<Tooltip content={'Add Group'}>
 									<button
 										class=" p-1 rounded-xl bg-transparent dark:hover:bg-white/5 hover:bg-black/5 transition font-medium text-sm flex items-center space-x-1"
 										type="button"
@@ -236,9 +233,9 @@
 											}}
 										>
 											{#if (accessControl?.write?.group_ids ?? []).includes(group.id)}
-												<Badge type={'success'} content={$i18n.t('Write')} />
+												<Badge type={'success'} content={'Write'} />
 											{:else}
-												<Badge type={'info'} content={$i18n.t('Read')} />
+												<Badge type={'info'} content={'Read'} />
 											{/if}
 										</button>
 
@@ -263,7 +260,7 @@
 						{:else}
 							<div class="flex items-center justify-center">
 								<div class="text-gray-500 text-xs text-center py-2 px-10">
-									{$i18n.t('No groups with access, add a group to grant access')}
+									{'No groups with access, add a group to grant access'}
 								</div>
 							</div>
 						{/if}

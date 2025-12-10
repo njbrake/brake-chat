@@ -10,9 +10,6 @@
 
 	import { splitStream } from '$lib/utils';
 	import Selector from '$lib/components/chat/ModelSelector/Selector.svelte';
-
-	const i18n = getContext('i18n');
-
 	let loaded = false;
 	let text = '';
 
@@ -128,7 +125,7 @@
 						<div class="overflow-hidden w-full">
 							<div class="max-w-full">
 								<Selector
-									placeholder={$i18n.t('Select a model')}
+									placeholder={'Select a model'}
 									items={$models.map((model) => ({
 										value: model.id,
 										label: model.name,
@@ -153,7 +150,7 @@
 							bind:this={textCompletionAreaElement}
 							class="w-full h-full p-3 bg-transparent border border-gray-100 dark:border-gray-850 outline-hidden resize-none rounded-lg text-sm"
 							bind:value={text}
-							placeholder={$i18n.t("You're a helpful assistant.")}
+							placeholder={"You're a helpful assistant."}
 						/>
 					</div>
 				</div>
@@ -167,7 +164,7 @@
 							submitHandler();
 						}}
 					>
-						{$i18n.t('Run')}
+						{'Run'}
 					</button>
 				{:else}
 					<button
@@ -176,7 +173,7 @@
 							stopResponse();
 						}}
 					>
-						{$i18n.t('Cancel')}
+						{'Cancel'}
 					</button>
 				{/if}
 			</div>

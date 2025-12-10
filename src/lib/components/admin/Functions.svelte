@@ -41,9 +41,6 @@
 	import TagSelector from '../workspace/common/TagSelector.svelte';
 	import { capitalizeFirstLetter } from '$lib/utils';
 	import Spinner from '../common/Spinner.svelte';
-
-	const i18n = getContext('i18n');
-
 	let shiftKey = false;
 
 	let functionsImportInputElement: HTMLInputElement;
@@ -99,7 +96,7 @@
 			return null;
 		});
 
-		toast.success($i18n.t('Redirecting you to Open WebUI Community'));
+		toast.success('Redirecting you to Open WebUI Community');
 
 		const url = 'https://openwebui.com';
 
@@ -130,7 +127,7 @@
 			sessionStorage.function = JSON.stringify({
 				..._function,
 				id: `${_function.id}_clone`,
-				name: `${_function.name} (${$i18n.t('Clone')})`
+				name: `${_function.name} (${'Clone'})`
 			});
 			goto('/admin/functions/create');
 		}
@@ -157,7 +154,7 @@
 		});
 
 		if (res) {
-			toast.success($i18n.t('Function deleted successfully'));
+			toast.success('Function deleted successfully');
 			functions = functions.filter((f) => f.id !== func.id);
 
 			_functions.set(await getFunctions(localStorage.token));
@@ -184,12 +181,12 @@
 		if (res) {
 			if (func.is_global) {
 				func.type === 'filter'
-					? toast.success($i18n.t('Filter is now globally enabled'))
-					: toast.success($i18n.t('Function is now globally enabled'));
+					? toast.success('Filter is now globally enabled')
+					: toast.success('Function is now globally enabled');
 			} else {
 				func.type === 'filter'
-					? toast.success($i18n.t('Filter is now globally disabled'))
-					: toast.success($i18n.t('Function is now globally disabled'));
+					? toast.success('Filter is now globally disabled')
+					: toast.success('Function is now globally disabled');
 			}
 
 			_functions.set(await getFunctions(localStorage.token));
@@ -248,7 +245,7 @@
 
 <svelte:head>
 	<title>
-		{$i18n.t('Functions')} • {$WEBUI_NAME}
+		{'Functions'} • {$WEBUI_NAME}
 	</title>
 </svelte:head>
 
@@ -285,7 +282,7 @@
 				<div class="flex justify-between items-center w-full">
 					<div class="flex items-center md:self-center text-xl font-medium px-0.5 gap-2 shrink-0">
 						<div>
-							{$i18n.t('Functions')}
+							{'Functions'}
 						</div>
 
 						<div class="text-lg font-medium text-gray-500 dark:text-gray-500">
@@ -302,7 +299,7 @@
 								}}
 							>
 								<div class=" self-center font-medium line-clamp-1">
-									{$i18n.t('Import')}
+									{'Import'}
 								</div>
 							</button>
 
@@ -324,7 +321,7 @@
 									}}
 								>
 									<div class=" self-center font-medium line-clamp-1">
-										{$i18n.t('Export')}
+										{'Export'}
 									</div>
 								</button>
 							{/if}
@@ -342,7 +339,7 @@
 							>
 								<Plus className="size-3" strokeWidth="2.5" />
 
-								<div class=" hidden md:block md:ml-1 text-xs">{$i18n.t('New Function')}</div>
+								<div class=" hidden md:block md:ml-1 text-xs">{'New Function'}</div>
 							</div>
 						</AddFunctionMenu>
 					</div>
@@ -361,7 +358,7 @@
 					<input
 						class=" w-full text-sm pr-4 py-1 rounded-r-xl outline-hidden bg-transparent"
 						bind:value={query}
-						placeholder={$i18n.t('Search Functions')}
+						placeholder={'Search Functions'}
 					/>
 
 					{#if query}
@@ -404,9 +401,9 @@
 					<TagSelector
 						bind:value={selectedType}
 						items={[
-							{ value: 'pipe', label: $i18n.t('Pipe') },
-							{ value: 'filter', label: $i18n.t('Filter') },
-							{ value: 'action', label: $i18n.t('Action') }
+							{ value: 'pipe', label: 'Pipe' },
+							{ value: 'filter', label: 'Filter' },
+							{ value: 'action', label: 'Action' }
 						]}
 					/>
 				</div>
@@ -446,15 +443,13 @@
 										<div class="flex gap-1.5 px-1">
 											<div class="text-xs text-gray-500 shrink-0">
 												<Tooltip
-													content={func?.user?.email ?? $i18n.t('Deleted User')}
+													content={func?.user?.email ?? 'Deleted User'}
 													className="flex shrink-0"
 													placement="top-start"
 												>
-													{$i18n.t('By {{name}}', {
-														name: capitalizeFirstLetter(
-															func?.user?.name ?? func?.user?.email ?? $i18n.t('Deleted User')
-														)
-													})}
+													{`By ${capitalizeFirstLetter(
+														func?.user?.name ?? func?.user?.email ?? 'Deleted User'
+													)}`}
 												</Tooltip>
 											</div>
 											<div class=" text-xs overflow-hidden text-ellipsis line-clamp-1">
@@ -466,7 +461,7 @@
 							</a>
 							<div class="flex flex-row gap-0.5 self-center">
 								{#if shiftKey}
-									<Tooltip content={$i18n.t('Delete')}>
+									<Tooltip content={'Delete'}>
 										<button
 											class="self-center w-fit text-sm px-2 py-2 dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
 											type="button"
@@ -479,7 +474,7 @@
 									</Tooltip>
 								{:else}
 									{#if func?.meta?.manifest?.funding_url ?? false}
-										<Tooltip content={$i18n.t('Support')}>
+										<Tooltip content={'Support'}>
 											<button
 												class="self-center w-fit text-sm px-2 py-2 dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
 												type="button"
@@ -493,7 +488,7 @@
 										</Tooltip>
 									{/if}
 
-									<Tooltip content={$i18n.t('Valves')}>
+									<Tooltip content={'Valves'}>
 										<button
 											class="self-center w-fit text-sm px-2 py-2 dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
 											type="button"
@@ -559,7 +554,7 @@
 								{/if}
 
 								<div class=" self-center mx-1">
-									<Tooltip content={func.is_active ? $i18n.t('Enabled') : $i18n.t('Disabled')}>
+									<Tooltip content={func.is_active ? 'Enabled' : 'Disabled'}>
 										<Switch
 											bind:state={func.is_active}
 											on:change={async (e) => {
@@ -585,9 +580,9 @@
 				<div class=" w-full h-full flex flex-col justify-center items-center my-16 mb-24">
 					<div class="max-w-md text-center">
 						<div class=" text-3xl mb-3">😕</div>
-						<div class=" text-lg font-medium mb-1">{$i18n.t('No functions found')}</div>
+						<div class=" text-lg font-medium mb-1">{'No functions found'}</div>
 						<div class=" text-gray-500 text-center text-xs">
-							{$i18n.t('Try adjusting your search or filter to find what you are looking for.')}
+							{'Try adjusting your search or filter to find what you are looking for.'}
 						</div>
 					</div>
 				</div>
@@ -595,15 +590,13 @@
 		</div>
 
 		<!-- <div class=" text-gray-500 text-xs mt-1 mb-2">
-	ⓘ {$i18n.t(
-		'Admins have access to all tools at all times; users need tools assigned per model in the workspace.'
-	)}
+	ⓘ {'Admins have access to all tools at all times; users need tools assigned per model in the workspace.'}
 </div> -->
 
 		{#if $config?.features.enable_community_sharing}
 			<div class=" my-16">
 				<div class=" text-xl font-medium mb-1 line-clamp-1">
-					{$i18n.t('Made by Open WebUI Community')}
+					{'Made by Open WebUI Community'}
 				</div>
 
 				<a
@@ -612,9 +605,9 @@
 					target="_blank"
 				>
 					<div class=" self-center">
-						<div class=" font-semibold line-clamp-1">{$i18n.t('Discover a function')}</div>
+						<div class=" font-semibold line-clamp-1">{'Discover a function'}</div>
 						<div class=" text-sm line-clamp-1">
-							{$i18n.t('Discover, download, and explore custom functions')}
+							{'Discover, download, and explore custom functions'}
 						</div>
 					</div>
 
@@ -630,13 +623,13 @@
 
 	<DeleteConfirmDialog
 		bind:show={showDeleteConfirm}
-		title={$i18n.t('Delete function?')}
+		title={'Delete function?'}
 		on:confirm={() => {
 			deleteHandler(selectedFunction);
 		}}
 	>
 		<div class=" text-sm text-gray-500 truncate">
-			{$i18n.t('This will delete')} <span class="  font-semibold">{selectedFunction.name}</span>.
+			{'This will delete'} <span class="  font-semibold">{selectedFunction.name}</span>.
 		</div>
 	</DeleteConfirmDialog>
 
@@ -678,7 +671,7 @@
 					});
 				}
 
-				toast.success($i18n.t('Functions imported successfully'));
+				toast.success('Functions imported successfully');
 				functions.set(await getFunctions(localStorage.token));
 				models.set(
 					await getModels(
@@ -695,18 +688,16 @@
 	>
 		<div class="text-sm text-gray-500">
 			<div class=" bg-yellow-500/20 text-yellow-700 dark:text-yellow-200 rounded-lg px-4 py-3">
-				<div>{$i18n.t('Please carefully review the following warnings:')}</div>
+				<div>{'Please carefully review the following warnings:'}</div>
 
 				<ul class=" mt-1 list-disc pl-4 text-xs">
-					<li>{$i18n.t('Functions allow arbitrary code execution.')}</li>
-					<li>{$i18n.t('Do not install functions from sources you do not fully trust.')}</li>
+					<li>{'Functions allow arbitrary code execution.'}</li>
+					<li>{'Do not install functions from sources you do not fully trust.'}</li>
 				</ul>
 			</div>
 
 			<div class="my-3">
-				{$i18n.t(
-					'I acknowledge that I have read and I understand the implications of my action. I am aware of the risks associated with executing arbitrary code and I have verified the trustworthiness of the source.'
-				)}
+				{'I acknowledge that I have read and I understand the implications of my action. I am aware of the risks associated with executing arbitrary code and I have verified the trustworthiness of the source.'}
 			</div>
 		</div>
 	</ConfirmDialog>

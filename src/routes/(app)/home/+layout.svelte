@@ -4,15 +4,12 @@
 	import { page } from '$app/stores';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Sidebar from '$lib/components/icons/Sidebar.svelte';
-
-	const i18n = getContext('i18n');
-
 	onMount(async () => {});
 </script>
 
 <svelte:head>
 	<title>
-		{$i18n.t('Home')} • {$WEBUI_NAME}
+		{'Home'} • {$WEBUI_NAME}
 	</title>
 </svelte:head>
 
@@ -25,10 +22,7 @@
 		<div class=" flex items-center">
 			{#if $mobile}
 				<div class="{$showSidebar ? 'md:hidden' : ''} flex flex-none items-center self-end mt-1.5">
-					<Tooltip
-						content={$showSidebar ? $i18n.t('Close Sidebar') : $i18n.t('Open Sidebar')}
-						interactive={true}
-					>
+					<Tooltip content={$showSidebar ? 'Close Sidebar' : 'Open Sidebar'} interactive={true}>
 						<button
 							id="sidebar-toggle-button"
 							class=" cursor-pointer flex rounded-lg hover:bg-gray-100 dark:hover:bg-gray-850 transition cursor-"
@@ -52,14 +46,14 @@
 						class="min-w-fit p-1.5 {$page.url.pathname.includes('/home/notes')
 							? ''
 							: 'text-gray-300 dark:text-gray-600 hover:text-gray-700 dark:hover:text-white'} transition"
-						href="/playground/notes">{$i18n.t('Notes')}</a
+						href="/playground/notes">{'Notes'}</a
 					>
 
 					<a
 						class="min-w-fit p-1.5 {$page.url.pathname.includes('/playground/calendar')
 							? ''
 							: 'text-gray-300 dark:text-gray-600 hover:text-gray-700 dark:hover:text-white'} transition"
-						href="/playground/completions">{$i18n.t('Calendar')}</a
+						href="/playground/completions">{'Calendar'}</a
 					>
 				</div>
 			</div>

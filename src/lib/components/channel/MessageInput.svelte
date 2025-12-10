@@ -3,9 +3,6 @@
 	import { v4 as uuidv4 } from 'uuid';
 
 	import { tick, getContext, onMount, onDestroy } from 'svelte';
-
-	const i18n = getContext('i18n');
-
 	import { config, mobile, settings, socket, user } from '$lib/stores';
 	import {
 		convertHeicToJpeg,
@@ -41,7 +38,7 @@
 	import Skeleton from '../chat/Messages/Skeleton.svelte';
 	import XMark from '../icons/XMark.svelte';
 
-	export let placeholder = $i18n.t('Type here...');
+	export let placeholder = 'Type here...';
 
 	export let id = null;
 	export let chatInputElement;
@@ -105,7 +102,7 @@
 	const textVariableHandler = async (text: string) => {
 		if (text.includes('{{CLIPBOARD}}')) {
 			const clipboardText = await navigator.clipboard.readText().catch((err) => {
-				toast.error($i18n.t('Failed to read clipboard contents'));
+				toast.error('Failed to read clipboard contents');
 				return '{{CLIPBOARD}}';
 			});
 
@@ -140,7 +137,7 @@
 			try {
 				location = await getUserPosition();
 			} catch (error) {
-				toast.error($i18n.t('Location access not allowed'));
+				toast.error('Location access not allowed');
 				location = 'LOCATION_UNKNOWN';
 			}
 			text = text.replaceAll('{{USER_LOCATION}}', String(location));
@@ -366,11 +363,7 @@
 					fileSize: file.size,
 					maxSize: ($config?.file?.max_size ?? 0) * 1024 * 1024
 				});
-				toast.error(
-					$i18n.t(`File size should not exceed {{maxSize}} MB.`, {
-						maxSize: $config?.file?.max_size
-					})
-				);
+				toast.error(`File size should not exceed ${$config?.file?.max_size} MB.`);
 				return;
 			}
 
@@ -453,7 +446,7 @@
 		};
 
 		if (fileItem.size == 0) {
-			toast.error($i18n.t('You cannot upload an empty file.'));
+			toast.error('You cannot upload an empty file.');
 			return null;
 		}
 
@@ -572,7 +565,6 @@
 			{
 				char: '@',
 				render: getSuggestionRenderer(MentionList, {
-					i18n,
 					triggerChar: '@',
 					modelSuggestions: true,
 					userSuggestions
@@ -583,7 +575,6 @@
 						{
 							char: '#',
 							render: getSuggestionRenderer(MentionList, {
-								i18n,
 								triggerChar: '#',
 								channelSuggestions
 							})
@@ -593,7 +584,6 @@
 			{
 				char: '/',
 				render: getSuggestionRenderer(CommandSuggestionList, {
-					i18n,
 					onSelect: (e) => {
 						const { type, data } = e;
 
@@ -669,7 +659,7 @@
 				if (inputFiles && inputFiles.length > 0) {
 					inputFilesHandler(Array.from(inputFiles));
 				} else {
-					toast.error($i18n.t(`File not found.`));
+					toast.error('File not found.');
 				}
 
 				filesInputElement.value = '';
@@ -729,7 +719,7 @@
 									<span class=" font-normal text-black dark:text-white">
 										{typingUsers.map((user) => user.name).join(', ')}
 									</span>
-									{$i18n.t('is typing...')}
+									{'is typing...'}
 								</div>
 							</div>
 						</div>
@@ -784,9 +774,7 @@
 										<div class="pl-[1px] flex items-center gap-2 text-sm">
 											<div class="translate-y-[0.5px]">
 												<span class=""
-													>{$i18n.t('Replying to {{NAME}}', {
-														NAME: replyToMessage?.meta?.model_name ?? replyToMessage.user.name
-													})}</span
+													>{`Replying to ${replyToMessage?.meta?.model_name ?? replyToMessage.user.name}`}</span
 												>
 											</div>
 										</div>
@@ -997,7 +985,7 @@
 
 								<div class="self-end flex space-x-1 mr-1">
 									{#if content === ''}
-										<Tooltip content={$i18n.t('Record voice')}>
+										<Tooltip content={'Record voice'}>
 											<button
 												id="voice-input-button"
 												class=" text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 transition rounded-full p-1.5 mr-0.5 self-center"
@@ -1007,14 +995,7 @@
 														let stream = await navigator.mediaDevices
 															.getUserMedia({ audio: true })
 															.catch(function (err) {
-																toast.error(
-																	$i18n.t(
-																		`Permission denied when accessing microphone: {{error}}`,
-																		{
-																			error: err
-																		}
-																	)
-																);
+																toast.error(`Permission denied when accessing microphone: ${err}`);
 																return null;
 															});
 
@@ -1025,7 +1006,7 @@
 														}
 														stream = null;
 													} catch {
-														toast.error($i18n.t('Permission denied when accessing microphone'));
+														toast.error('Permission denied when accessing microphone');
 													}
 												}}
 												aria-label="Voice Input"
@@ -1048,7 +1029,7 @@
 									<div class=" flex items-center">
 										{#if inputLoading && onStop}
 											<div class=" flex items-center">
-												<Tooltip content={$i18n.t('Stop')}>
+												<Tooltip content={'Stop'}>
 													<button
 														class="bg-white hover:bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-800 transition rounded-full p-1.5"
 														on:click={() => {
@@ -1072,7 +1053,7 @@
 											</div>
 										{:else}
 											<div class=" flex items-center">
-												<Tooltip content={$i18n.t('Send message')}>
+												<Tooltip content={'Send message'}>
 													<button
 														id="send-message-button"
 														class="{content !== '' || files.length !== 0

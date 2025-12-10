@@ -2,8 +2,6 @@
 	import { toast } from 'svelte-sonner';
 	import { goto, invalidate, invalidateAll } from '$app/navigation';
 	import { onMount, getContext, createEventDispatcher, tick, onDestroy } from 'svelte';
-	const i18n = getContext('i18n');
-
 	const dispatch = createEventDispatcher();
 
 	import {
@@ -79,7 +77,7 @@
 
 	const editChatTitle = async (id, title) => {
 		if (title === '') {
-			toast.error($i18n.t('Title cannot be an empty string.'));
+			toast.error('Title cannot be an empty string.');
 		} else {
 			await updateChatById(localStorage.token, id, {
 				title: title
@@ -98,13 +96,7 @@
 	};
 
 	const cloneChatHandler = async (id) => {
-		const res = await cloneChatById(
-			localStorage.token,
-			id,
-			$i18n.t('Clone of {{TITLE}}', {
-				TITLE: title
-			})
-		).catch((error) => {
+		const res = await cloneChatById(localStorage.token, id, `Clone of ${title}`).catch((error) => {
 			toast.error(`${error}`);
 			return null;
 		});
@@ -158,10 +150,10 @@
 
 				dispatch('change');
 
-				toast.success($i18n.t('Chat moved successfully'));
+				toast.success('Chat moved successfully');
 			}
 		} else {
-			toast.error($i18n.t('Failed to move chat'));
+			toast.error('Failed to move chat');
 		}
 	};
 
@@ -319,13 +311,13 @@
 
 <DeleteConfirmDialog
 	bind:show={showDeleteConfirm}
-	title={$i18n.t('Delete chat?')}
+	title={'Delete chat?'}
 	on:confirm={() => {
 		deleteChatHandler(id);
 	}}
 >
 	<div class=" text-sm text-gray-500 flex-1 line-clamp-3">
-		{$i18n.t('This will delete')} <span class="  font-semibold">{title}</span>.
+		{'This will delete'} <span class="  font-semibold">{title}</span>.
 	</div>
 </DeleteConfirmDialog>
 
@@ -364,7 +356,7 @@
 				id="chat-title-input-{id}"
 				bind:value={chatTitle}
 				class=" bg-transparent w-full outline-hidden mr-10"
-				placeholder={generating ? $i18n.t('Generating...') : ''}
+				placeholder={generating ? 'Generating...' : ''}
 				disabled={generating}
 				on:keydown={chatTitleInputKeydownHandler}
 				on:blur={async (e) => {
@@ -450,7 +442,7 @@
 					<Checkbox
 						state={isSelected ? 'checked' : 'unchecked'}
 						on:change={() => onToggleSelect(id)}
-						aria-label={$i18n.t('Select chat: {{title}}', { title })}
+						aria-label={`Select chat: ${title}`}
 					/>
 				</div>
 			{/if}
@@ -489,7 +481,7 @@
 				<div
 					class="flex self-center items-center space-x-1.5 z-10 translate-y-[0.5px] -translate-x-[0.5px]"
 				>
-					<Tooltip content={$i18n.t('Generate')}>
+					<Tooltip content={'Generate'}>
 						<button
 							class=" self-center dark:hover:text-white transition disabled:cursor-not-allowed"
 							id="generate-title-button"
@@ -504,7 +496,7 @@
 				</div>
 			{:else if shiftKey && mouseOver}
 				<div class=" flex items-center self-center space-x-1.5">
-					<Tooltip content={$i18n.t('Archive')} className="flex items-center">
+					<Tooltip content={'Archive'} className="flex items-center">
 						<button
 							class=" self-center dark:hover:text-white transition"
 							on:click={() => {
@@ -516,7 +508,7 @@
 						</button>
 					</Tooltip>
 
-					<Tooltip content={$i18n.t('Delete')}>
+					<Tooltip content={'Delete'}>
 						<button
 							class=" self-center dark:hover:text-white transition"
 							on:click={() => {

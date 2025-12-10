@@ -25,8 +25,8 @@
 		}
 	}
 
-	// Assuming $i18n.languages is an array of language codes
-	$: loadLocale($i18n.languages);
+	// Assuming ['en-US'] is an array of language codes
+	$: loadLocale(['en-US']);
 
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
@@ -48,8 +48,6 @@
 	import NoteMenu from './Notes/NoteMenu.svelte';
 	import FilesOverlay from '../chat/MessageInput/FilesOverlay.svelte';
 	import XMark from '../icons/XMark.svelte';
-
-	const i18n = getContext('i18n');
 	let loaded = false;
 
 	let importFiles = '';
@@ -133,7 +131,7 @@
 
 		for (const file of inputFiles) {
 			if (file.type !== 'text/markdown') {
-				toast.error($i18n.t('Only markdown files are allowed'));
+				toast.error('Only markdown files are allowed');
 				return;
 			}
 
@@ -143,7 +141,7 @@
 				let name = file.name.replace(/\.md$/, '');
 
 				if (typeof content !== 'string') {
-					toast.error($i18n.t('Invalid file content'));
+					toast.error('Invalid file content');
 					return;
 				}
 
@@ -230,7 +228,7 @@
 
 <svelte:head>
 	<title>
-		{$i18n.t('Notes')} • {$WEBUI_NAME}
+		{'Notes'} • {$WEBUI_NAME}
 	</title>
 </svelte:head>
 
@@ -240,14 +238,14 @@
 	{#if loaded}
 		<DeleteConfirmDialog
 			bind:show={showDeleteConfirm}
-			title={$i18n.t('Delete note?')}
+			title={'Delete note?'}
 			on:confirm={() => {
 				deleteNoteHandler(selectedNote.id);
 				showDeleteConfirm = false;
 			}}
 		>
 			<div class=" text-sm text-gray-500 truncate">
-				{$i18n.t('This will delete')} <span class="  font-semibold">{selectedNote.title}</span>.
+				{'This will delete'} <span class="  font-semibold">{selectedNote.title}</span>.
 			</div>
 		</DeleteConfirmDialog>
 
@@ -260,7 +258,7 @@
 					<input
 						class=" w-full text-sm py-1 rounded-r-xl outline-hidden bg-transparent"
 						bind:value={query}
-						placeholder={$i18n.t('Search Notes')}
+						placeholder={'Search Notes'}
 					/>
 
 					{#if query}
@@ -284,7 +282,7 @@
 				<div class="pb-10">
 					{#each Object.keys(notes) as timeRange}
 						<div class="w-full text-xs text-gray-500 dark:text-gray-500 font-medium pb-2.5">
-							{$i18n.t(timeRange)}
+							{timeRange}
 						</div>
 
 						<div
@@ -315,9 +313,9 @@
 																const res = await copyToClipboard(`${baseUrl}/notes/${note.id}`);
 
 																if (res) {
-																	toast.success($i18n.t('Copied link to clipboard'));
+																	toast.success('Copied link to clipboard');
 																} else {
-																	toast.error($i18n.t('Failed to copy link'));
+																	toast.error('Failed to copy link');
 																}
 															}}
 															onDelete={() => {
@@ -341,7 +339,7 @@
 													{#if note.data?.content?.md}
 														{note.data?.content?.md}
 													{:else}
-														{$i18n.t('No content')}
+														{'No content'}
 													{/if}
 												</div>
 											</div>
@@ -351,16 +349,14 @@
 													{dayjs(note.updated_at / 1000000).fromNow()}
 												</div>
 												<Tooltip
-													content={note?.user?.email ?? $i18n.t('Deleted User')}
+													content={note?.user?.email ?? 'Deleted User'}
 													className="flex shrink-0"
 													placement="top-start"
 												>
 													<div class="shrink-0 text-gray-500">
-														{$i18n.t('By {{name}}', {
-															name: capitalizeFirstLetter(
-																note?.user?.name ?? note?.user?.email ?? $i18n.t('Deleted User')
-															)
-														})}
+														{`By ${capitalizeFirstLetter(
+															note?.user?.name ?? note?.user?.email ?? 'Deleted User'
+														)}`}
 													</div>
 												</Tooltip>
 											</div>
@@ -375,11 +371,11 @@
 				<div class="w-full h-full flex flex-col items-center justify-center">
 					<div class="pb-20 text-center">
 						<div class=" text-xl font-medium text-gray-400 dark:text-gray-600">
-							{$i18n.t('No Notes')}
+							{'No Notes'}
 						</div>
 
 						<div class="mt-1 text-sm text-gray-300 dark:text-gray-700">
-							{$i18n.t('Create your first note by clicking on the plus button below.')}
+							{'Create your first note by clicking on the plus button below.'}
 						</div>
 					</div>
 				</div>
@@ -388,7 +384,7 @@
 
 		<div class="absolute bottom-0 left-0 right-0 p-5 max-w-full flex justify-end">
 			<div class="flex gap-0.5 justify-end w-full">
-				<Tooltip content={$i18n.t('Create Note')}>
+				<Tooltip content={'Create Note'}>
 					<button
 						class="cursor-pointer p-2.5 flex rounded-full border border-gray-50 bg-white dark:border-none dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 transition shadow-xl"
 						type="button"
@@ -442,7 +438,7 @@
 						}
 					}}
 				>
-					<div class=" self-center mr-2 font-medium line-clamp-1">{$i18n.t('Import Notes')}</div>
+					<div class=" self-center mr-2 font-medium line-clamp-1">{'Import Notes'}</div>
 
 					<div class=" self-center">
 						<svg

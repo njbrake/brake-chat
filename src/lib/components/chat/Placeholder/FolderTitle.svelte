@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import DOMPurify from 'dompurify';
 
 	import fileSaver from 'file-saver';
@@ -35,7 +33,7 @@
 
 	const updateHandler = async ({ name, meta, data }) => {
 		if (name === '') {
-			toast.error($i18n.t('Folder name cannot be empty.'));
+			toast.error('Folder name cannot be empty.');
 			return;
 		}
 
@@ -61,7 +59,7 @@
 				folder.data = data;
 			}
 
-			toast.success($i18n.t('Folder updated successfully'));
+			toast.success('Folder updated successfully');
 
 			const _folder = await getFolderById(localStorage.token, folder.id).catch((error) => {
 				toast.error(`${error}`);
@@ -86,7 +84,7 @@
 		if (res) {
 			folder.meta = { ...folder.meta, icon: iconName };
 
-			toast.success($i18n.t('Folder updated successfully'));
+			toast.success('Folder updated successfully');
 
 			const _folder = await getFolderById(localStorage.token, folder.id).catch((error) => {
 				toast.error(`${error}`);
@@ -107,7 +105,7 @@
 		);
 
 		if (res) {
-			toast.success($i18n.t('Folder deleted successfully'));
+			toast.success('Folder deleted successfully');
 			onDelete(folder);
 		}
 	};
@@ -140,26 +138,22 @@
 
 	<DeleteConfirmDialog
 		bind:show={showDeleteConfirm}
-		title={$i18n.t('Delete folder?')}
+		title={'Delete folder?'}
 		on:confirm={() => {
 			deleteHandler();
 		}}
 	>
 		<div class=" text-sm text-gray-700 dark:text-gray-300 flex-1 line-clamp-3 mb-2">
-			<!-- {$i18n.t('This will delete <strong>{{NAME}}</strong> and <strong>all its contents</strong>.', {
-				NAME: folder.name
-			})} -->
+			<!-- {`This will delete <strong>${folder.name}</strong> and <strong>all its contents</strong>.`} -->
 
-			{$i18n.t(`Are you sure you want to delete "{{NAME}}"?`, {
-				NAME: folder.name
-			})}
+			{`Are you sure you want to delete "{{NAME}}"?`.replace('{{' + 'NAME' + '}}', folder.name)}
 		</div>
 
 		<div class="flex items-center gap-1.5">
 			<input type="checkbox" bind:checked={deleteFolderContents} />
 
 			<div class="text-xs text-gray-500">
-				{$i18n.t('Delete all contents inside this folder')}
+				{'Delete all contents inside this folder'}
 			</div>
 		</div>
 	</DeleteConfirmDialog>

@@ -21,9 +21,6 @@
 	import ChevronUpDown from '$lib/components/icons/ChevronUpDown.svelte';
 	import CommandLine from '$lib/components/icons/CommandLine.svelte';
 	import Cube from '$lib/components/icons/Cube.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let id = '';
 	export let edit = true;
 
@@ -231,7 +228,7 @@
 			} catch (error) {
 				console.error('Failed to render mermaid diagram:', error);
 				const errorMsg = error instanceof Error ? error.message : String(error);
-				renderError = $i18n.t('Failed to render diagram') + `: ${errorMsg}`;
+				renderError = 'Failed to render diagram' + `: ${errorMsg}`;
 				renderHTML = null;
 			}
 		} else if (
@@ -243,7 +240,7 @@
 			} catch (error) {
 				console.error('Failed to render Vega visualization:', error);
 				const errorMsg = error instanceof Error ? error.message : String(error);
-				renderError = $i18n.t('Failed to render visualization') + `: ${errorMsg}`;
+				renderError = 'Failed to render visualization' + `: ${errorMsg}`;
 				renderHTML = null;
 			}
 		}
@@ -340,7 +337,7 @@
 						</div>
 
 						<div>
-							{collapsed ? $i18n.t('Expand') : $i18n.t('Collapse')}
+							{collapsed ? 'Expand' : 'Collapse'}
 						</div>
 					</button>
 
@@ -349,7 +346,7 @@
 							<div
 								class="run-code-button bg-none border-none p-0.5 cursor-not-allowed bg-white dark:bg-black"
 							>
-								{$i18n.t('Running')}
+								{'Running'}
 							</div>
 						{:else if run}
 							<button
@@ -361,7 +358,7 @@
 								}}
 							>
 								<div>
-									{$i18n.t('Run')}
+									{'Run'}
 								</div>
 							</button>
 						{/if}
@@ -372,13 +369,13 @@
 							class="save-code-button bg-none border-none transition rounded-md px-1.5 py-0.5 bg-white dark:bg-black"
 							on:click={saveCode}
 						>
-							{saved ? $i18n.t('Saved') : $i18n.t('Save')}
+							{saved ? 'Saved' : 'Save'}
 						</button>
 					{/if}
 
 					<button
 						class="copy-code-button bg-none border-none transition rounded-md px-1.5 py-0.5 bg-white dark:bg-black"
-						on:click={copyCode}>{copied ? $i18n.t('Copied') : $i18n.t('Copy')}</button
+						on:click={copyCode}>{copied ? 'Copied' : 'Copy'}</button
 					>
 
 					{#if preview && ['html', 'svg'].includes(lang)}
@@ -387,7 +384,7 @@
 							on:click={previewCode}
 						>
 							<div>
-								{$i18n.t('Preview')}
+								{'Preview'}
 							</div>
 						</button>
 					{/if}
@@ -434,9 +431,7 @@
 						class="bg-white dark:bg-black dark:text-white rounded-b-3xl! pt-0.5 pb-3 px-4 flex flex-col gap-2 text-xs"
 					>
 						<span class="text-gray-500 italic">
-							{$i18n.t('{{COUNT}} hidden lines', {
-								COUNT: code.split('\n').length
-							})}
+							{`${code.split('\n').length} hidden lines`}
 						</span>
 					</div>
 				{/if}
@@ -454,13 +449,13 @@
 					>
 						{#if executing}
 							<div class=" ">
-								<div class=" text-gray-500 text-sm mb-1">{$i18n.t('STDOUT/STDERR')}</div>
-								<div class="text-sm">{$i18n.t('Running...')}</div>
+								<div class=" text-gray-500 text-sm mb-1">{'STDOUT/STDERR'}</div>
+								<div class="text-sm">{'Running...'}</div>
 							</div>
 						{:else}
 							{#if stdout || stderr}
 								<div class=" ">
-									<div class=" text-gray-500 text-sm mb-1">{$i18n.t('STDOUT/STDERR')}</div>
+									<div class=" text-gray-500 text-sm mb-1">{'STDOUT/STDERR'}</div>
 									<div
 										class="text-sm font-mono whitespace-pre-wrap {stdout?.split('\n')?.length > 100
 											? `max-h-96`
@@ -472,7 +467,7 @@
 							{/if}
 							{#if result || files}
 								<div class=" ">
-									<div class=" text-gray-500 text-sm mb-1">{$i18n.t('RESULT')}</div>
+									<div class=" text-gray-500 text-sm mb-1">{'RESULT'}</div>
 									{#if result}
 										<div class="text-sm">{`${JSON.stringify(result)}`}</div>
 									{/if}

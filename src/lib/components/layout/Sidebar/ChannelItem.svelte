@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { onMount, getContext, tick, onDestroy } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import { page } from '$app/stores';
 	import { mobile, showSidebar, user } from '$lib/stores';
 	import { updateChannelById } from '$lib/apis/channels';
@@ -36,7 +34,7 @@
 		});
 
 		if (res) {
-			toast.success($i18n.t('Channel updated successfully'));
+			toast.success('Channel updated successfully');
 		}
 
 		onUpdate();

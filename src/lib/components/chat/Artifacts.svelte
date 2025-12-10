@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { onMount, getContext, createEventDispatcher } from 'svelte';
-	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
 
 	import {
@@ -145,10 +144,7 @@
 							</button>
 
 							<div class="text-xs self-center dark:text-gray-100 min-w-fit">
-								{$i18n.t('Version {{selectedVersion}} of {{totalVersions}}', {
-									selectedVersion: selectedContentIdx + 1,
-									totalVersions: contents.length
-								})}
+								{`Version ${selectedContentIdx + 1} of ${contents.length}`}
 							</div>
 
 							<button
@@ -184,10 +180,10 @@
 								setTimeout(() => {
 									copied = false;
 								}, 2000);
-							}}>{copied ? $i18n.t('Copied') : $i18n.t('Copy')}</button
+							}}>{copied ? 'Copied' : 'Copy'}</button
 						>
 
-						<Tooltip content={$i18n.t('Download')}>
+						<Tooltip content={'Download'}>
 							<button
 								class=" bg-none border-none text-xs bg-gray-50 hover:bg-gray-100 dark:bg-gray-850 dark:hover:bg-gray-800 transition rounded-md p-0.5"
 								on:click={downloadArtifact}
@@ -197,7 +193,7 @@
 						</Tooltip>
 
 						{#if contents[selectedContentIdx].type === 'iframe'}
-							<Tooltip content={$i18n.t('Open in full screen')}>
+							<Tooltip content={'Open in full screen'}>
 								<button
 									class=" bg-none border-none text-xs bg-gray-50 hover:bg-gray-100 dark:bg-gray-850 dark:hover:bg-gray-800 transition rounded-md p-0.5"
 									on:click={showFullScreen}
@@ -252,7 +248,7 @@
 					</div>
 				{:else}
 					<div class="m-auto font-medium text-xs text-gray-900 dark:text-white">
-						{$i18n.t('No HTML, CSS, or JavaScript content found.')}
+						{'No HTML, CSS, or JavaScript content found.'}
 					</div>
 				{/if}
 			</div>

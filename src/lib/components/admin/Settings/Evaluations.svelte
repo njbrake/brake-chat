@@ -13,9 +13,6 @@
 	import Plus from '$lib/components/icons/Plus.svelte';
 	import Model from './Evaluations/Model.svelte';
 	import ArenaModelModal from './Evaluations/ArenaModelModal.svelte';
-
-	const i18n = getContext('i18n');
-
 	let evaluationConfig = null;
 	let showAddModel = false;
 
@@ -26,7 +23,7 @@
 		});
 
 		if (evaluationConfig) {
-			toast.success($i18n.t('Settings saved successfully!'));
+			toast.success('Settings saved successfully!');
 			try {
 				models.set(
 					await getModels(
@@ -120,14 +117,14 @@
 		{#if evaluationConfig !== null}
 			<div class="">
 				<div class="mb-3">
-					<div class=" mt-0.5 mb-2.5 text-base font-medium">{$i18n.t('General')}</div>
+					<div class=" mt-0.5 mb-2.5 text-base font-medium">{'General'}</div>
 
 					<hr class=" border-gray-100 dark:border-gray-850 my-2" />
 
 					<div class="mb-2.5 flex w-full justify-between">
-						<div class=" text-xs font-medium">{$i18n.t('Arena Models')}</div>
+						<div class=" text-xs font-medium">{'Arena Models'}</div>
 
-						<Tooltip content={$i18n.t(`Message rating should be enabled to use this feature`)}>
+						<Tooltip content={'Message rating should be enabled to use this feature'}>
 							<Switch bind:state={evaluationConfig.ENABLE_EVALUATION_ARENA_MODELS} />
 						</Tooltip>
 					</div>
@@ -137,11 +134,11 @@
 					<div class="mb-3">
 						<div class=" mt-0.5 mb-2.5 text-base font-medium flex justify-between items-center">
 							<div>
-								{$i18n.t('Manage')}
+								{'Manage'}
 							</div>
 
 							<div>
-								<Tooltip content={$i18n.t('Add Arena Model')}>
+								<Tooltip content={'Add Arena Model'}>
 									<button
 										class="p-1"
 										type="button"
@@ -172,9 +169,7 @@
 								{/each}
 							{:else}
 								<div class=" text-center text-xs text-gray-500">
-									{$i18n.t(
-										`Using the default arena model with all models. Click the plus button to add custom models.`
-									)}
+									{'Using the default arena model with all models. Click the plus button to add custom models.'}
 								</div>
 							{/if}
 						</div>
@@ -195,7 +190,7 @@
 			class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
 			type="submit"
 		>
-			{$i18n.t('Save')}
+			{'Save'}
 		</button>
 	</div>
 </form>

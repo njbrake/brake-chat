@@ -13,8 +13,6 @@
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import SensitiveInput from '$lib/components/common/SensitiveInput.svelte';
 	import UserProfileImage from '$lib/components/chat/Settings/Account/UserProfileImage.svelte';
-
-	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
 	dayjs.extend(localizedFormat);
 
@@ -69,7 +67,7 @@
 <Modal size="sm" bind:show>
 	<div>
 		<div class=" flex justify-between dark:text-gray-300 px-5 pt-4 pb-2">
-			<div class=" text-lg font-medium self-center">{$i18n.t('Edit User')}</div>
+			<div class=" text-lg font-medium self-center">{'Edit User'}</div>
 			<button
 				class="self-center"
 				on:click={() => {
@@ -105,7 +103,7 @@
 									</div>
 
 									<div class="text-xs text-gray-500">
-										{$i18n.t('Created at')}
+										{'Created at'}
 										{dayjs(selectedUser.created_at * 1000).format('LL')}
 									</div>
 								</div>
@@ -113,7 +111,7 @@
 								<div class=" flex flex-col space-y-1.5">
 									{#if (userGroups ?? []).length > 0}
 										<div class="flex flex-col w-full text-sm">
-											<div class="mb-1 text-xs text-gray-500">{$i18n.t('User Groups')}</div>
+											<div class="mb-1 text-xs text-gray-500">{'User Groups'}</div>
 
 											<div class="flex flex-wrap gap-1 my-0.5 -mx-1">
 												{#each userGroups as userGroup}
@@ -134,7 +132,7 @@
 									{/if}
 
 									<div class="flex flex-col w-full">
-										<div class=" mb-1 text-xs text-gray-500">{$i18n.t('Role')}</div>
+										<div class=" mb-1 text-xs text-gray-500">{'Role'}</div>
 
 										<div class="flex-1">
 											<select
@@ -143,22 +141,22 @@
 												disabled={_user.id == sessionUser.id}
 												required
 											>
-												<option value="admin">{$i18n.t('Admin')}</option>
-												<option value="user">{$i18n.t('User')}</option>
-												<option value="pending">{$i18n.t('Pending')}</option>
+												<option value="admin">{'Admin'}</option>
+												<option value="user">{'User'}</option>
+												<option value="pending">{'Pending'}</option>
 											</select>
 										</div>
 									</div>
 
 									<div class="flex flex-col w-full">
-										<div class=" mb-1 text-xs text-gray-500">{$i18n.t('Name')}</div>
+										<div class=" mb-1 text-xs text-gray-500">{'Name'}</div>
 
 										<div class="flex-1">
 											<input
 												class="w-full text-sm bg-transparent outline-hidden"
 												type="text"
 												bind:value={_user.name}
-												placeholder={$i18n.t('Enter Your Name')}
+												placeholder={'Enter Your Name'}
 												autocomplete="off"
 												required
 											/>
@@ -166,14 +164,14 @@
 									</div>
 
 									<div class="flex flex-col w-full">
-										<div class=" mb-1 text-xs text-gray-500">{$i18n.t('Email')}</div>
+										<div class=" mb-1 text-xs text-gray-500">{'Email'}</div>
 
 										<div class="flex-1">
 											<input
 												class="w-full text-sm bg-transparent disabled:text-gray-500 dark:disabled:text-gray-500 outline-hidden"
 												type="email"
 												bind:value={_user.email}
-												placeholder={$i18n.t('Enter Your Email')}
+												placeholder={'Enter Your Email'}
 												autocomplete="off"
 												required
 											/>
@@ -182,7 +180,7 @@
 
 									{#if _user?.oauth_sub}
 										<div class="flex flex-col w-full">
-											<div class=" mb-1 text-xs text-gray-500">{$i18n.t('OAuth ID')}</div>
+											<div class=" mb-1 text-xs text-gray-500">{'OAuth ID'}</div>
 
 											<div class="flex-1 text-sm break-all mb-1">
 												{_user.oauth_sub ?? ''}
@@ -191,13 +189,13 @@
 									{/if}
 
 									<div class="flex flex-col w-full">
-										<div class=" mb-1 text-xs text-gray-500">{$i18n.t('New Password')}</div>
+										<div class=" mb-1 text-xs text-gray-500">{'New Password'}</div>
 
 										<div class="flex-1">
 											<SensitiveInput
 												class="w-full text-sm bg-transparent outline-hidden"
 												type="password"
-												placeholder={$i18n.t('Enter New Password')}
+												placeholder={'Enter New Password'}
 												bind:value={_user.password}
 												autocomplete="new-password"
 												required={false}
@@ -213,7 +211,7 @@
 								class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full flex flex-row space-x-1 items-center"
 								type="submit"
 							>
-								{$i18n.t('Save')}
+								{'Save'}
 							</button>
 						</div>
 					</div>

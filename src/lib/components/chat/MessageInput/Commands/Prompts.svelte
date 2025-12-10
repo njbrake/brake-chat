@@ -2,9 +2,6 @@
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import { tick, getContext, onMount, onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
-
-	const i18n = getContext('i18n');
-
 	export let query = '';
 	export let prompts = [];
 	export let onSelect = (e) => {};
@@ -36,7 +33,7 @@
 </script>
 
 <div class="px-2 text-xs text-gray-500 py-1">
-	{$i18n.t('Prompts')}
+	{'Prompts'}
 </div>
 
 {#if filteredItems.length > 0}

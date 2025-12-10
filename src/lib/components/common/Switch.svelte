@@ -9,8 +9,6 @@
 	export let id = '';
 	export let ariaLabelledbyId = '';
 	export let tooltip = false;
-
-	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
 </script>
 
@@ -19,8 +17,8 @@
 		? tooltip
 		: typeof tooltip === 'boolean' && tooltip
 			? state
-				? $i18n.t('Enabled')
-				: $i18n.t('Disabled')
+				? 'Enabled'
+				: 'Disabled'
 			: ''}
 	placement="top"
 >

@@ -80,9 +80,6 @@
 	import CommandSuggestionList from './MessageInput/CommandSuggestionList.svelte';
 	import Knobs from '../icons/Knobs.svelte';
 	import ValvesModal from '../workspace/common/ValvesModal.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let onChange: Function = () => {};
 	export let createMessagePair: Function;
 	export let stopResponse: Function;
@@ -164,7 +161,7 @@
 	const textVariableHandler = async (text: string) => {
 		if (text.includes('{{CLIPBOARD}}')) {
 			const clipboardText = await navigator.clipboard.readText().catch((err) => {
-				toast.error($i18n.t('Failed to read clipboard contents'));
+				toast.error('Failed to read clipboard contents');
 				return '{{CLIPBOARD}}';
 			});
 
@@ -200,7 +197,7 @@
 			try {
 				location = await getUserPosition();
 			} catch (error) {
-				toast.error($i18n.t('Location access not allowed'));
+				toast.error('Location access not allowed');
 				location = 'LOCATION_UNKNOWN';
 			}
 			text = text.replaceAll('{{USER_LOCATION}}', String(location));
@@ -523,12 +520,12 @@
 
 	const uploadFileHandler = async (file, fullContext: boolean = false) => {
 		if ($_user?.role !== 'admin' && !($_user?.permissions?.chat?.file_upload ?? true)) {
-			toast.error($i18n.t('You do not have permission to upload files.'));
+			toast.error('You do not have permission to upload files.');
 			return null;
 		}
 
 		if (fileUploadCapableModels.length !== selectedModels.length) {
-			toast.error($i18n.t('Model(s) do not support file upload'));
+			toast.error('Model(s) do not support file upload');
 			return null;
 		}
 
@@ -548,7 +545,7 @@
 		};
 
 		if (fileItem.size == 0) {
-			toast.error($i18n.t('You cannot upload an empty file.'));
+			toast.error('You cannot upload an empty file.');
 			return null;
 		}
 
@@ -601,14 +598,12 @@
 			// If temporary chat is enabled, we just add the file to the list without uploading it.
 
 			const content = await extractContentFromFile(file).catch((error) => {
-				toast.error(
-					$i18n.t('Failed to extract content from the file: {{error}}', { error: error })
-				);
+				toast.error(`Failed to extract content from the file: ${error}`);
 				return null;
 			});
 
 			if (content === null) {
-				toast.error($i18n.t('Failed to extract content from the file.'));
+				toast.error('Failed to extract content from the file.');
 				files = files.filter((item) => item?.itemId !== tempItemId);
 				return null;
 			} else {
@@ -636,9 +631,7 @@
 			files.length + inputFiles.length > $config?.file?.max_count
 		) {
 			toast.error(
-				$i18n.t(`You can only chat with a maximum of {{maxCount}} file(s) at a time.`, {
-					maxCount: $config?.file?.max_count
-				})
+				`You can only chat with a maximum of ${$config?.file?.max_count} file(s) at a time.`
 			);
 			return;
 		}
@@ -659,17 +652,13 @@
 					fileSize: file.size,
 					maxSize: ($config?.file?.max_size ?? 0) * 1024 * 1024
 				});
-				toast.error(
-					$i18n.t(`File size should not exceed {{maxSize}} MB.`, {
-						maxSize: $config?.file?.max_size
-					})
-				);
+				toast.error(`File size should not exceed ${$config?.file?.max_size} MB.`);
 				return;
 			}
 
 			if (file['type'].startsWith('image/')) {
 				if (visionCapableModels.length === 0) {
-					toast.error($i18n.t('Selected model(s) do not support image inputs'));
+					toast.error('Selected model(s) do not support image inputs');
 					return;
 				}
 
@@ -788,7 +777,6 @@
 			{
 				char: '@',
 				render: getSuggestionRenderer(CommandSuggestionList, {
-					i18n,
 					onSelect: (e) => {
 						const { type, data } = e;
 
@@ -823,7 +811,6 @@
 			{
 				char: '/',
 				render: getSuggestionRenderer(CommandSuggestionList, {
-					i18n,
 					onSelect: (e) => {
 						const { type, data } = e;
 
@@ -858,7 +845,6 @@
 			{
 				char: '#',
 				render: getSuggestionRenderer(CommandSuggestionList, {
-					i18n,
 					onSelect: (e) => {
 						const { type, data } = e;
 
@@ -1012,7 +998,7 @@
 								const _inputFiles = Array.from(inputFiles);
 								inputFilesHandler(_inputFiles);
 							} else {
-								toast.error($i18n.t(`File not found.`));
+								toast.error('File not found.');
 							}
 
 							filesInputElement.value = '';
@@ -1071,7 +1057,7 @@
 											<img
 												alt="model profile"
 												class="size-3.5 max-w-[28px] object-cover rounded-full"
-												src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${$models.find((model) => model.id === atSelectedModel.id).id}&lang=${$i18n.language}`}
+												src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${$models.find((model) => model.id === atSelectedModel.id).id}&lang=${'en-US'}`}
 											/>
 											<div class="translate-y-[0.5px]">
 												<span class="">{atSelectedModel.name}</span>
@@ -1105,11 +1091,12 @@
 													{#if atSelectedModel ? visionCapableModels.length === 0 : selectedModels.length !== visionCapableModels.length}
 														<Tooltip
 															className=" absolute top-1 left-1"
-															content={$i18n.t('{{ models }}', {
-																models: [...(atSelectedModel ? [atSelectedModel] : selectedModels)]
+															content={'{{ models }}'.replace(
+																'{{' + 'models' + '}}',
+																[...(atSelectedModel ? [atSelectedModel] : selectedModels)]
 																	.filter((id) => !visionCapableModels.includes(id))
 																	.join(', ')
-															})}
+															)}
 														>
 															<svg
 																xmlns="http://www.w3.org/2000/svg"
@@ -1134,7 +1121,7 @@
 															? ''
 															: 'outline-hidden focus:outline-hidden group-hover:visible invisible transition'}"
 														type="button"
-														aria-label={$i18n.t('Remove file')}
+														aria-label={'Remove file'}
 														on:click={() => {
 															files.splice(fileIdx, 1);
 															files = files;
@@ -1212,13 +1199,13 @@
 															navigator.maxTouchPoints > 0 ||
 															navigator.msMaxTouchPoints > 0
 														)}
-													placeholder={placeholder ? placeholder : $i18n.t('Send a Message')}
+													placeholder={placeholder ? placeholder : 'Send a Message'}
 													largeTextAsFile={($settings?.largeTextAsFile ?? false) && !shiftKey}
 													autocomplete={$config?.features?.enable_autocomplete_generation &&
 														($settings?.promptAutocomplete ?? false)}
 													generateAutoCompletion={async (text) => {
 														if (selectedModelIds.length === 0 || !selectedModelIds.at(0)) {
-															toast.error($i18n.t('Please select a model first.'));
+															toast.error('Please select a model first.');
 														}
 
 														const res = await generateAutoCompletion(
@@ -1396,11 +1383,7 @@
 												}
 											} catch (error) {
 												console.error('Google Drive Error:', error);
-												toast.error(
-													$i18n.t('Error accessing Google Drive: {{error}}', {
-														error: error.message
-													})
-												);
+												toast.error(`Error accessing Google Drive: ${error.message}`);
 											}
 										}}
 										uploadOneDriveHandler={async (authorityType) => {
@@ -1478,7 +1461,7 @@
 
 									{#if selectedModelIds.length === 1 && $models.find((m) => m.id === selectedModelIds[0])?.has_user_valves}
 										<div class="ml-1 flex gap-1.5">
-											<Tooltip content={$i18n.t('Valves')} placement="top">
+											<Tooltip content={'Valves'} placement="top">
 												<button
 													id="model-valves-button"
 													class="bg-transparent hover:bg-gray-100 text-gray-700 dark:text-white dark:hover:bg-gray-800 rounded-full size-8 flex justify-center items-center outline-hidden focus:outline-hidden"
@@ -1496,11 +1479,7 @@
 
 									<div class="ml-1 flex gap-1.5">
 										{#if (selectedToolIds ?? []).length > 0}
-											<Tooltip
-												content={$i18n.t('{{COUNT}} Available Tools', {
-													COUNT: selectedToolIds.length
-												})}
-											>
+											<Tooltip content={`${selectedToolIds.length} Available Tools`}>
 												<button
 													class="translate-y-[0.5px] px-1 flex gap-1 items-center text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 rounded-lg self-center transition"
 													aria-label="Available Tools"
@@ -1556,7 +1535,7 @@
 										{/each}
 
 										{#if webSearchEnabled}
-											<Tooltip content={$i18n.t('Web Search')} placement="top">
+											<Tooltip content={'Web Search'} placement="top">
 												<button
 													on:click|preventDefault={() => (webSearchEnabled = !webSearchEnabled)}
 													type="button"
@@ -1574,7 +1553,7 @@
 										{/if}
 
 										{#if imageGenerationEnabled}
-											<Tooltip content={$i18n.t('Image')} placement="top">
+											<Tooltip content={'Image'} placement="top">
 												<button
 													on:click|preventDefault={() =>
 														(imageGenerationEnabled = !imageGenerationEnabled)}
@@ -1592,11 +1571,11 @@
 										{/if}
 
 										{#if codeInterpreterEnabled}
-											<Tooltip content={$i18n.t('Code Interpreter')} placement="top">
+											<Tooltip content={'Code Interpreter'} placement="top">
 												<button
 													aria-label={codeInterpreterEnabled
-														? $i18n.t('Disable Code Interpreter')
-														: $i18n.t('Enable Code Interpreter')}
+														? 'Disable Code Interpreter'
+														: 'Enable Code Interpreter'}
 													aria-pressed={codeInterpreterEnabled}
 													on:click|preventDefault={() =>
 														(codeInterpreterEnabled = !codeInterpreterEnabled)}
@@ -1621,8 +1600,8 @@
 
 								<div class="self-end flex space-x-1 mr-1 shrink-0">
 									{#if (!history?.currentId || history.messages[history.currentId]?.done == true) && ($_user?.role === 'admin' || ($_user?.permissions?.chat?.stt ?? true))}
-										<!-- {$i18n.t('Record voice')} -->
-										<Tooltip content={$i18n.t('Dictate')}>
+										<!-- {'Record voice'} -->
+										<Tooltip content={'Dictate'}>
 											<button
 												id="voice-input-button"
 												class=" text-gray-600 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 transition rounded-full p-1.5 mr-0.5 self-center"
@@ -1632,14 +1611,7 @@
 														let stream = await navigator.mediaDevices
 															.getUserMedia({ audio: true })
 															.catch(function (err) {
-																toast.error(
-																	$i18n.t(
-																		`Permission denied when accessing microphone: {{error}}`,
-																		{
-																			error: err
-																		}
-																	)
-																);
+																toast.error(`Permission denied when accessing microphone: ${err}`);
 																return null;
 															});
 
@@ -1650,7 +1622,7 @@
 														}
 														stream = null;
 													} catch {
-														toast.error($i18n.t('Permission denied when accessing microphone'));
+														toast.error('Permission denied when accessing microphone');
 													}
 												}}
 												aria-label="Voice Input"
@@ -1672,7 +1644,7 @@
 
 									{#if (taskIds && taskIds.length > 0) || (history.currentId && history.messages[history.currentId]?.done != true) || generating}
 										<div class=" flex items-center">
-											<Tooltip content={$i18n.t('Stop')}>
+											<Tooltip content={'Stop'}>
 												<button
 													class="bg-white hover:bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-800 transition rounded-full p-1.5"
 													on:click={() => {
@@ -1696,21 +1668,21 @@
 										</div>
 									{:else if prompt === '' && files.length === 0 && ($_user?.role === 'admin' || ($_user?.permissions?.chat?.call ?? true))}
 										<div class=" flex items-center">
-											<!-- {$i18n.t('Call')} -->
-											<Tooltip content={$i18n.t('Voice mode')}>
+											<!-- {'Call'} -->
+											<Tooltip content={'Voice mode'}>
 												<button
 													class=" bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full p-1.5 self-center"
 													type="button"
 													on:click={async () => {
 														if (selectedModels.length > 1) {
-															toast.error($i18n.t('Select only one model to call'));
+															toast.error('Select only one model to call');
 
 															return;
 														}
 
 														if ($config.audio.stt.engine === 'web') {
 															toast.error(
-																$i18n.t('Call feature is not supported when using Web STT engine')
+																'Call feature is not supported when using Web STT engine'
 															);
 
 															return;
@@ -1746,12 +1718,10 @@
 															showControls.set(true);
 														} catch (err) {
 															// If the user denies the permission or an error occurs, show an error message
-															toast.error(
-																$i18n.t('Permission denied when accessing media devices')
-															);
+															toast.error('Permission denied when accessing media devices');
 														}
 													}}
-													aria-label={$i18n.t('Voice mode')}
+													aria-label={'Voice mode'}
 												>
 													<Voice className="size-5" strokeWidth="2.5" />
 												</button>
@@ -1759,7 +1729,7 @@
 										</div>
 									{:else}
 										<div class=" flex items-center">
-											<Tooltip content={$i18n.t('Send message')}>
+											<Tooltip content={'Send message'}>
 												<button
 													id="send-message-button"
 													class="{!(prompt === '' && files.length === 0)

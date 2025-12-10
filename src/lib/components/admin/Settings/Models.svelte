@@ -4,8 +4,6 @@
 	const { saveAs } = fileSaver;
 
 	import { onMount, getContext, tick } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import { WEBUI_NAME, config, mobile, models as _models, settings, user } from '$lib/stores';
 	import {
 		createNewModel,
@@ -114,7 +112,7 @@
 			});
 
 			if (res) {
-				toast.success($i18n.t('Model updated successfully'));
+				toast.success('Model updated successfully');
 			}
 		} else {
 			const res = await createNewModel(localStorage.token, {
@@ -130,7 +128,7 @@
 			});
 
 			if (res) {
-				toast.success($i18n.t('Model updated successfully'));
+				toast.success('Model updated successfully');
 			}
 		}
 		await init();
@@ -186,13 +184,7 @@
 		console.debug(model);
 
 		toast.success(
-			model.meta.hidden
-				? $i18n.t(`Model {{name}} is now hidden`, {
-						name: model.id
-					})
-				: $i18n.t(`Model {{name}} is now visible`, {
-						name: model.id
-					})
+			model.meta.hidden ? `Model ${model.id} is now hidden` : `Model ${model.id} is now visible`
 		);
 
 		upsertModelHandler(model);
@@ -203,9 +195,9 @@
 		const res = await copyToClipboard(`${baseUrl}/?model=${encodeURIComponent(model.id)}`);
 
 		if (res) {
-			toast.success($i18n.t('Copied link to clipboard'));
+			toast.success('Copied link to clipboard');
 		} else {
-			toast.error($i18n.t('Failed to copy link'));
+			toast.error('Failed to copy link');
 		}
 	};
 
@@ -270,14 +262,14 @@
 		<div class="flex flex-col gap-1 mt-1.5 mb-2">
 			<div class="flex justify-between items-center">
 				<div class="flex items-center md:self-center text-xl font-medium px-0.5 gap-2">
-					{$i18n.t('Models')}
+					{'Models'}
 					<span class="text-lg font-medium text-gray-500 dark:text-gray-300"
 						>{filteredModels.length}</span
 					>
 				</div>
 
 				<div class="flex items-center gap-1.5">
-					<Tooltip content={$i18n.t('Manage Models')}>
+					<Tooltip content={'Manage Models'}>
 						<button
 							class=" p-1 rounded-full flex gap-1 items-center"
 							type="button"
@@ -289,7 +281,7 @@
 						</button>
 					</Tooltip>
 
-					<Tooltip content={$i18n.t('Settings')}>
+					<Tooltip content={'Settings'}>
 						<button
 							class=" p-1 rounded-full flex gap-1 items-center"
 							type="button"
@@ -311,7 +303,7 @@
 					<input
 						class=" w-full text-sm py-1 rounded-r-xl outline-hidden bg-transparent"
 						bind:value={searchValue}
-						placeholder={$i18n.t('Search Models')}
+						placeholder={'Search Models'}
 					/>
 					{#if searchValue}
 						<div class="self-center pl-1.5 translate-y-[0.5px] rounded-l-xl bg-transparent">
@@ -379,7 +371,7 @@
 						</button>
 						<div class="flex flex-row gap-0.5 items-center self-center">
 							{#if shiftKey}
-								<Tooltip content={model?.meta?.hidden ? $i18n.t('Show') : $i18n.t('Hide')}>
+								<Tooltip content={model?.meta?.hidden ? 'Show' : 'Hide'}>
 									<button
 										class="self-center w-fit text-sm px-2 py-2 dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
 										type="button"
@@ -444,9 +436,7 @@
 								</ModelMenu>
 
 								<div class="ml-1">
-									<Tooltip
-										content={(model?.is_active ?? true) ? $i18n.t('Enabled') : $i18n.t('Disabled')}
-									>
+									<Tooltip content={(model?.is_active ?? true) ? 'Enabled' : 'Disabled'}>
 										<Switch
 											bind:state={model.is_active}
 											on:change={async () => {
@@ -462,7 +452,7 @@
 			{:else}
 				<div class="flex flex-col items-center justify-center w-full h-20">
 					<div class="text-gray-500 dark:text-gray-400 text-xs">
-						{$i18n.t('No models found')}
+						{'No models found'}
 					</div>
 				</div>
 			{/if}
@@ -489,13 +479,13 @@
 										const res = await importModels(localStorage.token, models);
 
 										if (res) {
-											toast.success($i18n.t('Models imported successfully'));
+											toast.success('Models imported successfully');
 											await init();
 										} else {
-											toast.error($i18n.t('Failed to import models'));
+											toast.error('Failed to import models');
 										}
 									} catch (e) {
-										toast.error(e?.detail ?? $i18n.t('Invalid JSON file'));
+										toast.error(e?.detail ?? 'Invalid JSON file');
 										console.error(e);
 									}
 
@@ -517,7 +507,7 @@
 							<Spinner className="size-3" />
 						{/if}
 						<div class=" self-center mr-2 font-medium line-clamp-1">
-							{$i18n.t('Import Presets')}
+							{'Import Presets'}
 						</div>
 
 						<div class=" self-center">
@@ -543,7 +533,7 @@
 						}}
 					>
 						<div class=" self-center mr-2 font-medium line-clamp-1">
-							{$i18n.t('Export Presets')} ({models.length})
+							{'Export Presets'} ({models.length})
 						</div>
 
 						<div class=" self-center">

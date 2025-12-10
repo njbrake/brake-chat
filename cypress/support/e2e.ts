@@ -24,10 +24,6 @@ const login = (email: string, password: string) => {
 			cy.get('button[type="submit"]').click();
 			// Wait until the user is redirected to the home page
 			cy.get('#chat-search').should('exist');
-			// Get the current version to skip the changelog dialog
-			if (localStorage.getItem('version') === null) {
-				cy.get('button').contains("Okay, Let's Go!").click();
-			}
 		},
 		{
 			validate: () => {

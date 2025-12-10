@@ -16,9 +16,6 @@
 	import Pencil from '$lib/components/icons/Pencil.svelte';
 	import PencilSolid from '$lib/components/icons/PencilSolid.svelte';
 	import Link from '$lib/components/icons/Link.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let createHandler: Function;
 	export let importFromLinkHandler: Function;
 
@@ -35,7 +32,7 @@
 		}
 	}}
 >
-	<Tooltip content={$i18n.t('Create')}>
+	<Tooltip content={'Create'}>
 		<slot />
 	</Tooltip>
 
@@ -57,7 +54,7 @@
 				<div class=" self-center mr-2">
 					<Pencil />
 				</div>
-				<div class=" self-center truncate">{$i18n.t('New Tool')}</div>
+				<div class=" self-center truncate">{'New Tool'}</div>
 			</button>
 
 			<button
@@ -70,7 +67,7 @@
 				<div class=" self-center mr-2">
 					<Link />
 				</div>
-				<div class=" self-center truncate">{$i18n.t('Import From Link')}</div>
+				<div class=" self-center truncate">{'Import From Link'}</div>
 			</button>
 		</DropdownMenu.Content>
 	</div>

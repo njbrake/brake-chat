@@ -29,9 +29,6 @@
 	import MessageInput from './MessageInput.svelte';
 	import FolderPlaceholder from './Placeholder/FolderPlaceholder.svelte';
 	import FolderTitle from './Placeholder/FolderTitle.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let createMessagePair: Function;
 	export let stopResponse: Function;
 
@@ -73,12 +70,12 @@
 <div class="m-auto w-full max-w-6xl px-2 @2xl:px-20 translate-y-6 py-24 text-center">
 	{#if $temporaryChatEnabled}
 		<Tooltip
-			content={$i18n.t("This chat won't appear in history and your messages will not be saved.")}
+			content={"This chat won't appear in history and your messages will not be saved."}
 			className="w-full flex justify-center mb-0.5"
 			placement="top"
 		>
 			<div class="flex items-center gap-2 text-gray-500 text-base my-2 w-fit">
-				<EyeSlash strokeWidth="2.5" className="size-4" />{$i18n.t('Temporary Chat')}
+				<EyeSlash strokeWidth="2.5" className="size-4" />{'Temporary Chat'}
 			</div>
 		</Tooltip>
 	{/if}
@@ -114,15 +111,13 @@
 								>
 									<button
 										aria-hidden={models.length <= 1}
-										aria-label={$i18n.t('Get information on {{name}} in the UI', {
-											name: models[modelIdx]?.name
-										})}
+										aria-label={`Get information on ${models[modelIdx]?.name} in the UI`}
 										on:click={() => {
 											selectedModelIdx = modelIdx;
 										}}
 									>
 										<img
-											src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${model?.id}&lang=${$i18n.language}`}
+											src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${model?.id}&lang=${'en-US'}`}
 											class=" size-9 @sm:size-10 rounded-full border-[1px] border-gray-100 dark:border-none"
 											aria-hidden="true"
 											draggable="false"
@@ -148,7 +143,7 @@
 								</span>
 							</Tooltip>
 						{:else}
-							{$i18n.t('Hello, {{name}}', { name: $user?.name })}
+							{`Hello, ${$user?.name}`}
 						{/if}
 					</div>
 				</div>
@@ -215,7 +210,7 @@
 					{toolServers}
 					{stopResponse}
 					{createMessagePair}
-					placeholder={$i18n.t('How can I help you today?')}
+					placeholder={'How can I help you today?'}
 					{onChange}
 					on:upload={(e) => {
 						dispatch('upload', e.detail);

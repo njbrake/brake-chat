@@ -7,8 +7,6 @@
 
 	import { toast } from 'svelte-sonner';
 	import { onMount, getContext, tick } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import { WEBUI_NAME, knowledge, user } from '$lib/stores';
 	import {
 		getKnowledgeBases,
@@ -90,7 +88,7 @@
 		if (res) {
 			knowledgeBases = await getKnowledgeBaseList(localStorage.token);
 			knowledge.set(await getKnowledgeBases(localStorage.token));
-			toast.success($i18n.t('Knowledge deleted successfully.'));
+			toast.success('Knowledge deleted successfully.');
 		}
 	};
 
@@ -103,7 +101,7 @@
 
 <svelte:head>
 	<title>
-		{$i18n.t('Knowledge')} • {$WEBUI_NAME}
+		{'Knowledge'} • {$WEBUI_NAME}
 	</title>
 </svelte:head>
 
@@ -119,7 +117,7 @@
 		<div class="flex justify-between items-center">
 			<div class="flex items-center md:self-center text-xl font-medium px-0.5 gap-2 shrink-0">
 				<div>
-					{$i18n.t('Knowledge')}
+					{'Knowledge'}
 				</div>
 
 				<div class="text-lg font-medium text-gray-500 dark:text-gray-500">
@@ -134,7 +132,7 @@
 				>
 					<Plus className="size-3" strokeWidth="2.5" />
 
-					<div class=" hidden md:block md:ml-1 text-xs">{$i18n.t('New Knowledge')}</div>
+					<div class=" hidden md:block md:ml-1 text-xs">{'New Knowledge'}</div>
 				</a>
 			</div>
 		</div>
@@ -151,7 +149,7 @@
 				<input
 					class=" w-full text-sm py-1 rounded-r-xl outline-hidden bg-transparent"
 					bind:value={query}
-					placeholder={$i18n.t('Search Knowledge')}
+					placeholder={'Search Knowledge'}
 				/>
 				{#if query}
 					<div class="self-center pl-1.5 translate-y-[0.5px] rounded-l-xl bg-transparent">
@@ -202,9 +200,7 @@
 							on:click={() => {
 								if (item?.meta?.document) {
 									toast.error(
-										$i18n.t(
-											'Only collections can be edited, create a new knowledge base to edit/add documents.'
-										)
+										'Only collections can be edited, create a new knowledge base to edit/add documents.'
 									);
 								} else {
 									goto(`/workspace/knowledge/${item.id}`);
@@ -217,14 +213,14 @@
 										<div class=" flex gap-2 items-center">
 											<div>
 												{#if item?.meta?.document}
-													<Badge type="muted" content={$i18n.t('Document')} />
+													<Badge type="muted" content={'Document'} />
 												{:else}
-													<Badge type="success" content={$i18n.t('Collection')} />
+													<Badge type="success" content={'Collection'} />
 												{/if}
 											</div>
 
 											<div class=" text-xs text-gray-500 line-clamp-1">
-												{$i18n.t('Updated')}
+												{'Updated'}
 												{dayjs(item.updated_at * 1000).fromNow()}
 											</div>
 										</div>
@@ -249,15 +245,13 @@
 										<div>
 											<div class="text-xs text-gray-500">
 												<Tooltip
-													content={item?.user?.email ?? $i18n.t('Deleted User')}
+													content={item?.user?.email ?? 'Deleted User'}
 													className="flex shrink-0"
 													placement="top-start"
 												>
-													{$i18n.t('By {{name}}', {
-														name: capitalizeFirstLetter(
-															item?.user?.name ?? item?.user?.email ?? $i18n.t('Deleted User')
-														)
-													})}
+													{`By ${capitalizeFirstLetter(
+														item?.user?.name ?? item?.user?.email ?? 'Deleted User'
+													)}`}
 												</Tooltip>
 											</div>
 										</div>
@@ -272,9 +266,9 @@
 			<div class=" w-full h-full flex flex-col justify-center items-center my-16 mb-24">
 				<div class="max-w-md text-center">
 					<div class=" text-3xl mb-3">😕</div>
-					<div class=" text-lg font-medium mb-1">{$i18n.t('No knowledge found')}</div>
+					<div class=" text-lg font-medium mb-1">{'No knowledge found'}</div>
 					<div class=" text-gray-500 text-center text-xs">
-						{$i18n.t('Try adjusting your search or filter to find what you are looking for.')}
+						{'Try adjusting your search or filter to find what you are looking for.'}
 					</div>
 				</div>
 			</div>
@@ -282,7 +276,7 @@
 	</div>
 
 	<div class=" text-gray-500 text-xs m-2">
-		ⓘ {$i18n.t("Use '#' in the prompt input to load and include your knowledge.")}
+		ⓘ {"Use '#' in the prompt input to load and include your knowledge."}
 	</div>
 {:else}
 	<div class="w-full h-full flex justify-center items-center">

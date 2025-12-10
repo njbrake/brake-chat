@@ -5,13 +5,10 @@
 
 	import { getContext, onDestroy, onMount, tick } from 'svelte';
 	import { fade } from 'svelte/transition';
-	const i18n: Writable<i18nType> = getContext('i18n');
-
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
 	import { get, type Unsubscriber, type Writable } from 'svelte/store';
-	import type { i18n as i18nType } from 'i18next';
 	import { WEBUI_BASE_URL, WEBUI_API_BASE_URL } from '$lib/constants';
 
 	import {
@@ -760,15 +757,11 @@
 			fileItem.url = `${WEBUI_API_BASE_URL}/files/${uploadedFile.id}`;
 
 			files = files;
-			toast.success($i18n.t('File uploaded successfully'));
+			toast.success('File uploaded successfully');
 		} catch (e) {
 			console.error('Error uploading file:', e);
 			files = files.filter((f) => f.itemId !== tempItemId);
-			toast.error(
-				$i18n.t('Error uploading file: {{error}}', {
-					error: e.message || 'Unknown error'
-				})
-			);
+			toast.error(`Error uploading file: ${e.message || 'Unknown error'}`);
 		}
 	};
 
@@ -1268,7 +1261,7 @@
 	const createMessagePair = async (userPrompt) => {
 		messageInput?.setText('');
 		if (selectedModels.length === 0) {
-			toast.error($i18n.t('Model not selected'));
+			toast.error('Model not selected');
 		} else {
 			const modelId = selectedModels[0];
 			const model = $models.filter((m) => m.id === modelId).at(0);
@@ -1557,11 +1550,11 @@
 		}
 
 		if (userPrompt === '' && files.length === 0) {
-			toast.error($i18n.t('Please enter a prompt'));
+			toast.error('Please enter a prompt');
 			return;
 		}
 		if (selectedModels.includes('')) {
-			toast.error($i18n.t('Model not selected'));
+			toast.error('Model not selected');
 			return;
 		}
 
@@ -1569,9 +1562,7 @@
 			files.length > 0 &&
 			files.filter((file) => file.type !== 'image' && file.status === 'uploading').length > 0
 		) {
-			toast.error(
-				$i18n.t(`Oops! There are files still uploading. Please wait for the upload to complete.`)
-			);
+			toast.error('Oops! There are files still uploading. Please wait for the upload to complete.');
 			return;
 		}
 
@@ -1580,9 +1571,7 @@
 			files.length + chatFiles.length > $config?.file?.max_count
 		) {
 			toast.error(
-				$i18n.t(`You can only chat with a maximum of {{maxCount}} file(s) at a time.`, {
-					maxCount: $config?.file?.max_count
-				})
+				`You can only chat with a maximum of ${$config?.file?.max_count} file(s) at a time.`
 			);
 			return;
 		}
@@ -1596,7 +1585,7 @@
 
 			if (lastMessage.error && !lastMessage.content) {
 				// Error in response
-				toast.error($i18n.t(`Oops! There was an error in the previous response.`));
+				toast.error('Oops! There was an error in the previous response.');
 				return;
 			}
 		}
@@ -1741,11 +1730,7 @@
 					);
 
 					if (hasImages && !(model.info?.meta?.capabilities?.vision ?? true)) {
-						toast.error(
-							$i18n.t('Model {{modelName}} is not vision capable', {
-								modelName: model.name ?? model.id
-							})
-						);
+						toast.error(`Model ${model.name ?? model.id} is not vision capable`);
 					}
 
 					let responseMessageId =
@@ -1765,7 +1750,7 @@
 
 					if (chatEventEmitter) clearInterval(chatEventEmitter);
 				} else {
-					toast.error($i18n.t(`Model {{modelId}} not found`, { modelId }));
+					toast.error(`Model {{modelId}} not found`, { modelId });
 				}
 			})
 		);
@@ -1991,7 +1976,7 @@
 			}
 
 			if (typeof errorMessage === 'object') {
-				errorMessage = $i18n.t(`Uh-oh! There was an issue with the response.`);
+				errorMessage = 'Uh-oh! There was an issue with the response.';
 			}
 
 			toast.error(`${errorMessage}`);
@@ -2052,7 +2037,7 @@
 		}
 
 		responseMessage.error = {
-			content: $i18n.t(`Uh-oh! There was an issue with the response.`) + '\n' + errorMessage
+			content: 'Uh-oh! There was an issue with the response.' + '\n' + errorMessage
 		};
 		responseMessage.done = true;
 
@@ -2246,7 +2231,7 @@
 				localStorage.token,
 				{
 					id: _chatId,
-					title: $i18n.t('New Chat'),
+					title: 'New Chat',
 					models: selectedModels,
 					system: $settings.system ?? undefined,
 					params: params,
@@ -2335,10 +2320,10 @@
 				await chats.set(await getChatList(localStorage.token, $currentChatPage));
 				await pinnedChats.set(await getPinnedChats(localStorage.token));
 
-				toast.success($i18n.t('Chat moved successfully'));
+				toast.success('Chat moved successfully');
 			}
 		} else {
-			toast.error($i18n.t('Failed to move chat'));
+			toast.error('Failed to move chat');
 		}
 	};
 </script>
@@ -2426,12 +2411,11 @@
 						onSaveTempChat={async () => {
 							try {
 								if (!history?.currentId || !Object.keys(history.messages).length) {
-									toast.error($i18n.t('No conversation to save'));
+									toast.error('No conversation to save');
 									return;
 								}
 								const messages = createMessagesList(history, history.currentId);
-								const title =
-									messages.find((m) => m.role === 'user')?.content ?? $i18n.t('New Chat');
+								const title = messages.find((m) => m.role === 'user')?.content ?? 'New Chat';
 
 								const savedChat = await createNewChat(
 									localStorage.token,
@@ -2452,11 +2436,11 @@
 									chats.set(await getChatList(localStorage.token, $currentChatPage));
 
 									await goto(`/c/${savedChat.id}`);
-									toast.success($i18n.t('Conversation saved successfully'));
+									toast.success('Conversation saved successfully');
 								}
 							} catch (error) {
 								console.error('Error saving conversation:', error);
-								toast.error($i18n.t('Failed to save conversation'));
+								toast.error('Failed to save conversation');
 							}
 						}}
 					/>
@@ -2548,7 +2532,7 @@
 								<div
 									class="absolute bottom-1 text-xs text-gray-500 text-center line-clamp-1 right-0 left-0"
 								>
-									<!-- {$i18n.t('LLMs can make mistakes. Verify important information.')} -->
+									<!-- {'LLMs can make mistakes. Verify important information.'} -->
 								</div>
 							</div>
 						{:else}

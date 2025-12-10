@@ -2,7 +2,6 @@
 	import { toast } from 'svelte-sonner';
 
 	import { createEventDispatcher, getContext, onMount } from 'svelte';
-	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
 
 	import { user } from '$lib/stores';
@@ -20,7 +19,7 @@
 	<div>
 		<div class=" flex justify-between dark:text-gray-100 px-5 pt-4">
 			<div class=" text-lg font-medium self-center font-primary">
-				{$i18n.t('Manage Models')}
+				{'Manage Models'}
 			</div>
 			<button
 				class="self-center"
@@ -36,7 +35,7 @@
 			<div class=" flex flex-col w-full sm:flex-row sm:justify-center sm:space-x-6">
 				<div class=" py-5 text-gray-400 text-xs">
 					<div>
-						{$i18n.t('No inference engine with management support found')}
+						{'No inference engine with management support found'}
 					</div>
 				</div>
 			</div>

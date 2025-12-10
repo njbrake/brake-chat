@@ -21,9 +21,6 @@
 	import Spinner from '../common/Spinner.svelte';
 
 	import ChatPlaceholder from './ChatPlaceholder.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let className = 'h-full flex pt-8';
 
 	export let chatId = '';
@@ -263,7 +260,7 @@
 
 	const editMessage = async (messageId, { content, files }, submit = true) => {
 		if ((selectedModels ?? []).filter((id) => id).length === 0) {
-			toast.error($i18n.t('Model not selected'));
+			toast.error('Model not selected');
 			return;
 		}
 		if (history.messages[messageId].role === 'user') {
@@ -406,7 +403,7 @@
 		<div class="w-full pt-2">
 			{#key chatId}
 				<section class="w-full" aria-labelledby="chat-conversation">
-					<h2 class="sr-only" id="chat-conversation">{$i18n.t('Chat Conversation')}</h2>
+					<h2 class="sr-only" id="chat-conversation">{'Chat Conversation'}</h2>
 					{#if messages.at(0)?.parentId !== null}
 						<Loader
 							on:visible={(e) => {
@@ -418,7 +415,7 @@
 						>
 							<div class="w-full flex justify-center py-1 text-xs animate-pulse items-center gap-2">
 								<Spinner className=" size-4" />
-								<div class=" ">{$i18n.t('Loading...')}</div>
+								<div class=" ">{'Loading...'}</div>
 							</div>
 						</Loader>
 					{/if}

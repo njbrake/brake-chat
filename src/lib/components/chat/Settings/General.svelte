@@ -1,13 +1,9 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { createEventDispatcher, onMount, getContext } from 'svelte';
-	import { getLanguages, changeLanguage } from '$lib/i18n';
 	const dispatch = createEventDispatcher();
 
 	import { config, models, settings, theme, user } from '$lib/stores';
-
-	const i18n = getContext('i18n');
-
 	import AdvancedParams from './Advanced/AdvancedParams.svelte';
 	import Textarea from '$lib/components/common/Textarea.svelte';
 	export let saveSettings: Function;
@@ -17,8 +13,6 @@
 	let themes = ['dark', 'light', 'oled-dark'];
 	let selectedTheme = 'system';
 
-	let languages: Awaited<ReturnType<typeof getLanguages>> = [];
-	let lang = $i18n.language;
 	let notificationEnabled = false;
 	let system = '';
 
@@ -32,9 +26,7 @@
 			saveSettings({ notificationEnabled: notificationEnabled });
 		} else {
 			toast.error(
-				$i18n.t(
-					'Response notifications cannot be activated as the website permissions have been denied. Please visit your browser settings to grant the necessary access.'
-				)
+				'Response notifications cannot be activated as the website permissions have been denied. Please visit your browser settings to grant the necessary access.'
 			);
 		}
 	};
@@ -109,8 +101,6 @@
 
 	onMount(async () => {
 		selectedTheme = localStorage.theme ?? 'system';
-
-		languages = await getLanguages();
 
 		notificationEnabled = $settings.notificationEnabled ?? false;
 		system = $settings.system ?? '';
@@ -193,50 +183,31 @@
 <div class="flex flex-col h-full justify-between text-sm" id="tab-general">
 	<div class="  overflow-y-scroll max-h-[28rem] md:max-h-full">
 		<div class="">
-			<div class=" mb-1 text-sm font-medium">{$i18n.t('WebUI Settings')}</div>
+			<div class=" mb-1 text-sm font-medium">{'WebUI Settings'}</div>
 
 			<div class="flex w-full justify-between">
-				<div class=" self-center text-xs font-medium">{$i18n.t('Theme')}</div>
+				<div class=" self-center text-xs font-medium">{'Theme'}</div>
 				<div class="flex items-center relative">
 					<select
 						class="dark:bg-gray-900 w-fit pr-8 rounded-sm py-2 px-2 text-xs bg-transparent text-right {$settings.highContrastMode
 							? ''
 							: 'outline-hidden'}"
 						bind:value={selectedTheme}
-						placeholder={$i18n.t('Select a theme')}
+						placeholder={'Select a theme'}
 						on:change={() => themeChangeHandler(selectedTheme)}
 					>
-						<option value="system">⚙️ {$i18n.t('System')}</option>
-						<option value="dark">🌑 {$i18n.t('Dark')}</option>
-						<option value="oled-dark">🌃 {$i18n.t('OLED Dark')}</option>
-						<option value="light">☀️ {$i18n.t('Light')}</option>
+						<option value="system">⚙️ {'System'}</option>
+						<option value="dark">🌑 {'Dark'}</option>
+						<option value="oled-dark">🌃 {'OLED Dark'}</option>
+						<option value="light">☀️ {'Light'}</option>
 						<option value="her">🌷 Her</option>
-						<!-- <option value="rose-pine dark">🪻 {$i18n.t('Rosé Pine')}</option>
-						<option value="rose-pine-dawn light">🌷 {$i18n.t('Rosé Pine Dawn')}</option> -->
+						<!-- <option value="rose-pine dark">🪻 {'Rosé Pine'}</option>
+						<option value="rose-pine-dawn light">🌷 {'Rosé Pine Dawn'}</option> -->
 					</select>
 				</div>
 			</div>
 
-			<div class=" flex w-full justify-between">
-				<div class=" self-center text-xs font-medium">{$i18n.t('Language')}</div>
-				<div class="flex items-center relative">
-					<select
-						class="dark:bg-gray-900 w-fit pr-8 rounded-sm py-2 px-2 text-xs bg-transparent text-right {$settings.highContrastMode
-							? ''
-							: 'outline-hidden'}"
-						bind:value={lang}
-						placeholder={$i18n.t('Select a language')}
-						on:change={(e) => {
-							changeLanguage(lang);
-						}}
-					>
-						{#each languages as language}
-							<option value={language['code']}>{language['title']}</option>
-						{/each}
-					</select>
-				</div>
-			</div>
-			{#if $i18n.language === 'en-US' && !($config?.license_metadata ?? false)}
+			{#if !($config?.license_metadata ?? false)}
 				<div
 					class="mb-2 text-xs {($settings?.highContrastMode ?? false)
 						? 'text-gray-800 dark:text-gray-100'
@@ -257,7 +228,7 @@
 
 			<div>
 				<div class=" py-0.5 flex w-full justify-between">
-					<div class=" self-center text-xs font-medium">{$i18n.t('Notifications')}</div>
+					<div class=" self-center text-xs font-medium">{'Notifications'}</div>
 
 					<button
 						class="p-1 px-3 text-xs flex rounded-sm transition"
@@ -267,9 +238,9 @@
 						type="button"
 					>
 						{#if notificationEnabled === true}
-							<span class="ml-2 self-center">{$i18n.t('On')}</span>
+							<span class="ml-2 self-center">{'On'}</span>
 						{:else}
-							<span class="ml-2 self-center">{$i18n.t('Off')}</span>
+							<span class="ml-2 self-center">{'Off'}</span>
 						{/if}
 					</button>
 				</div>
@@ -280,7 +251,7 @@
 			<hr class="border-gray-100/50 dark:border-gray-850 my-3" />
 
 			<div>
-				<div class=" my-2.5 text-sm font-medium">{$i18n.t('System Prompt')}</div>
+				<div class=" my-2.5 text-sm font-medium">{'System Prompt'}</div>
 				<Textarea
 					bind:value={system}
 					className={'w-full text-sm outline-hidden resize-vertical' +
@@ -288,7 +259,7 @@
 							? ' p-2.5 border-2 border-gray-300 dark:border-gray-700 rounded-lg bg-transparent text-gray-900 dark:text-gray-100 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 overflow-y-hidden'
 							: '  dark:text-gray-300 ')}
 					rows="4"
-					placeholder={$i18n.t('Enter system prompt here')}
+					placeholder={'Enter system prompt here'}
 				/>
 			</div>
 		{/if}
@@ -296,7 +267,7 @@
 		{#if $user?.role === 'admin' || (($user?.permissions.chat?.controls ?? true) && ($user?.permissions.chat?.params ?? true))}
 			<div class="mt-2 space-y-3 pr-1.5">
 				<div class="flex justify-between items-center text-sm">
-					<div class="  font-medium">{$i18n.t('Advanced Parameters')}</div>
+					<div class="  font-medium">{'Advanced Parameters'}</div>
 					<button
 						class=" text-xs font-medium {($settings?.highContrastMode ?? false)
 							? 'text-gray-800 dark:text-gray-100'
@@ -304,7 +275,7 @@
 						type="button"
 						on:click={() => {
 							showAdvanced = !showAdvanced;
-						}}>{showAdvanced ? $i18n.t('Hide') : $i18n.t('Show')}</button
+						}}>{showAdvanced ? 'Hide' : 'Show'}</button
 					>
 				</div>
 
@@ -322,7 +293,7 @@
 				saveHandler();
 			}}
 		>
-			{$i18n.t('Save')}
+			{'Save'}
 		</button>
 	</div>
 </div>

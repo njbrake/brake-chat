@@ -9,9 +9,6 @@
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Loader from '$lib/components/common/Loader.svelte';
 	import { chatId } from '$lib/stores';
-
-	const i18n = getContext('i18n');
-
 	export let onSelect = (e) => {};
 
 	let loaded = false;
@@ -69,7 +66,7 @@
 
 {#if loaded}
 	{#if items.length === 0}
-		<div class="text-center text-xs text-gray-500 py-3">{$i18n.t('No chats found')}</div>
+		<div class="text-center text-xs text-gray-500 py-3">{'No chats found'}</div>
 	{:else}
 		<div class="flex flex-col gap-0.5">
 			{#each items as item, idx}
@@ -112,7 +109,7 @@
 				>
 					<div class="w-full flex justify-center py-4 text-xs animate-pulse items-center gap-2">
 						<Spinner className=" size-4" />
-						<div class=" ">{$i18n.t('Loading...')}</div>
+						<div class=" ">{'Loading...'}</div>
 					</div>
 				</Loader>
 			{/if}

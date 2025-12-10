@@ -20,9 +20,6 @@
 	import XMark from '../icons/XMark.svelte';
 	import ChevronUp from '../icons/ChevronUp.svelte';
 	import ChevronDown from '../icons/ChevronDown.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 
 	export let title = 'Chats';
@@ -120,7 +117,7 @@
 					<input
 						class=" w-full text-sm pr-4 py-1 rounded-r-xl outline-hidden bg-transparent"
 						bind:value={query}
-						placeholder={$i18n.t('Search Chats')}
+						placeholder={'Search Chats'}
 					/>
 
 					{#if query}
@@ -149,7 +146,7 @@
 									on:click={() => setSortKey('title')}
 								>
 									<div class="flex gap-1.5 items-center">
-										{$i18n.t('Title')}
+										{'Title'}
 
 										{#if orderBy === 'title'}
 											<span class="font-normal"
@@ -171,7 +168,7 @@
 									on:click={() => setSortKey('updated_at')}
 								>
 									<div class="flex gap-1.5 items-center">
-										{$i18n.t('Updated at')}
+										{'Updated at'}
 
 										{#if orderBy === 'updated_at'}
 											<span class="font-normal"
@@ -195,7 +192,7 @@
 								<div
 									class="text-xs text-gray-500 dark:text-gray-400 text-center px-5 min-h-20 w-full h-full flex justify-center items-center"
 								>
-									{$i18n.t('No results found')}
+									{'No results found'}
 								</div>
 							{/if}
 
@@ -206,25 +203,7 @@
 											? ''
 											: 'pt-5'} pb-2 px-2"
 									>
-										{$i18n.t(chat.time_range)}
-										<!-- localisation keys for time_range to be recognized from the i18next parser (so they don't get automatically removed):
-							{$i18n.t('Today')}
-							{$i18n.t('Yesterday')}
-							{$i18n.t('Previous 7 days')}
-							{$i18n.t('Previous 30 days')}
-							{$i18n.t('January')}
-							{$i18n.t('February')}
-							{$i18n.t('March')}
-							{$i18n.t('April')}
-							{$i18n.t('May')}
-							{$i18n.t('June')}
-							{$i18n.t('July')}
-							{$i18n.t('August')}
-							{$i18n.t('September')}
-							{$i18n.t('October')}
-							{$i18n.t('November')}
-							{$i18n.t('December')}
-							-->
+										{chat.time_range}
 									</div>
 								{/if}
 
@@ -244,21 +223,19 @@
 
 									<div class="basis-2/5 flex items-center justify-end">
 										<div class="hidden sm:flex text-gray-500 dark:text-gray-400 text-xs">
-											{$i18n.t(
-												dayjs(chat?.updated_at * 1000).calendar(null, {
-													sameDay: '[Today]',
-													nextDay: '[Tomorrow]',
-													nextWeek: 'dddd',
-													lastDay: '[Yesterday]',
-													lastWeek: '[Last] dddd',
-													sameElse: 'L' // use localized format, otherwise dayjs.calendar() defaults to DD/MM/YYYY
-												})
-											)}
+											{dayjs(chat?.updated_at * 1000).calendar(null, {
+												sameDay: '[Today]',
+												nextDay: '[Tomorrow]',
+												nextWeek: 'dddd',
+												lastDay: '[Yesterday]',
+												lastWeek: '[Last] dddd',
+												sameElse: 'L'
+											})}
 										</div>
 
 										<div class="flex justify-end pl-2.5 text-gray-600 dark:text-gray-300">
 											{#if unarchiveHandler}
-												<Tooltip content={$i18n.t('Unarchive Chat')}>
+												<Tooltip content={'Unarchive Chat'}>
 													<button
 														class="self-center w-fit px-1 text-sm rounded-xl"
 														on:click={async (e) => {
@@ -285,7 +262,7 @@
 												</Tooltip>
 											{/if}
 
-											<Tooltip content={$i18n.t('Delete Chat')}>
+											<Tooltip content={'Delete Chat'}>
 												<button
 													class="self-center w-fit px-1 text-sm rounded-xl"
 													on:click={async (e) => {
@@ -328,7 +305,7 @@
 										class="w-full flex justify-center py-1 text-xs animate-pulse items-center gap-2"
 									>
 										<Spinner className=" size-4" />
-										<div class=" ">{$i18n.t('Loading...')}</div>
+										<div class=" ">{'Loading...'}</div>
 									</div>
 								</Loader>
 							{/if}
@@ -356,9 +333,9 @@
 											class="text-xs text-gray-700 uppercase bg-transparent dark:text-gray-200 border-b-1 border-gray-50 dark:border-gray-850"
 										>
 											<tr>
-												<th scope="col" class="px-3 py-2"> {$i18n.t('Name')} </th>
+												<th scope="col" class="px-3 py-2"> {'Name'} </th>
 												<th scope="col" class="px-3 py-2 hidden md:flex">
-													{$i18n.t('Created At')}
+													{'Created At'}
 												</th>
 												<th scope="col" class="px-3 py-2 text-right" />
 											</tr>
@@ -386,7 +363,7 @@
 													<td class="px-3 py-1 text-right">
 														<div class="flex justify-end w-full">
 															{#if unarchiveHandler}
-																<Tooltip content={$i18n.t('Unarchive Chat')}>
+																<Tooltip content={'Unarchive Chat'}>
 																	<button
 																		class="self-center w-fit text-sm px-2 py-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
 																		on:click={async () => {
@@ -411,7 +388,7 @@
 																</Tooltip>
 															{/if}
 
-															<Tooltip content={$i18n.t('Delete Chat')}>
+															<Tooltip content={'Delete Chat'}>
 																<button
 																	class="self-center w-fit text-sm px-2 py-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
 																	on:click={async () => {
@@ -447,7 +424,7 @@
 						</div>
 					{:else}
 						<div class="text-left text-sm w-full mb-8">
-							{emptyPlaceholder || $i18n.t('No chats found.')}
+							{emptyPlaceholder || 'No chats found.'}
 						</div>
 					{/if}
 				{:else}

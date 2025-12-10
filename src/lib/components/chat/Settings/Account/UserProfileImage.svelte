@@ -1,9 +1,6 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { getContext } from 'svelte';
-
-	const i18n = getContext('i18n');
-
 	import { getGravatarUrl } from '$lib/apis/utils';
 	import { canvasPixelTest, generateInitialsImage } from '$lib/utils';
 
@@ -116,7 +113,7 @@
 			type="button"
 			on:click={async () => {
 				profileImageUrl = `${WEBUI_BASE_URL}/user.png`;
-			}}>{$i18n.t('Remove')}</button
+			}}>{'Remove'}</button
 		>
 
 		<button
@@ -127,15 +124,13 @@
 					profileImageUrl = generateInitialsImage(user?.name);
 				} else {
 					toast.info(
-						$i18n.t(
-							'Fingerprint spoofing detected: Unable to use initials as avatar. Defaulting to default profile image.'
-						),
+						'Fingerprint spoofing detected: Unable to use initials as avatar. Defaulting to default profile image.',
 						{
 							duration: 1000 * 10
 						}
 					);
 				}
-			}}>{$i18n.t('Initials')}</button
+			}}>{'Initials'}</button
 		>
 
 		<button
@@ -145,7 +140,7 @@
 				const url = await getGravatarUrl(localStorage.token, user?.email);
 
 				profileImageUrl = url;
-			}}>{$i18n.t('Gravatar')}</button
+			}}>{'Gravatar'}</button
 		>
 	</div>
 </div>

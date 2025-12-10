@@ -2,8 +2,6 @@
 	import { marked } from 'marked';
 	import DOMPurify from 'dompurify';
 	import { onMount, createEventDispatcher, getContext, tick } from 'svelte';
-
-	const i18n = getContext('i18n');
 	const eventDispatch = createEventDispatcher();
 
 	marked.use({
@@ -14,7 +12,7 @@
 	export let id = '';
 	export let value = '';
 	export let html = '';
-	export let placeholder = $i18n.t('Type here...');
+	export let placeholder = 'Type here...';
 	export let editable = true;
 	export let className = 'input-prose';
 	export let onChange = (e) => {};

@@ -17,9 +17,6 @@
 	import Lock from '../icons/Lock.svelte';
 	import UserAlt from '../icons/UserAlt.svelte';
 	import ChannelInfoModal from './ChannelInfoModal.svelte';
-
-	const i18n = getContext('i18n');
-
 	let showChannelInfoModal = false;
 
 	export let channel;
@@ -40,10 +37,7 @@
 						? 'md:hidden'
 						: ''} mr-1.5 mt-0.5 self-start flex flex-none items-center text-gray-600 dark:text-gray-400"
 				>
-					<Tooltip
-						content={$showSidebar ? $i18n.t('Close Sidebar') : $i18n.t('Open Sidebar')}
-						interactive={true}
-					>
+					<Tooltip content={$showSidebar ? 'Close Sidebar' : 'Open Sidebar'} interactive={true}>
 						<button
 							id="sidebar-toggle-button"
 							class=" cursor-pointer flex rounded-lg hover:bg-gray-100 dark:hover:bg-gray-850 transition cursor-"
@@ -85,7 +79,7 @@
 
 			<div class="self-start flex flex-none items-center text-gray-600 dark:text-gray-400 gap-1">
 				{#if channel?.user_count !== undefined}
-					<Tooltip content={$i18n.t('Users')}>
+					<Tooltip content={'Users'}>
 						<button
 							class=" flex cursor-pointer py-1 px-1.5 border dark:border-gray-850 border-gray-50 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-850 transition"
 							aria-label="User Count"

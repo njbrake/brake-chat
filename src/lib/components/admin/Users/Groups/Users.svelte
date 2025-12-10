@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime';
 	import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -97,7 +95,7 @@
 			<input
 				class=" w-full text-sm pr-4 rounded-r-xl outline-hidden bg-transparent"
 				bind:value={query}
-				placeholder={$i18n.t('Search')}
+				placeholder={'Search'}
 			/>
 		</div>
 	</div>
@@ -120,7 +118,7 @@
 								on:click={() => setSortKey(`group_id:${groupId}`)}
 							>
 								<div class="flex gap-1.5 items-center">
-									{$i18n.t('MBR')}
+									{'MBR'}
 
 									{#if orderBy === `group_id:${groupId}`}
 										<span class="font-normal"
@@ -144,7 +142,7 @@
 								on:click={() => setSortKey('role')}
 							>
 								<div class="flex gap-1.5 items-center">
-									{$i18n.t('Role')}
+									{'Role'}
 
 									{#if orderBy === 'role'}
 										<span class="font-normal"
@@ -167,7 +165,7 @@
 								on:click={() => setSortKey('name')}
 							>
 								<div class="flex gap-1.5 items-center">
-									{$i18n.t('Name')}
+									{'Name'}
 
 									{#if orderBy === 'name'}
 										<span class="font-normal"
@@ -191,7 +189,7 @@
 								on:click={() => setSortKey('last_active_at')}
 							>
 								<div class="flex gap-1.5 items-center">
-									{$i18n.t('Last Active')}
+									{'Last Active'}
 
 									{#if orderBy === 'last_active_at'}
 										<span class="font-normal"
@@ -231,7 +229,7 @@
 												: user.role === 'user'
 													? 'success'
 													: 'muted'}
-											content={$i18n.t(user.role)}
+											content={user.role}
 										/>
 									</div>
 								</td>
@@ -259,7 +257,7 @@
 			</div>
 		{:else}
 			<div class="text-gray-500 text-xs text-center py-2 px-10">
-				{$i18n.t('No users were found.')}
+				{'No users were found.'}
 			</div>
 		{/if}
 

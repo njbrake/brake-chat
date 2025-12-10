@@ -4,17 +4,14 @@
 
 	import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
 	import Check from '$lib/components/icons/Check.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let value = '';
-	export let placeholder = $i18n.t('Select view');
+	export let placeholder = 'Select view';
 	export let onChange: (value: string) => void = () => {};
 
 	const items = [
-		{ value: '', label: $i18n.t('All') },
-		{ value: 'created', label: $i18n.t('Created by you') },
-		{ value: 'shared', label: $i18n.t('Shared with you') }
+		{ value: '', label: 'All' },
+		{ value: 'created', label: 'Created by you' },
+		{ value: 'shared', label: 'Shared with you' }
 	];
 </script>
 
@@ -70,7 +67,7 @@
 		selectedTag = '';
 	}}
 >
-	{$i18n.t('All')}
+	{'All'}
 </button>
 
 <button
@@ -81,7 +78,7 @@
 		selectedTag = '';
 	}}
 >
-	{$i18n.t('Created by you')}
+	{'Created by you'}
 </button>
 
 <button
@@ -92,5 +89,5 @@
 		selectedTag = '';
 	}}
 >
-	{$i18n.t('Shared with you')}
+	{'Shared with you'}
 </button> -->

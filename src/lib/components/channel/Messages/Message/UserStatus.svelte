@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { getContext, onMount } from 'svelte';
-
-	const i18n = getContext('i18n');
 	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
 
 	export let user = null;
@@ -33,7 +31,7 @@
 						</span>
 					</div>
 
-					<span class="text-xs"> {$i18n.t('Active')} </span>
+					<span class="text-xs"> {'Active'} </span>
 				{:else}
 					<div>
 						<span class="relative flex size-2">
@@ -41,7 +39,7 @@
 						</span>
 					</div>
 
-					<span class="text-xs"> {$i18n.t('Away')} </span>
+					<span class="text-xs"> {'Away'} </span>
 				{/if}
 			</div>
 		</div>

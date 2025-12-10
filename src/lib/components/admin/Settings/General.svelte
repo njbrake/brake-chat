@@ -15,14 +15,11 @@
 	import Switch from '$lib/components/common/Switch.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import { WEBUI_BUILD_HASH, WEBUI_VERSION } from '$lib/constants';
-	import { config, showChangelog } from '$lib/stores';
+	import { config } from '$lib/stores';
 	import { compareVersion } from '$lib/utils';
 	import { onMount, getContext } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import Textarea from '$lib/components/common/Textarea.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let saveHandler: Function;
 
 	let updateAvailable = null;
@@ -74,7 +71,7 @@
 			return null;
 		});
 		if (res) {
-			toast.success($i18n.t('LDAP server updated'));
+			toast.success('LDAP server updated');
 		}
 	};
 
@@ -87,7 +84,7 @@
 		if (res) {
 			saveHandler();
 		} else {
-			toast.error($i18n.t('Failed to update settings'));
+			toast.error('Failed to update settings');
 		}
 	};
 
@@ -127,21 +124,21 @@
 		{#if adminConfig !== null}
 			<div class="">
 				<div class="mb-3.5">
-					<div class=" mt-0.5 mb-2.5 text-base font-medium">{$i18n.t('General')}</div>
+					<div class=" mt-0.5 mb-2.5 text-base font-medium">{'General'}</div>
 
 					<hr class=" border-gray-100 dark:border-gray-850 my-2" />
 
 					<div class="mb-2.5">
 						<div class=" mb-1 text-xs font-medium flex space-x-2 items-center">
 							<div>
-								{$i18n.t('Version')}
+								{'Version'}
 							</div>
 						</div>
 						<div class="flex w-full justify-between items-center">
 							<div class="flex flex-col text-xs text-gray-700 dark:text-gray-200">
 								<div class="flex gap-1">
-									<Tooltip content={WEBUI_BUILD_HASH}>
-										v{WEBUI_VERSION}
+									<Tooltip content={'WEBUI_BUILD_HASH'}>
+										v{'WEBUI_VERSION'}
 									</Tooltip>
 
 									{#if $config?.features?.enable_version_update_check}
@@ -150,23 +147,13 @@
 											target="_blank"
 										>
 											{updateAvailable === null
-												? $i18n.t('Checking for updates...')
+												? 'Checking for updates...'
 												: updateAvailable
-													? `(v${version.latest} ${$i18n.t('available!')})`
-													: $i18n.t('(latest)')}
+													? `(v${version.latest} ${'available!'})`
+													: '(latest)'}
 										</a>
 									{/if}
 								</div>
-
-								<button
-									class=" underline flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-500"
-									type="button"
-									on:click={() => {
-										showChangelog.set(true);
-									}}
-								>
-									<div>{$i18n.t("See what's new")}</div>
-								</button>
 							</div>
 
 							{#if $config?.features?.enable_version_update_check}
@@ -177,7 +164,7 @@
 										checkForVersionUpdates();
 									}}
 								>
-									{$i18n.t('Check for updates')}
+									{'Check for updates'}
 								</button>
 							{/if}
 						</div>
@@ -187,10 +174,10 @@
 						<div class="flex w-full justify-between items-center">
 							<div class="text-xs pr-2">
 								<div class="">
-									{$i18n.t('Help')}
+									{'Help'}
 								</div>
 								<div class=" text-xs text-gray-500">
-									{$i18n.t('Discover how to use Open WebUI and seek support from the community.')}
+									{'Discover how to use Open WebUI and seek support from the community.'}
 								</div>
 							</div>
 
@@ -199,7 +186,7 @@
 								href="https://docs.openwebui.com/"
 								target="_blank"
 							>
-								{$i18n.t('Documentation')}
+								{'Documentation'}
 							</a>
 						</div>
 
@@ -233,7 +220,7 @@
 						<div class="flex w-full justify-between items-center">
 							<div class="text-xs pr-2">
 								<div class="">
-									{$i18n.t('License')}
+									{'License'}
 								</div>
 
 								{#if $config?.license_metadata}
@@ -267,9 +254,7 @@
 										target="_blank"
 									>
 										<span class="text-gray-500">
-											{$i18n.t(
-												'Upgrade to a licensed plan for enhanced capabilities, including custom theming and branding, and dedicated support.'
-											)}
+											{'Upgrade to a licensed plan for enhanced capabilities, including custom theming and branding, and dedicated support.'}
 										</span>
 									</a>
 								{/if}
@@ -278,39 +263,39 @@
 							<!-- <button
 								class="flex-shrink-0 text-xs px-3 py-1.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-850 dark:hover:bg-gray-800 transition rounded-lg font-medium"
 							>
-								{$i18n.t('Activate')}
+								{'Activate'}
 							</button> -->
 						</div>
 					</div>
 				</div>
 
 				<div class="mb-3">
-					<div class=" mt-0.5 mb-2.5 text-base font-medium">{$i18n.t('Authentication')}</div>
+					<div class=" mt-0.5 mb-2.5 text-base font-medium">{'Authentication'}</div>
 
 					<hr class=" border-gray-100 dark:border-gray-850 my-2" />
 
 					<div class="  mb-2.5 flex w-full justify-between">
-						<div class=" self-center text-xs font-medium">{$i18n.t('Default User Role')}</div>
+						<div class=" self-center text-xs font-medium">{'Default User Role'}</div>
 						<div class="flex items-center relative">
 							<select
 								class="dark:bg-gray-900 w-fit pr-8 rounded-sm px-2 text-xs bg-transparent outline-hidden text-right"
 								bind:value={adminConfig.DEFAULT_USER_ROLE}
-								placeholder={$i18n.t('Select a role')}
+								placeholder={'Select a role'}
 							>
-								<option value="pending">{$i18n.t('pending')}</option>
-								<option value="user">{$i18n.t('user')}</option>
-								<option value="admin">{$i18n.t('admin')}</option>
+								<option value="pending">{'pending'}</option>
+								<option value="user">{'user'}</option>
+								<option value="admin">{'admin'}</option>
 							</select>
 						</div>
 					</div>
 
 					<div class="  mb-2.5 flex w-full justify-between">
-						<div class=" self-center text-xs font-medium">{$i18n.t('Default Group')}</div>
+						<div class=" self-center text-xs font-medium">{'Default Group'}</div>
 						<div class="flex items-center relative">
 							<select
 								class="dark:bg-gray-900 w-fit pr-8 rounded-sm px-2 text-xs bg-transparent outline-hidden text-right"
 								bind:value={adminConfig.DEFAULT_GROUP_ID}
-								placeholder={$i18n.t('Select a group')}
+								placeholder={'Select a group'}
 							>
 								<option value={''}>None</option>
 								{#each groups as group}
@@ -321,14 +306,14 @@
 					</div>
 
 					<div class=" mb-2.5 flex w-full justify-between pr-2">
-						<div class=" self-center text-xs font-medium">{$i18n.t('Enable New Sign Ups')}</div>
+						<div class=" self-center text-xs font-medium">{'Enable New Sign Ups'}</div>
 
 						<Switch bind:state={adminConfig.ENABLE_SIGNUP} />
 					</div>
 
 					<div class="mb-2.5 flex w-full items-center justify-between pr-2">
 						<div class=" self-center text-xs font-medium">
-							{$i18n.t('Show Admin Details in Account Pending Overlay')}
+							{'Show Admin Details in Account Pending Overlay'}
 						</div>
 
 						<Switch bind:state={adminConfig.SHOW_ADMIN_DETAILS} />
@@ -336,30 +321,26 @@
 
 					<div class="mb-2.5">
 						<div class=" self-center text-xs font-medium mb-2">
-							{$i18n.t('Pending User Overlay Title')}
+							{'Pending User Overlay Title'}
 						</div>
 						<Textarea
-							placeholder={$i18n.t(
-								'Enter a title for the pending user info overlay. Leave empty for default.'
-							)}
+							placeholder={'Enter a title for the pending user info overlay. Leave empty for default.'}
 							bind:value={adminConfig.PENDING_USER_OVERLAY_TITLE}
 						/>
 					</div>
 
 					<div class="mb-2.5">
 						<div class=" self-center text-xs font-medium mb-2">
-							{$i18n.t('Pending User Overlay Content')}
+							{'Pending User Overlay Content'}
 						</div>
 						<Textarea
-							placeholder={$i18n.t(
-								'Enter content for the pending user info overlay. Leave empty for default.'
-							)}
+							placeholder={'Enter content for the pending user info overlay. Leave empty for default.'}
 							bind:value={adminConfig.PENDING_USER_OVERLAY_CONTENT}
 						/>
 					</div>
 
 					<div class="mb-2.5 flex w-full justify-between pr-2">
-						<div class=" self-center text-xs font-medium">{$i18n.t('Enable API Keys')}</div>
+						<div class=" self-center text-xs font-medium">{'Enable API Keys'}</div>
 
 						<Switch bind:state={adminConfig.ENABLE_API_KEYS} />
 					</div>
@@ -367,7 +348,7 @@
 					{#if adminConfig?.ENABLE_API_KEYS}
 						<div class="mb-2.5 flex w-full justify-between pr-2">
 							<div class=" self-center text-xs font-medium">
-								{$i18n.t('API Key Endpoint Restrictions')}
+								{'API Key Endpoint Restrictions'}
 							</div>
 
 							<Switch bind:state={adminConfig.ENABLE_API_KEYS_ENDPOINT_RESTRICTIONS} />
@@ -376,7 +357,7 @@
 						{#if adminConfig?.ENABLE_API_KEYS_ENDPOINT_RESTRICTIONS}
 							<div class=" flex w-full flex-col pr-2 mb-2.5">
 								<div class=" text-xs font-medium">
-									{$i18n.t('Allowed Endpoints')}
+									{'Allowed Endpoints'}
 								</div>
 
 								<input
@@ -393,7 +374,7 @@
 										target="_blank"
 										class=" text-gray-300 font-medium underline"
 									>
-										{$i18n.t('To learn more about available endpoints, visit our documentation.')}
+										{'To learn more about available endpoints, visit our documentation.'}
 									</a>
 								</div>
 							</div>
@@ -402,7 +383,7 @@
 
 					<div class=" mb-2.5 w-full justify-between">
 						<div class="flex w-full justify-between">
-							<div class=" self-center text-xs font-medium">{$i18n.t('JWT Expiration')}</div>
+							<div class=" self-center text-xs font-medium">{'JWT Expiration'}</div>
 						</div>
 
 						<div class="flex mt-2 space-x-2">
@@ -415,9 +396,9 @@
 						</div>
 
 						<div class="mt-2 text-xs text-gray-400 dark:text-gray-500">
-							{$i18n.t('Valid time units:')}
+							{'Valid time units:'}
 							<span class=" text-gray-300 font-medium"
-								>{$i18n.t("'s', 'm', 'h', 'd', 'w' or '-1' for no expiration.")}</span
+								>{"'s', 'm', 'h', 'd', 'w' or '-1' for no expiration."}</span
 							>
 						</div>
 
@@ -427,13 +408,13 @@
 									class=" bg-yellow-500/20 text-yellow-700 dark:text-yellow-200 rounded-lg px-3 py-2"
 								>
 									<div>
-										<span class=" font-medium">{$i18n.t('Warning')}:</span>
+										<span class=" font-medium">{'Warning'}:</span>
 										<span
 											><a
 												href="https://docs.openwebui.com/getting-started/env-configuration#jwt_expires_in"
 												target="_blank"
 												class=" underline"
-												>{$i18n.t('No expiration can pose security risks.')}
+												>{'No expiration can pose security risks.'}
 											</a></span
 										>
 									</div>
@@ -445,7 +426,7 @@
 					<div class=" space-y-3">
 						<div class="mt-2 space-y-2 pr-1.5">
 							<div class="flex justify-between items-center text-sm">
-								<div class="  font-medium">{$i18n.t('LDAP')}</div>
+								<div class="  font-medium">{'LDAP'}</div>
 
 								<div class="mt-1">
 									<Switch bind:state={ENABLE_LDAP} />
@@ -457,12 +438,12 @@
 									<div class="flex w-full gap-2">
 										<div class="w-full">
 											<div class=" self-center text-xs font-medium min-w-fit mb-1">
-												{$i18n.t('Label')}
+												{'Label'}
 											</div>
 											<input
 												class="w-full bg-transparent outline-hidden py-0.5"
 												required
-												placeholder={$i18n.t('Enter server label')}
+												placeholder={'Enter server label'}
 												bind:value={LDAP_SERVER.label}
 											/>
 										</div>
@@ -471,28 +452,28 @@
 									<div class="flex w-full gap-2">
 										<div class="w-full">
 											<div class=" self-center text-xs font-medium min-w-fit mb-1">
-												{$i18n.t('Host')}
+												{'Host'}
 											</div>
 											<input
 												class="w-full bg-transparent outline-hidden py-0.5"
 												required
-												placeholder={$i18n.t('Enter server host')}
+												placeholder={'Enter server host'}
 												bind:value={LDAP_SERVER.host}
 											/>
 										</div>
 										<div class="w-full">
 											<div class=" self-center text-xs font-medium min-w-fit mb-1">
-												{$i18n.t('Port')}
+												{'Port'}
 											</div>
 											<Tooltip
 												placement="top-start"
-												content={$i18n.t('Default to 389 or 636 if TLS is enabled')}
+												content={'Default to 389 or 636 if TLS is enabled'}
 												className="w-full"
 											>
 												<input
 													class="w-full bg-transparent outline-hidden py-0.5"
 													type="number"
-													placeholder={$i18n.t('Enter server port')}
+													placeholder={'Enter server port'}
 													bind:value={LDAP_SERVER.port}
 												/>
 											</Tooltip>
@@ -501,26 +482,26 @@
 									<div class="flex w-full gap-2">
 										<div class="w-full">
 											<div class=" self-center text-xs font-medium min-w-fit mb-1">
-												{$i18n.t('Application DN')}
+												{'Application DN'}
 											</div>
 											<Tooltip
-												content={$i18n.t('The Application Account DN you bind with for search')}
+												content={'The Application Account DN you bind with for search'}
 												placement="top-start"
 											>
 												<input
 													class="w-full bg-transparent outline-hidden py-0.5"
 													required
-													placeholder={$i18n.t('Enter Application DN')}
+													placeholder={'Enter Application DN'}
 													bind:value={LDAP_SERVER.app_dn}
 												/>
 											</Tooltip>
 										</div>
 										<div class="w-full">
 											<div class=" self-center text-xs font-medium min-w-fit mb-1">
-												{$i18n.t('Application DN Password')}
+												{'Application DN Password'}
 											</div>
 											<SensitiveInput
-												placeholder={$i18n.t('Enter Application DN Password')}
+												placeholder={'Enter Application DN Password'}
 												bind:value={LDAP_SERVER.app_dn_password}
 											/>
 										</div>
@@ -528,18 +509,16 @@
 									<div class="flex w-full gap-2">
 										<div class="w-full">
 											<div class=" self-center text-xs font-medium min-w-fit mb-1">
-												{$i18n.t('Attribute for Mail')}
+												{'Attribute for Mail'}
 											</div>
 											<Tooltip
-												content={$i18n.t(
-													'The LDAP attribute that maps to the mail that users use to sign in.'
-												)}
+												content={'The LDAP attribute that maps to the mail that users use to sign in.'}
 												placement="top-start"
 											>
 												<input
 													class="w-full bg-transparent outline-hidden py-0.5"
 													required
-													placeholder={$i18n.t('Example: mail')}
+													placeholder={'Example: mail'}
 													bind:value={LDAP_SERVER.attribute_for_mail}
 												/>
 											</Tooltip>
@@ -548,20 +527,16 @@
 									<div class="flex w-full gap-2">
 										<div class="w-full">
 											<div class=" self-center text-xs font-medium min-w-fit mb-1">
-												{$i18n.t('Attribute for Username')}
+												{'Attribute for Username'}
 											</div>
 											<Tooltip
-												content={$i18n.t(
-													'The LDAP attribute that maps to the username that users use to sign in.'
-												)}
+												content={'The LDAP attribute that maps to the username that users use to sign in.'}
 												placement="top-start"
 											>
 												<input
 													class="w-full bg-transparent outline-hidden py-0.5"
 													required
-													placeholder={$i18n.t(
-														'Example: sAMAccountName or uid or userPrincipalName'
-													)}
+													placeholder={'Example: sAMAccountName or uid or userPrincipalName'}
 													bind:value={LDAP_SERVER.attribute_for_username}
 												/>
 											</Tooltip>
@@ -570,16 +545,13 @@
 									<div class="flex w-full gap-2">
 										<div class="w-full">
 											<div class=" self-center text-xs font-medium min-w-fit mb-1">
-												{$i18n.t('Search Base')}
+												{'Search Base'}
 											</div>
-											<Tooltip
-												content={$i18n.t('The base to search for users')}
-												placement="top-start"
-											>
+											<Tooltip content={'The base to search for users'} placement="top-start">
 												<input
 													class="w-full bg-transparent outline-hidden py-0.5"
 													required
-													placeholder={$i18n.t('Example: ou=users,dc=foo,dc=example')}
+													placeholder={'Example: ou=users,dc=foo,dc=example'}
 													bind:value={LDAP_SERVER.search_base}
 												/>
 											</Tooltip>
@@ -588,11 +560,11 @@
 									<div class="flex w-full gap-2">
 										<div class="w-full">
 											<div class=" self-center text-xs font-medium min-w-fit mb-1">
-												{$i18n.t('Search Filters')}
+												{'Search Filters'}
 											</div>
 											<input
 												class="w-full bg-transparent outline-hidden py-0.5"
-												placeholder={$i18n.t('Example: (&(objectClass=inetOrgPerson)(uid=%s))')}
+												placeholder={'Example: (&(objectClass=inetOrgPerson)(uid=%s))'}
 												bind:value={LDAP_SERVER.search_filters}
 											/>
 										</div>
@@ -603,12 +575,12 @@
 											href="https://ldap.com/ldap-filters/"
 											target="_blank"
 										>
-											{$i18n.t('Click here for filter guides.')}
+											{'Click here for filter guides.'}
 										</a>
 									</div>
 									<div>
 										<div class="flex justify-between items-center text-sm">
-											<div class="  font-medium">{$i18n.t('TLS')}</div>
+											<div class="  font-medium">{'TLS'}</div>
 
 											<div class="mt-1">
 												<Switch bind:state={LDAP_SERVER.use_tls} />
@@ -618,17 +590,17 @@
 											<div class="flex w-full gap-2">
 												<div class="w-full">
 													<div class=" self-center text-xs font-medium min-w-fit mb-1 mt-1">
-														{$i18n.t('Certificate Path')}
+														{'Certificate Path'}
 													</div>
 													<input
 														class="w-full bg-transparent outline-hidden py-0.5"
-														placeholder={$i18n.t('Enter certificate path')}
+														placeholder={'Enter certificate path'}
 														bind:value={LDAP_SERVER.certificate_path}
 													/>
 												</div>
 											</div>
 											<div class="flex justify-between items-center text-xs">
-												<div class=" font-medium">{$i18n.t('Validate certificate')}</div>
+												<div class=" font-medium">{'Validate certificate'}</div>
 
 												<div class="mt-1">
 													<Switch bind:state={LDAP_SERVER.validate_cert} />
@@ -637,12 +609,12 @@
 											<div class="flex w-full gap-2">
 												<div class="w-full">
 													<div class=" self-center text-xs font-medium min-w-fit mb-1">
-														{$i18n.t('Ciphers')}
+														{'Ciphers'}
 													</div>
-													<Tooltip content={$i18n.t('Default to ALL')} placement="top-start">
+													<Tooltip content={'Default to ALL'} placement="top-start">
 														<input
 															class="w-full bg-transparent outline-hidden py-0.5"
-															placeholder={$i18n.t('Example: ALL')}
+															placeholder={'Example: ALL'}
 															bind:value={LDAP_SERVER.ciphers}
 														/>
 													</Tooltip>
@@ -658,27 +630,27 @@
 				</div>
 
 				<div class="mb-3">
-					<div class=" mt-0.5 mb-2.5 text-base font-medium">{$i18n.t('Features')}</div>
+					<div class=" mt-0.5 mb-2.5 text-base font-medium">{'Features'}</div>
 
 					<hr class=" border-gray-100 dark:border-gray-850 my-2" />
 
 					<div class="mb-2.5 flex w-full items-center justify-between pr-2">
 						<div class=" self-center text-xs font-medium">
-							{$i18n.t('Enable Community Sharing')}
+							{'Enable Community Sharing'}
 						</div>
 
 						<Switch bind:state={adminConfig.ENABLE_COMMUNITY_SHARING} />
 					</div>
 
 					<div class="mb-2.5 flex w-full items-center justify-between pr-2">
-						<div class=" self-center text-xs font-medium">{$i18n.t('Enable Message Rating')}</div>
+						<div class=" self-center text-xs font-medium">{'Enable Message Rating'}</div>
 
 						<Switch bind:state={adminConfig.ENABLE_MESSAGE_RATING} />
 					</div>
 
 					<div class="mb-2.5 flex w-full items-center justify-between pr-2">
 						<div class=" self-center text-xs font-medium">
-							{$i18n.t('Notes')} ({$i18n.t('Beta')})
+							{'Notes'} ({'Beta'})
 						</div>
 
 						<Switch bind:state={adminConfig.ENABLE_NOTES} />
@@ -686,7 +658,7 @@
 
 					<div class="mb-2.5 flex w-full items-center justify-between pr-2">
 						<div class=" self-center text-xs font-medium">
-							{$i18n.t('Channels')} ({$i18n.t('Beta')})
+							{'Channels'} ({'Beta'})
 						</div>
 
 						<Switch bind:state={adminConfig.ENABLE_CHANNELS} />
@@ -694,7 +666,7 @@
 
 					<div class="mb-2.5 flex w-full items-center justify-between pr-2">
 						<div class=" self-center text-xs font-medium">
-							{$i18n.t('User Webhooks')}
+							{'User Webhooks'}
 						</div>
 
 						<Switch bind:state={adminConfig.ENABLE_USER_WEBHOOKS} />
@@ -702,17 +674,17 @@
 
 					<div class="mb-2.5">
 						<div class=" self-center text-xs font-medium mb-2">
-							{$i18n.t('Response Watermark')}
+							{'Response Watermark'}
 						</div>
 						<Textarea
-							placeholder={$i18n.t('Enter a watermark for the response. Leave empty for none.')}
+							placeholder={'Enter a watermark for the response. Leave empty for none.'}
 							bind:value={adminConfig.RESPONSE_WATERMARK}
 						/>
 					</div>
 
 					<div class="mb-2.5 w-full justify-between">
 						<div class="flex w-full justify-between">
-							<div class=" self-center text-xs font-medium">{$i18n.t('WebUI URL')}</div>
+							<div class=" self-center text-xs font-medium">{'WebUI URL'}</div>
 						</div>
 
 						<div class="flex mt-2 space-x-2">
@@ -725,15 +697,13 @@
 						</div>
 
 						<div class="mt-2 text-xs text-gray-400 dark:text-gray-500">
-							{$i18n.t(
-								'Enter the public URL of your WebUI. This URL will be used to generate links in the notifications.'
-							)}
+							{'Enter the public URL of your WebUI. This URL will be used to generate links in the notifications.'}
 						</div>
 					</div>
 
 					<div class=" w-full justify-between">
 						<div class="flex w-full justify-between">
-							<div class=" self-center text-xs font-medium">{$i18n.t('Webhook URL')}</div>
+							<div class=" self-center text-xs font-medium">{'Webhook URL'}</div>
 						</div>
 
 						<div class="flex mt-2 space-x-2">
@@ -755,7 +725,7 @@
 			class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
 			type="submit"
 		>
-			{$i18n.t('Save')}
+			{'Save'}
 		</button>
 	</div>
 </form>

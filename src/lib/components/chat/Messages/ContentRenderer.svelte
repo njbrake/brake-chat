@@ -1,7 +1,5 @@
 <script>
 	import { onDestroy, onMount, tick, getContext } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import Markdown from './Markdown.svelte';
 	import {
 		artifactCode,

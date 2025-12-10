@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { getContext } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import { models } from '$lib/stores';
 	import Collapsible from '$lib/components/common/Collapsible.svelte';
@@ -31,7 +29,7 @@
 
 	<div class=" font-medium text-base flex items-center gap-1">
 		<div>
-			{$i18n.t('Controls')}
+			{'Controls'}
 		</div>
 	</div>
 </div>
@@ -39,7 +37,7 @@
 <div class="mt-1 px-1.5">
 	<div class="pb-10">
 		{#if files.length > 0}
-			<div class=" text-xs font-medium mb-2">{$i18n.t('Files')}</div>
+			<div class=" text-xs font-medium mb-2">{'Files'}</div>
 
 			<div class="flex flex-col gap-1">
 				{#each files.filter((file) => file.type !== 'image') as file, fileIdx}
@@ -87,12 +85,12 @@
 			<hr class="my-2 border-gray-50 dark:border-gray-700/10" />
 		{/if}
 
-		<div class=" text-xs font-medium mb-1">{$i18n.t('Model')}</div>
+		<div class=" text-xs font-medium mb-1">{'Model'}</div>
 
 		<div class="w-full">
 			<select class="w-full bg-transparent text-sm outline-hidden" bind:value={selectedModelId}>
 				<option value="" class="bg-gray-50 dark:bg-gray-700" disabled>
-					{$i18n.t('Select a model')}
+					{'Select a model'}
 				</option>
 				{#each $models.filter((model) => !(model?.info?.meta?.hidden ?? false)) as model}
 					<option value={model.id} class="bg-gray-50 dark:bg-gray-700">{model.name}</option>

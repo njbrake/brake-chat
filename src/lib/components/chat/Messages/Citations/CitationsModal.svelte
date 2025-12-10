@@ -1,8 +1,5 @@
 <script lang="ts">
 	import { getContext, onMount, tick } from 'svelte';
-
-	const i18n = getContext('i18n');
-
 	import Modal from '$lib/components/common/Modal.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import CitationModal from './CitationModal.svelte';
@@ -41,7 +38,7 @@
 	<div>
 		<div class=" flex justify-between dark:text-gray-300 px-5 pt-4 pb-2">
 			<div class=" text-lg font-medium self-center capitalize">
-				{$i18n.t('Citations')}
+				{'Citations'}
 			</div>
 			<button
 				class="self-center"

@@ -33,9 +33,6 @@
 	import Markdown from '$lib/components/chat/Messages/Markdown.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import ProfilePreview from '../Messages/Message/ProfilePreview.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let channel = null;
 
 	let page = 1;
@@ -114,7 +111,7 @@
 					<input
 						class=" w-full text-sm pr-4 py-1 rounded-r-xl outline-hidden bg-transparent"
 						bind:value={query}
-						placeholder={$i18n.t('Search')}
+						placeholder={'Search'}
 					/>
 				</div>
 			</div>
@@ -134,7 +131,7 @@
 								on:click={() => setSortKey('name')}
 							>
 								<div class="flex gap-1.5 items-center">
-									{$i18n.t('Name')}
+									{'Name'}
 
 									{#if orderBy === 'name'}
 										<span class="font-normal"
@@ -157,7 +154,7 @@
 								on:click={() => setSortKey('role')}
 							>
 								<div class="flex gap-1.5 items-center">
-									{$i18n.t('Role')}
+									{'Role'}
 
 									{#if orderBy === 'role'}
 										<span class="font-normal"
@@ -214,7 +211,7 @@
 												: user.role === 'user'
 													? 'success'
 													: 'muted'}
-											content={$i18n.t(user.role)}
+											content={user.role}
 										/>
 									</div>
 								</div>
@@ -229,7 +226,7 @@
 			{/if}
 		{:else}
 			<div class="text-gray-500 text-xs text-center py-5 px-10">
-				{$i18n.t('No users were found.')}
+				{'No users were found.'}
 			</div>
 		{/if}
 	{/if}

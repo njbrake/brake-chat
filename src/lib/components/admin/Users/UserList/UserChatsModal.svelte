@@ -13,9 +13,6 @@
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import ChatsModal from '$lib/components/layout/ChatsModal.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 	export let user;
 
@@ -107,10 +104,8 @@
 	bind:query
 	bind:orderBy
 	bind:direction
-	title={$i18n.t("{{user}}'s Chats", {
-		user: user.name.length > 32 ? `${user.name.slice(0, 32)}...` : user.name
-	})}
-	emptyPlaceholder={$i18n.t('No chats found for this user.')}
+	title={`${user.name.length > 32 ? `${user.name.slice(0, 32)}...` : user.name}'s Chats`}
+	emptyPlaceholder={'No chats found for this user.'}
 	shareUrl={true}
 	{chatList}
 	{allChatsLoaded}

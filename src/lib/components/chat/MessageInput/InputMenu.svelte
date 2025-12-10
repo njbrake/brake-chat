@@ -28,9 +28,6 @@
 	import Knowledge from './InputMenu/Knowledge.svelte';
 	import AttachWebpageModal from './AttachWebpageModal.svelte';
 	import GlobeAlt from '$lib/components/icons/GlobeAlt.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let files = [];
 
 	export let selectedModels: string[] = [];
@@ -124,7 +121,7 @@
 		}
 	}}
 >
-	<Tooltip content={$i18n.t('More')}>
+	<Tooltip content={'More'}>
 		<slot />
 	</Tooltip>
 
@@ -141,9 +138,9 @@
 				<div in:fly={{ x: -20, duration: 150 }}>
 					<Tooltip
 						content={fileUploadCapableModels.length !== selectedModels.length
-							? $i18n.t('Model(s) do not support file upload')
+							? 'Model(s) do not support file upload'
 							: !fileUploadEnabled
-								? $i18n.t('You do not have permission to upload files.')
+								? 'You do not have permission to upload files.'
 								: ''}
 						className="w-full"
 					>
@@ -159,15 +156,15 @@
 						>
 							<Clip />
 
-							<div class="line-clamp-1">{$i18n.t('Upload Files')}</div>
+							<div class="line-clamp-1">{'Upload Files'}</div>
 						</DropdownMenu.Item>
 					</Tooltip>
 
 					<Tooltip
 						content={fileUploadCapableModels.length !== selectedModels.length
-							? $i18n.t('Model(s) do not support file upload')
+							? 'Model(s) do not support file upload'
 							: !fileUploadEnabled
-								? $i18n.t('You do not have permission to upload files.')
+								? 'You do not have permission to upload files.'
 								: ''}
 						className="w-full"
 					>
@@ -190,15 +187,15 @@
 							}}
 						>
 							<Camera />
-							<div class=" line-clamp-1">{$i18n.t('Capture')}</div>
+							<div class=" line-clamp-1">{'Capture'}</div>
 						</DropdownMenu.Item>
 					</Tooltip>
 
 					<Tooltip
 						content={fileUploadCapableModels.length !== selectedModels.length
-							? $i18n.t('Model(s) do not support file upload')
+							? 'Model(s) do not support file upload'
 							: !fileUploadEnabled
-								? $i18n.t('You do not have permission to upload files.')
+								? 'You do not have permission to upload files.'
 								: ''}
 						className="w-full"
 					>
@@ -213,16 +210,16 @@
 							}}
 						>
 							<GlobeAlt />
-							<div class="line-clamp-1">{$i18n.t('Attach Webpage')}</div>
+							<div class="line-clamp-1">{'Attach Webpage'}</div>
 						</DropdownMenu.Item>
 					</Tooltip>
 
 					{#if $config?.features?.enable_notes ?? false}
 						<Tooltip
 							content={fileUploadCapableModels.length !== selectedModels.length
-								? $i18n.t('Model(s) do not support file upload')
+								? 'Model(s) do not support file upload'
 								: !fileUploadEnabled
-									? $i18n.t('You do not have permission to upload files.')
+									? 'You do not have permission to upload files.'
 									: ''}
 							className="w-full"
 						>
@@ -238,7 +235,7 @@
 
 								<div class="flex items-center w-full justify-between">
 									<div class=" line-clamp-1">
-										{$i18n.t('Attach Notes')}
+										{'Attach Notes'}
 									</div>
 
 									<div class="text-gray-500">
@@ -252,9 +249,9 @@
 					{#if ($knowledge ?? []).length > 0}
 						<Tooltip
 							content={fileUploadCapableModels.length !== selectedModels.length
-								? $i18n.t('Model(s) do not support file upload')
+								? 'Model(s) do not support file upload'
 								: !fileUploadEnabled
-									? $i18n.t('You do not have permission to upload files.')
+									? 'You do not have permission to upload files.'
 									: ''}
 							className="w-full"
 						>
@@ -270,7 +267,7 @@
 
 								<div class="flex items-center w-full justify-between">
 									<div class=" line-clamp-1">
-										{$i18n.t('Attach Knowledge')}
+										{'Attach Knowledge'}
 									</div>
 
 									<div class="text-gray-500">
@@ -284,9 +281,9 @@
 					{#if ($chats ?? []).length > 0}
 						<Tooltip
 							content={fileUploadCapableModels.length !== selectedModels.length
-								? $i18n.t('Model(s) do not support file upload')
+								? 'Model(s) do not support file upload'
 								: !fileUploadEnabled
-									? $i18n.t('You do not have permission to upload files.')
+									? 'You do not have permission to upload files.'
 									: ''}
 							className="w-full"
 						>
@@ -302,7 +299,7 @@
 
 								<div class="flex items-center w-full justify-between">
 									<div class=" line-clamp-1">
-										{$i18n.t('Reference Chats')}
+										{'Reference Chats'}
 									</div>
 
 									<div class="text-gray-500">
@@ -347,7 +344,7 @@
 										fill="#ffba00"
 									/>
 								</svg>
-								<div class="line-clamp-1">{$i18n.t('Google Drive')}</div>
+								<div class="line-clamp-1">{'Google Drive'}</div>
 							</DropdownMenu.Item>
 						{/if}
 
@@ -448,7 +445,7 @@
 
 								<div class="flex items-center w-full justify-between">
 									<div class=" line-clamp-1">
-										{$i18n.t('Microsoft OneDrive')}
+										{'Microsoft OneDrive'}
 									</div>
 
 									<div class="text-gray-500">
@@ -471,7 +468,7 @@
 
 						<div class="flex items-center w-full justify-between">
 							<div>
-								{$i18n.t('Knowledge')}
+								{'Knowledge'}
 							</div>
 						</div>
 					</button>
@@ -490,7 +487,7 @@
 
 						<div class="flex items-center w-full justify-between">
 							<div>
-								{$i18n.t('Notes')}
+								{'Notes'}
 							</div>
 						</div>
 					</button>
@@ -509,7 +506,7 @@
 
 						<div class="flex items-center w-full justify-between">
 							<div>
-								{$i18n.t('Chats')}
+								{'Chats'}
 							</div>
 						</div>
 					</button>
@@ -528,7 +525,7 @@
 
 						<div class="flex items-center w-full justify-between">
 							<div>
-								{$i18n.t('Microsoft OneDrive')}
+								{'Microsoft OneDrive'}
 							</div>
 						</div>
 					</button>
@@ -541,7 +538,7 @@
 							}}
 						>
 							<div class="flex flex-col">
-								<div class="line-clamp-1">{$i18n.t('Microsoft OneDrive (personal)')}</div>
+								<div class="line-clamp-1">{'Microsoft OneDrive (personal)'}</div>
 							</div>
 						</DropdownMenu.Item>
 					{/if}
@@ -555,9 +552,9 @@
 						>
 							<div class="flex flex-col">
 								<div class="line-clamp-1">
-									{$i18n.t('Microsoft OneDrive (work/school)')}
+									{'Microsoft OneDrive (work/school)'}
 								</div>
-								<div class="text-xs text-gray-500">{$i18n.t('Includes SharePoint')}</div>
+								<div class="text-xs text-gray-500">{'Includes SharePoint'}</div>
 							</div>
 						</DropdownMenu.Item>
 					{/if}

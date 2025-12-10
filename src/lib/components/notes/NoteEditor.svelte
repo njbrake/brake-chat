@@ -3,9 +3,6 @@
 	import { v4 as uuidv4 } from 'uuid';
 	import fileSaver from 'file-saver';
 	const { saveAs } = fileSaver;
-
-	const i18n = getContext('i18n');
-
 	import { marked } from 'marked';
 	import { toast } from 'svelte-sonner';
 
@@ -57,8 +54,8 @@
 		}
 	}
 
-	// Assuming $i18n.languages is an array of language codes
-	$: loadLocale($i18n.languages);
+	// Assuming ['en-US'] is an array of language codes
+	$: loadLocale(['en-US']);
 
 	import { deleteNoteById, getNoteById, updateNoteById } from '$lib/apis/notes';
 
@@ -174,7 +171,7 @@
 
 		debounceTimeout = setTimeout(async () => {
 			const res = await updateNoteById(localStorage.token, id, {
-				title: note?.title === '' ? $i18n.t('Untitled') : note.title,
+				title: note?.title === '' ? 'Untitled' : note.title,
 				data: {
 					files: files
 				},
@@ -275,7 +272,7 @@ ${content}
 				}
 			} catch (e) {
 				console.error('Error parsing JSON response:', e);
-				toast.error($i18n.t('Failed to generate title'));
+				toast.error('Failed to generate title');
 			}
 		}
 
@@ -290,7 +287,7 @@ ${content}
 
 	async function enhanceNoteHandler() {
 		if (selectedModelId === '') {
-			toast.error($i18n.t('Please select a model.'));
+			toast.error('Please select a model.');
 			return;
 		}
 
@@ -387,7 +384,7 @@ ${content}
 		};
 
 		if (fileItem.size == 0) {
-			toast.error($i18n.t('You cannot upload an empty file.'));
+			toast.error('You cannot upload an empty file.');
 			return null;
 		}
 
@@ -509,11 +506,7 @@ ${content}
 				fileSize: file.size,
 				maxSize: ($config?.file?.max_size ?? 0) * 1024 * 1024
 			});
-			toast.error(
-				$i18n.t(`File size should not exceed {{maxSize}} MB.`, {
-					maxSize: $config?.file?.max_size
-				})
-			);
+			toast.error(`File size should not exceed ${$config?.file?.max_size} MB.`);
 			return;
 		}
 
@@ -582,10 +575,10 @@ ${content}
 		});
 
 		if (res) {
-			toast.success($i18n.t('Note deleted successfully'));
+			toast.success('Note deleted successfully');
 			goto('/notes');
 		} else {
-			toast.error($i18n.t('Failed to delete note'));
+			toast.error('Failed to delete note');
 		}
 	};
 
@@ -856,14 +849,14 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 
 <DeleteConfirmDialog
 	bind:show={showDeleteConfirm}
-	title={$i18n.t('Delete note?')}
+	title={'Delete note?'}
 	on:confirm={() => {
 		deleteNoteHandler(note.id);
 		showDeleteConfirm = false;
 	}}
 >
 	<div class=" text-sm text-gray-500">
-		{$i18n.t('This will delete')} <span class="  font-semibold">{note.title}</span>.
+		{'This will delete'} <span class="  font-semibold">{note.title}</span>.
 	</div>
 </DeleteConfirmDialog>
 
@@ -886,9 +879,7 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 										? 'md:hidden pl-0.5'
 										: ''} flex flex-none items-center pr-1 -translate-x-1"
 								>
-									<Tooltip
-										content={$showSidebar ? $i18n.t('Close Sidebar') : $i18n.t('Open Sidebar')}
-									>
+									<Tooltip content={$showSidebar ? 'Close Sidebar' : 'Open Sidebar'}>
 										<button
 											id="sidebar-toggle-button"
 											class=" cursor-pointer flex rounded-lg hover:bg-gray-100 dark:hover:bg-gray-850 transition cursor-"
@@ -908,7 +899,7 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 								class="w-full text-2xl font-medium bg-transparent outline-hidden"
 								type="text"
 								bind:value={note.title}
-								placeholder={titleGenerating ? $i18n.t('Generating...') : $i18n.t('Title')}
+								placeholder={titleGenerating ? 'Generating...' : 'Title'}
 								disabled={(note?.user_id !== $user?.id && $user?.role !== 'admin') ||
 									titleGenerating}
 								required
@@ -931,7 +922,7 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 								<div
 									class="flex self-center items-center space-x-1.5 z-10 translate-y-[0.5px] -translate-x-[0.5px] pl-2"
 								>
-									<Tooltip content={$i18n.t('Generate')}>
+									<Tooltip content={'Generate'}>
 										<button
 											class=" self-center dark:hover:text-white transition"
 											id="generate-title-button"
@@ -984,7 +975,7 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 									</div>
 								{/if}
 
-								<Tooltip placement="top" content={$i18n.t('Chat')} className="cursor-pointer">
+								<Tooltip placement="top" content={'Chat'} className="cursor-pointer">
 									<button
 										class="p-1.5 bg-transparent hover:bg-white/5 transition rounded-lg"
 										on:click={() => {
@@ -1002,7 +993,7 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 									</button>
 								</Tooltip>
 
-								<Tooltip placement="top" content={$i18n.t('Controls')} className="cursor-pointer">
+								<Tooltip placement="top" content={'Controls'} className="cursor-pointer">
 									<button
 										class="p-1.5 bg-transparent hover:bg-white/5 transition rounded-lg"
 										on:click={() => {
@@ -1029,9 +1020,9 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 										const res = await copyToClipboard(`${baseUrl}/notes/${note.id}`);
 
 										if (res) {
-											toast.success($i18n.t('Copied link to clipboard'));
+											toast.success('Copied link to clipboard');
 										} else {
-											toast.error($i18n.t('Failed to copy link'));
+											toast.error('Failed to copy link');
 										}
 									}}
 									onCopyToClipboard={async () => {
@@ -1045,7 +1036,7 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 										});
 
 										if (res) {
-											toast.success($i18n.t('Copied to clipboard'));
+											toast.success('Copied to clipboard');
 										}
 									}}
 									onDelete={() => {
@@ -1079,23 +1070,14 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 									<!-- check for same date, yesterday, last week, and other -->
 
 									{#if dayjs(note.created_at / 1000000).isSame(dayjs(), 'day')}
-										<span
-											>{dayjs(note.created_at / 1000000).format($i18n.t('[Today at] h:mm A'))}</span
-										>
+										<span>{dayjs(note.created_at / 1000000).format('[Today at] h:mm A')}</span>
 									{:else if dayjs(note.created_at / 1000000).isSame(dayjs().subtract(1, 'day'), 'day')}
-										<span
-											>{dayjs(note.created_at / 1000000).format(
-												$i18n.t('[Yesterday at] h:mm A')
-											)}</span
-										>
+										<span>{dayjs(note.created_at / 1000000).format('[Yesterday at] h:mm A')}</span>
 									{:else if dayjs(note.created_at / 1000000).isSame(dayjs().subtract(1, 'week'), 'week')}
-										<span
-											>{dayjs(note.created_at / 1000000).format(
-												$i18n.t('[Last] dddd [at] h:mm A')
-											)}</span
+										<span>{dayjs(note.created_at / 1000000).format('[Last] dddd [at] h:mm A')}</span
 										>
 									{:else}
-										<span>{dayjs(note.created_at / 1000000).format($i18n.t('DD/MM/YYYY'))}</span>
+										<span>{dayjs(note.created_at / 1000000).format('DD/MM/YYYY')}</span>
 									{/if}
 								</button>
 
@@ -1108,20 +1090,16 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 								>
 									<Users className="size-3.5" strokeWidth="2" />
 
-									<span> {note?.access_control ? $i18n.t('Private') : $i18n.t('Everyone')} </span>
+									<span> {note?.access_control ? 'Private' : 'Everyone'} </span>
 								</button>
 
 								{#if editor}
 									<div class="flex items-center gap-1 px-1 min-w-fit">
 										<div>
-											{$i18n.t('{{COUNT}} words', {
-												COUNT: wordCount
-											})}
+											{`${wordCount} words`}
 										</div>
 										<div>
-											{$i18n.t('{{COUNT}} characters', {
-												COUNT: charCount
-											})}
+											{`${charCount} characters`}
 										</div>
 									</div>
 								{/if}
@@ -1149,7 +1127,7 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 							bind:value={note.data.content.md}
 							html={note.data?.content?.html}
 							{files}
-							placeholder={$i18n.t('Write something...')}
+							placeholder={'Write something...'}
 							editable={versionIdx === null && !editing}
 							onSelectionUpdate={({ editor }) => {
 								const { from, to } = editor.state.selection;
@@ -1253,11 +1231,7 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 								let stream = await navigator.mediaDevices
 									.getUserMedia({ audio: true })
 									.catch(function (err) {
-										toast.error(
-											$i18n.t(`Permission denied when accessing microphone: {{error}}`, {
-												error: err
-											})
-										);
+										toast.error(`Permission denied when accessing microphone: ${err}`);
 										return null;
 									});
 
@@ -1268,7 +1242,7 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 								}
 								stream = null;
 							} catch {
-								toast.error($i18n.t('Permission denied when accessing microphone'));
+								toast.error('Permission denied when accessing microphone');
 							}
 						}}
 						onCaptureAudio={async () => {
@@ -1292,7 +1266,7 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 							};
 						}}
 					>
-						<Tooltip content={$i18n.t('Record')} placement="top">
+						<Tooltip content={'Record'} placement="top">
 							<div
 								class="cursor-pointer p-2.5 flex rounded-full border border-gray-50 bg-white dark:border-none dark:bg-gray-850 hover:bg-gray-50 dark:hover:bg-gray-800 transition shadow-xl"
 							>
@@ -1304,7 +1278,7 @@ Provide the enhanced notes in markdown format. Use markdown syntax for headings,
 					<div
 						class="cursor-pointer flex gap-0.5 rounded-full border border-gray-50 dark:border-gray-850 dark:bg-gray-850 transition shadow-xl"
 					>
-						<Tooltip content={$i18n.t('AI')} placement="top">
+						<Tooltip content={'AI'} placement="top">
 							{#if editing}
 								<button
 									class="p-2 flex justify-center items-center hover:bg-gray-50 dark:hover:bg-gray-800 rounded-full transition shrink-0"

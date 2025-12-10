@@ -8,9 +8,6 @@
 
 	import UserList from './Users/UserList.svelte';
 	import Groups from './Users/Groups.svelte';
-
-	const i18n = getContext('i18n');
-
 	let selectedTab;
 	$: {
 		const pathParts = $page.url.pathname.split('/');
@@ -82,7 +79,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('Overview')}</div>
+			<div class=" self-center">{'Overview'}</div>
 		</button>
 
 		<button
@@ -107,7 +104,7 @@
 					/>
 				</svg>
 			</div>
-			<div class=" self-center">{$i18n.t('Groups')}</div>
+			<div class=" self-center">{'Groups'}</div>
 		</button>
 	</div>
 

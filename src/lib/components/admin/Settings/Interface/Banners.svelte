@@ -6,8 +6,6 @@
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import Sortable from 'sortablejs';
 	import { getContext } from 'svelte';
-	const i18n = getContext('i18n');
-
 	export let banners = [];
 
 	let sortable = null;
@@ -65,23 +63,23 @@
 					required
 				>
 					{#if banner.type == ''}
-						<option value="" selected disabled class="text-gray-900">{$i18n.t('Type')}</option>
+						<option value="" selected disabled class="text-gray-900">{'Type'}</option>
 					{/if}
-					<option value="info" class="text-gray-900">{$i18n.t('Info')}</option>
-					<option value="warning" class="text-gray-900">{$i18n.t('Warning')}</option>
-					<option value="error" class="text-gray-900">{$i18n.t('Error')}</option>
-					<option value="success" class="text-gray-900">{$i18n.t('Success')}</option>
+					<option value="info" class="text-gray-900">{'Info'}</option>
+					<option value="warning" class="text-gray-900">{'Warning'}</option>
+					<option value="error" class="text-gray-900">{'Error'}</option>
+					<option value="success" class="text-gray-900">{'Success'}</option>
 				</select>
 
 				<Textarea
 					className="mr-2 text-xs w-full bg-transparent outline-hidden resize-none"
-					placeholder={$i18n.t('Content')}
+					placeholder={'Content'}
 					bind:value={banner.content}
 					maxSize={100}
 				/>
 
 				<div class="relative -left-2">
-					<Tooltip content={$i18n.t('Remember Dismissal')} className="flex h-fit items-center">
+					<Tooltip content={'Remember Dismissal'} className="flex h-fit items-center">
 						<Switch bind:state={banner.dismissible} />
 					</Tooltip>
 				</div>

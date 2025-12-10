@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { getContext, onMount } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import Modal from '$lib/components/common/Modal.svelte';
 	import Plus from '$lib/components/icons/Plus.svelte';
 	import Minus from '$lib/components/icons/Minus.svelte';
@@ -27,11 +25,11 @@
 	<div>
 		<div class=" flex justify-between dark:text-gray-100 px-5 pt-4 pb-1.5">
 			<h1 class="text-lg font-medium self-center font-primary">
-				{$i18n.t('Manage')}
+				{'Manage'}
 			</h1>
 			<button
 				class="self-center"
-				aria-label={$i18n.t('Close modal')}
+				aria-label={'Close modal'}
 				on:click={() => {
 					show = false;
 				}}
@@ -53,13 +51,13 @@
 						<div>
 							<div class=" py-0.5 flex flex-col w-full text-sm">
 								<div id="image-compression-size-label" class=" text-xs mb-2">
-									{$i18n.t('Image Max Compression Size')}
+									{'Image Max Compression Size'}
 								</div>
 
 								<div class="p-1 flex-1 flex gap-2">
 									<div class=" flex-1">
 										<label class="sr-only" for="image-comp-width"
-											>{$i18n.t('Image Max Compression Size width')}</label
+											>{'Image Max Compression Size width'}</label
 										>
 										<input
 											bind:value={size.width}
@@ -67,7 +65,7 @@
 											aria-labelledby="image-comp-width"
 											class="w-full bg-transparent outline-hidden text-center"
 											min="0"
-											placeholder={$i18n.t('Width')}
+											placeholder={'Width'}
 										/>
 									</div>
 
@@ -77,7 +75,7 @@
 
 									<div class="flex-1">
 										<label class="sr-only" for="image-comp-height"
-											>{$i18n.t('Image Max Compression Size height')}</label
+											>{'Image Max Compression Size height'}</label
 										>
 										<input
 											bind:value={size.height}
@@ -85,7 +83,7 @@
 											aria-labelledby="image-comp-height"
 											class="w-full bg-transparent outline-hidden text-center"
 											min="0"
-											placeholder={$i18n.t('Height')}
+											placeholder={'Height'}
 										/>
 									</div>
 								</div>
@@ -98,7 +96,7 @@
 							class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
 							type="submit"
 						>
-							{$i18n.t('Save')}
+							{'Save'}
 						</button>
 					</div>
 				</form>

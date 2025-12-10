@@ -1,8 +1,6 @@
 <script>
 	import { onMount, getContext, createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
-	const i18n = getContext('i18n');
-
 	import Switch from './Switch.svelte';
 	import MapSelector from './Valves/MapSelector.svelte';
 
@@ -46,13 +44,13 @@
 					{#if (valves[property] ?? null) === null}
 						<span class="ml-2 self-center">
 							{#if (valvesSpec?.required ?? []).includes(property)}
-								{$i18n.t('None')}
+								{'None'}
 							{:else}
-								{$i18n.t('Default')}
+								{'Default'}
 							{/if}
 						</span>
 					{:else}
-						<span class="ml-2 self-center"> {$i18n.t('Custom')} </span>
+						<span class="ml-2 self-center"> {'Custom'} </span>
 					{/if}
 				</button>
 			</div>
@@ -78,7 +76,7 @@
 						{:else if (valvesSpec.properties[property]?.type ?? null) === 'boolean'}
 							<div class="flex justify-between items-center">
 								<div class="text-xs text-gray-500">
-									{valves[property] ? $i18n.t('Enabled') : $i18n.t('Disabled')}
+									{valves[property] ? 'Enabled' : 'Disabled'}
 								</div>
 
 								<div class=" pr-2">
@@ -121,7 +119,7 @@
 									<input
 										type="text"
 										class="flex-1 rounded-lg py-2 text-sm dark:text-gray-300 dark:bg-gray-850 outline-hidden border border-gray-100 dark:border-gray-850"
-										placeholder={$i18n.t('Enter hex color (e.g. #FF0000)')}
+										placeholder={'Enter hex color (e.g. #FF0000)'}
 										bind:value={valves[property]}
 										autocomplete="off"
 										disabled
@@ -147,7 +145,7 @@
 										<input
 											type="text"
 											class=" w-full rounded-lg py-1 text-left text-sm dark:text-gray-300 dark:bg-gray-850 outline-hidden border border-gray-100 dark:border-gray-850"
-											placeholder={$i18n.t('Enter coordinates (e.g. 51.505, -0.09)')}
+											placeholder={'Enter coordinates (e.g. 51.505, -0.09)'}
 											bind:value={valves[property]}
 											autocomplete="off"
 											on:change={() => {
@@ -181,5 +179,5 @@
 		</div>
 	{/each}
 {:else}
-	<div class="text-xs">{$i18n.t('No valves')}</div>
+	<div class="text-xs">{'No valves'}</div>
 {/if}

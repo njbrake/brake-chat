@@ -39,9 +39,6 @@
 	import ChatCheck from '../icons/ChatCheck.svelte';
 	import Knobs from '../icons/Knobs.svelte';
 	import { WEBUI_API_BASE_URL } from '$lib/constants';
-
-	const i18n = getContext('i18n');
-
 	export let initNewChat: Function;
 	export let shareEnabled: boolean = false;
 	export let scrollTop = 0;
@@ -91,7 +88,7 @@
 					<div
 						class="-translate-x-0.5 mr-1 mt-1 self-start flex flex-none items-center text-gray-600 dark:text-gray-400"
 					>
-						<Tooltip content={$showSidebar ? $i18n.t('Close Sidebar') : $i18n.t('Open Sidebar')}>
+						<Tooltip content={$showSidebar ? 'Close Sidebar' : 'Open Sidebar'}>
 							<button
 								class=" cursor-pointer flex rounded-lg hover:bg-gray-100 dark:hover:bg-gray-850 transition"
 								on:click={() => {
@@ -121,7 +118,7 @@
 
 					{#if $user?.role === 'user' ? ($user?.permissions?.chat?.temporary ?? true) && !($user?.permissions?.chat?.temporary_enforced ?? false) : true}
 						{#if !chat?.id}
-							<Tooltip content={$i18n.t(`Temporary Chat`)}>
+							<Tooltip content={'Temporary Chat'}>
 								<button
 									class="flex cursor-pointer px-2 py-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-850 transition"
 									id="temporary-chat-button"
@@ -153,7 +150,7 @@
 								</button>
 							</Tooltip>
 						{:else if $temporaryChatEnabled}
-							<Tooltip content={$i18n.t(`Save Chat`)}>
+							<Tooltip content={'Save Chat'}>
 								<button
 									class="flex cursor-pointer px-2 py-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-850 transition"
 									id="save-temporary-chat-button"
@@ -170,7 +167,7 @@
 					{/if}
 
 					{#if $mobile && !$temporaryChatEnabled && chat && chat.id}
-						<Tooltip content={$i18n.t('New Chat')}>
+						<Tooltip content={'New Chat'}>
 							<button
 								class=" flex {$showSidebar
 									? 'md:hidden'
@@ -211,7 +208,7 @@
 					{/if}
 
 					{#if $user?.role === 'admin' || ($user?.permissions.chat?.controls ?? true)}
-						<Tooltip content={$i18n.t('Controls')}>
+						<Tooltip content={'Controls'}>
 							<button
 								class=" flex cursor-pointer px-2 py-2 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-850 transition"
 								on:click={async () => {
@@ -241,7 +238,7 @@
 								class="select-none flex rounded-xl p-1.5 w-full hover:bg-gray-50 dark:hover:bg-gray-850 transition"
 							>
 								<div class=" self-center">
-									<span class="sr-only">{$i18n.t('User menu')}</span>
+									<span class="sr-only">{'User menu'}</span>
 									<img
 										src={`${WEBUI_API_BASE_URL}/users/${$user?.id}/profile/image`}
 										class="size-6 object-cover rounded-full"
@@ -259,7 +256,7 @@
 
 	{#if $temporaryChatEnabled && ($chatId ?? '').startsWith('local:')}
 		<div class=" w-full z-30 text-center">
-			<div class="text-xs text-gray-500">{$i18n.t('Temporary Chat')}</div>
+			<div class="text-xs text-gray-500">{'Temporary Chat'}</div>
 		</div>
 	{/if}
 
@@ -272,9 +269,8 @@
 							banner={{
 								type: 'info',
 								title: 'Trial License',
-								content: $i18n.t(
+								content:
 									'You are currently using a trial license. Please contact support to upgrade your license.'
-								)
 							}}
 						/>
 					{/if}
@@ -284,9 +280,8 @@
 							banner={{
 								type: 'error',
 								title: 'License Error',
-								content: $i18n.t(
+								content:
 									'Exceeded the number of seats in your license. Please contact support to increase the number of seats.'
-								)
 							}}
 						/>
 					{/if}

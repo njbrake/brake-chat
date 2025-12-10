@@ -16,9 +16,6 @@
 	import { toast } from 'svelte-sonner';
 	import Tag from '$lib/components/icons/Tag.svelte';
 	import Label from '$lib/components/icons/Label.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let selectedModelIdx: number = -1;
 	export let item: any = {};
 	export let index: number = -1;
@@ -33,9 +30,9 @@
 		const res = await copyToClipboard(`${baseUrl}/?model=${encodeURIComponent(model.id)}`);
 
 		if (res) {
-			toast.success($i18n.t('Copied link to clipboard'));
+			toast.success('Copied link to clipboard');
 		} else {
-			toast.error($i18n.t('Failed to copy link'));
+			toast.error('Failed to copy link');
 		}
 	};
 
@@ -76,7 +73,7 @@
 			<div class="flex items-center min-w-fit">
 				<Tooltip content={$user?.role === 'admin' ? (item?.value ?? '') : ''} placement="top-start">
 					<img
-						src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${item.model.id}&lang=${$i18n.language}`}
+						src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${item.model.id}&lang=${'en-US'}`}
 						alt="Model"
 						class="rounded-full size-5 flex items-center"
 					/>
@@ -113,7 +110,7 @@
 				{/if}
 
 				{#if item.model?.direct}
-					<Tooltip content={`${$i18n.t('Direct')}`}>
+					<Tooltip content={`${'Direct'}`}>
 						<div class="translate-y-[1px]">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -130,7 +127,7 @@
 						</div>
 					</Tooltip>
 				{:else if item.model.connection_type === 'external'}
-					<Tooltip content={`${$i18n.t('External')}`}>
+					<Tooltip content={`${'External'}`}>
 						<div class="translate-y-[1px]">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -191,7 +188,7 @@
 			}}
 		>
 			<button
-				aria-label={`${$i18n.t('More Options')}`}
+				aria-label={`${'More Options'}`}
 				class="flex"
 				on:click={(e) => {
 					e.preventDefault();

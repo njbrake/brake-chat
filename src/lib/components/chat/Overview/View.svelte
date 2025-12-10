@@ -3,8 +3,6 @@
 	import { useSvelteFlow, useNodesInitialized, useStore } from '@xyflow/svelte';
 
 	const dispatch = createEventDispatcher();
-	const i18n = getContext('i18n');
-
 	import { onMount, tick } from 'svelte';
 
 	import { writable } from 'svelte/store';
@@ -178,7 +176,7 @@
 			>
 				<ArrowLeft className="size-3.5" />
 			</button>
-			<div class=" text-lg font-medium self-center font-primary">{$i18n.t('Chat Overview')}</div>
+			<div class=" text-lg font-medium self-center font-primary">{'Chat Overview'}</div>
 		</div>
 		<button
 			class="self-center p-0.5"

@@ -23,9 +23,6 @@
 	import { goto } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
 	import ArchivedChatsModal from '$lib/components/layout/ArchivedChatsModal.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let saveSettings: Function;
 
 	// Chats
@@ -158,7 +155,7 @@
 						/>
 					</svg>
 				</div>
-				<div class=" self-center text-sm font-medium">{$i18n.t('Import Chats')}</div>
+				<div class=" self-center text-sm font-medium">{'Import Chats'}</div>
 			</button>
 
 			{#if $user?.role === 'admin' || ($user.permissions?.chat?.export ?? true)}
@@ -182,7 +179,7 @@
 							/>
 						</svg>
 					</div>
-					<div class=" self-center text-sm font-medium">{$i18n.t('Export Chats')}</div>
+					<div class=" self-center text-sm font-medium">{'Export Chats'}</div>
 				</button>
 			{/if}
 		</div>
@@ -213,7 +210,7 @@
 						/>
 					</svg>
 				</div>
-				<div class=" self-center text-sm font-medium">{$i18n.t('Archived Chats')}</div>
+				<div class=" self-center text-sm font-medium">{'Archived Chats'}</div>
 			</button>
 
 			{#if showArchiveConfirm}
@@ -232,7 +229,7 @@
 								clip-rule="evenodd"
 							/>
 						</svg>
-						<span>{$i18n.t('Are you sure?')}</span>
+						<span>{'Are you sure?'}</span>
 					</div>
 
 					<div class="flex space-x-1.5 items-center">
@@ -299,7 +296,7 @@
 							/>
 						</svg>
 					</div>
-					<div class=" self-center text-sm font-medium">{$i18n.t('Archive All Chats')}</div>
+					<div class=" self-center text-sm font-medium">{'Archive All Chats'}</div>
 				</button>
 			{/if}
 
@@ -319,7 +316,7 @@
 								clip-rule="evenodd"
 							/>
 						</svg>
-						<span>{$i18n.t('Are you sure?')}</span>
+						<span>{'Are you sure?'}</span>
 					</div>
 
 					<div class="flex space-x-1.5 items-center">
@@ -383,7 +380,7 @@
 							/>
 						</svg>
 					</div>
-					<div class=" self-center text-sm font-medium">{$i18n.t('Delete All Chats')}</div>
+					<div class=" self-center text-sm font-medium">{'Delete All Chats'}</div>
 				</button>
 			{/if}
 		</div>

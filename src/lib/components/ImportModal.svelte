@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { getContext, onMount } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
@@ -23,7 +21,7 @@
 		loading = true;
 
 		if (!url) {
-			toast.error($i18n.t('Please enter a valid URL'));
+			toast.error('Please enter a valid URL');
 			loading = false;
 			return;
 		}
@@ -36,7 +34,7 @@
 
 		if (res) {
 			if (!successMessage) {
-				successMessage = $i18n.t('Function imported successfully');
+				successMessage = 'Function imported successfully';
 			}
 
 			toast.success(successMessage);
@@ -64,7 +62,7 @@
 <Modal size="sm" bind:show>
 	<div>
 		<div class=" flex justify-between dark:text-gray-300 px-5 pt-4 pb-2">
-			<div class=" text-lg font-medium self-center">{$i18n.t('Import')}</div>
+			<div class=" text-lg font-medium self-center">{'Import'}</div>
 			<button
 				class="self-center"
 				on:click={() => {
@@ -85,18 +83,18 @@
 				>
 					<div class="px-1">
 						<div class="flex flex-col w-full">
-							<div class=" mb-1 text-xs text-gray-500">{$i18n.t('URL')}</div>
+							<div class=" mb-1 text-xs text-gray-500">{'URL'}</div>
 
 							<div class="flex-1">
 								<input
 									class="w-full text-sm bg-transparent disabled:text-gray-500 dark:disabled:text-gray-500 outline-hidden"
 									type="url"
 									bind:value={url}
-									placeholder={$i18n.t('Enter the URL to import')}
+									placeholder={'Enter the URL to import'}
 									required
 								/>
 
-								<!-- $i18n.t('Enter the URL of the function to import') -->
+								<!-- 'Enter the URL of the function to import' -->
 							</div>
 						</div>
 					</div>
@@ -109,7 +107,7 @@
 							type="submit"
 							disabled={loading}
 						>
-							{$i18n.t('Import')}
+							{'Import'}
 
 							{#if loading}
 								<div class="ml-2 self-center">

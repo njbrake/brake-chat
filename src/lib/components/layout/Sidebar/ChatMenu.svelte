@@ -25,9 +25,6 @@
 	import Download from '$lib/components/icons/Download.svelte';
 	import Folder from '$lib/components/icons/Folder.svelte';
 	import Messages from '$lib/components/chat/Messages.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let shareHandler: Function;
 	export let moveChatHandler: Function;
 
@@ -290,7 +287,7 @@
 		}
 	}}
 >
-	<Tooltip content={$i18n.t('More')}>
+	<Tooltip content={'More'}>
 		<slot />
 	</Tooltip>
 
@@ -310,7 +307,7 @@
 					}}
 				>
 					<Share strokeWidth="1.5" />
-					<div class="flex items-center">{$i18n.t('Share')}</div>
+					<div class="flex items-center">{'Share'}</div>
 				</DropdownMenu.Item>
 			{/if}
 
@@ -320,7 +317,7 @@
 				>
 					<Download strokeWidth="1.5" />
 
-					<div class="flex items-center">{$i18n.t('Download')}</div>
+					<div class="flex items-center">{'Download'}</div>
 				</DropdownMenu.SubTrigger>
 				<DropdownMenu.SubContent
 					class="w-full rounded-2xl p-1 z-50 bg-white dark:bg-gray-850 dark:text-white shadow-lg border border-gray-100  dark:border-gray-800"
@@ -334,7 +331,7 @@
 								downloadJSONExport();
 							}}
 						>
-							<div class="flex items-center line-clamp-1">{$i18n.t('Export chat (.json)')}</div>
+							<div class="flex items-center line-clamp-1">{'Export chat (.json)'}</div>
 						</DropdownMenu.Item>
 					{/if}
 
@@ -344,7 +341,7 @@
 							downloadTxt();
 						}}
 					>
-						<div class="flex items-center line-clamp-1">{$i18n.t('Plain text (.txt)')}</div>
+						<div class="flex items-center line-clamp-1">{'Plain text (.txt)'}</div>
 					</DropdownMenu.Item>
 
 					<DropdownMenu.Item
@@ -353,7 +350,7 @@
 							downloadPdf();
 						}}
 					>
-						<div class="flex items-center line-clamp-1">{$i18n.t('PDF document (.pdf)')}</div>
+						<div class="flex items-center line-clamp-1">{'PDF document (.pdf)'}</div>
 					</DropdownMenu.Item>
 				</DropdownMenu.SubContent>
 			</DropdownMenu.Sub>
@@ -365,7 +362,7 @@
 				}}
 			>
 				<Pencil strokeWidth="1.5" />
-				<div class="flex items-center">{$i18n.t('Rename')}</div>
+				<div class="flex items-center">{'Rename'}</div>
 			</DropdownMenu.Item>
 
 			<hr class="border-gray-50 dark:border-gray-800 my-1" />
@@ -378,10 +375,10 @@
 			>
 				{#if pinned}
 					<BookmarkSlash strokeWidth="1.5" />
-					<div class="flex items-center">{$i18n.t('Unpin')}</div>
+					<div class="flex items-center">{'Unpin'}</div>
 				{:else}
 					<Bookmark strokeWidth="1.5" />
-					<div class="flex items-center">{$i18n.t('Pin')}</div>
+					<div class="flex items-center">{'Pin'}</div>
 				{/if}
 			</DropdownMenu.Item>
 
@@ -392,7 +389,7 @@
 				}}
 			>
 				<DocumentDuplicate strokeWidth="1.5" />
-				<div class="flex items-center">{$i18n.t('Clone')}</div>
+				<div class="flex items-center">{'Clone'}</div>
 			</DropdownMenu.Item>
 
 			{#if chatId && $folders.length > 0}
@@ -402,7 +399,7 @@
 					>
 						<Folder />
 
-						<div class="flex items-center">{$i18n.t('Move')}</div>
+						<div class="flex items-center">{'Move'}</div>
 					</DropdownMenu.SubTrigger>
 					<DropdownMenu.SubContent
 						class="w-full rounded-2xl p-1 z-50 bg-white dark:bg-gray-850 dark:text-white border border-gray-100  dark:border-gray-800 shadow-lg max-h-52 overflow-y-auto scrollbar-hidden"
@@ -432,7 +429,7 @@
 				}}
 			>
 				<ArchiveBox strokeWidth="1.5" />
-				<div class="flex items-center">{$i18n.t('Archive')}</div>
+				<div class="flex items-center">{'Archive'}</div>
 			</DropdownMenu.Item>
 
 			<DropdownMenu.Item
@@ -442,7 +439,7 @@
 				}}
 			>
 				<GarbageBin strokeWidth="1.5" />
-				<div class="flex items-center">{$i18n.t('Delete')}</div>
+				<div class="flex items-center">{'Delete'}</div>
 			</DropdownMenu.Item>
 		</DropdownMenu.Content>
 	</div>

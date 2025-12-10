@@ -9,9 +9,6 @@
 	import Eye from '$lib/components/icons/Eye.svelte';
 	import EyeSlash from '$lib/components/icons/EyeSlash.svelte';
 	import { settings } from '$lib/stores';
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 	export let model;
 
@@ -33,7 +30,7 @@
 >
 	<DropdownMenu.Trigger>
 		<Tooltip
-			content={$i18n.t('More')}
+			content={'More'}
 			className={($settings?.highContrastMode ?? false)
 				? ''
 				: 'group-hover/item:opacity-100 opacity-0'}
@@ -70,9 +67,9 @@
 
 			<div class="flex items-center">
 				{#if ($settings?.pinnedModels ?? []).includes(model?.id)}
-					{$i18n.t('Hide from Sidebar')}
+					{'Hide from Sidebar'}
 				{:else}
-					{$i18n.t('Keep in Sidebar')}
+					{'Keep in Sidebar'}
 				{/if}
 			</div>
 		</DropdownMenu.Item>
@@ -90,7 +87,7 @@
 		>
 			<Link />
 
-			<div class="flex items-center">{$i18n.t('Copy Link')}</div>
+			<div class="flex items-center">{'Copy Link'}</div>
 		</DropdownMenu.Item>
 	</DropdownMenu.Content>
 </DropdownMenu.Root>

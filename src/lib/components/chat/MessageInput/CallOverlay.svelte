@@ -14,9 +14,6 @@
 	import VideoInputMenu from './CallOverlay/VideoInputMenu.svelte';
 	import { KokoroWorker } from '$lib/workers/KokoroWorker';
 	import { WEBUI_API_BASE_URL } from '$lib/constants';
-
-	const i18n = getContext('i18n');
-
 	export let eventTarget: EventTarget;
 	export let submitPrompt: Function;
 	export let stopResponse: Function;
@@ -761,7 +758,7 @@
 								: rmsLevel * 100 > 1
 									? 'size-14'
 									: 'size-12'}  transition-all rounded-full bg-cover bg-center bg-no-repeat"
-						style={`background-image: url('${WEBUI_API_BASE_URL}/models/model/profile/image?id=${model?.id}&lang=${$i18n.language}&voice=true');`}
+						style={`background-image: url('${WEBUI_API_BASE_URL}/models/model/profile/image?id=${model?.id}&lang=${'en-US'}&voice=true');`}
 					/>
 				{/if}
 				<!-- navbar -->
@@ -837,7 +834,7 @@
 									: rmsLevel * 100 > 1
 										? 'size-44'
 										: 'size-40'} transition-all rounded-full bg-cover bg-center bg-no-repeat"
-							style={`background-image: url('${WEBUI_API_BASE_URL}/models/model/profile/image?id=${model?.id}&lang=${$i18n.language}&voice=true');`}
+							style={`background-image: url('${WEBUI_API_BASE_URL}/models/model/profile/image?id=${model?.id}&lang=${'en-US'}&voice=true');`}
 						/>
 					{/if}
 				</button>
@@ -905,7 +902,7 @@
 						</button>
 					</VideoInputMenu>
 				{:else}
-					<Tooltip content={$i18n.t('Camera')}>
+					<Tooltip content={'Camera'}>
 						<button
 							class=" p-3 rounded-full bg-gray-50 dark:bg-gray-900"
 							type="button"
@@ -949,11 +946,11 @@
 				>
 					<div class=" line-clamp-1 text-sm font-medium">
 						{#if loading}
-							{$i18n.t('Thinking...')}
+							{'Thinking...'}
 						{:else if assistantSpeaking}
-							{$i18n.t('Tap to interrupt')}
+							{'Tap to interrupt'}
 						{:else}
-							{$i18n.t('Listening...')}
+							{'Listening...'}
 						{/if}
 					</div>
 				</button>

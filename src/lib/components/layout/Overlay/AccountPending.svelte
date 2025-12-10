@@ -5,9 +5,6 @@
 	import { getAdminDetails } from '$lib/apis/auths';
 	import { onMount, tick, getContext } from 'svelte';
 	import { config } from '$lib/stores';
-
-	const i18n = getContext('i18n');
-
 	let adminDetails = null;
 
 	onMount(async () => {
@@ -31,8 +28,8 @@
 					{#if ($config?.ui?.pending_user_overlay_title ?? '').trim() !== ''}
 						{$config.ui.pending_user_overlay_title}
 					{:else}
-						{$i18n.t('Account Activation Pending')}<br />
-						{$i18n.t('Contact Admin for WebUI Access')}
+						{'Account Activation Pending'}<br />
+						{'Contact Admin for WebUI Access'}
 					{/if}
 				</div>
 
@@ -47,9 +44,7 @@
 							)
 						)}
 					{:else}
-						{$i18n.t('Your account status is currently pending activation.')}{'\n'}{$i18n.t(
-							'To access the WebUI, please reach out to the administrator. Admins can manage user statuses from the Admin Panel.'
-						)}
+						{'Your account status is currently pending activation.'}{'\n'}{'To access the WebUI, please reach out to the administrator. Admins can manage user statuses from the Admin Panel.'}
 					{/if}
 				</div>
 
@@ -60,7 +55,7 @@
 							location.href = '/';
 						}}
 					>
-						{$i18n.t('Check Again')}
+						{'Check Again'}
 					</button>
 
 					<button
@@ -68,7 +63,7 @@
 						on:click={async () => {
 							localStorage.removeItem('token');
 							location.href = '/auth';
-						}}>{$i18n.t('Sign Out')}</button
+						}}>{'Sign Out'}</button
 					>
 				</div>
 			</div>

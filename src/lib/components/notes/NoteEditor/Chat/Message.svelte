@@ -1,8 +1,5 @@
 <script lang="ts">
 	import { onMount, getContext } from 'svelte';
-
-	const i18n = getContext('i18n');
-
 	import Skeleton from '$lib/components/chat/Messages/Skeleton.svelte';
 	import Markdown from '$lib/components/chat/Messages/Markdown.svelte';
 	import Pencil from '$lib/components/icons/Pencil.svelte';
@@ -23,11 +20,11 @@
 <div class="flex flex-col gap-1 group">
 	<div class="flex items-center justify-between pt-1">
 		<div class="py-1 text-sm font-semibold uppercase min-w-[6rem] text-left rounded-lg transition">
-			{$i18n.t(message.role)}
+			{message.role}
 		</div>
 
 		<div class="flex items-center gap-2">
-			<Tooltip placement="top" content={$i18n.t('Insert')}>
+			<Tooltip placement="top" content={'Insert'}>
 				<button
 					class=" text-transparent group-hover:text-gray-500 dark:hover:text-gray-300 transition"
 					on:click={() => {
@@ -38,7 +35,7 @@
 				</button>
 			</Tooltip>
 
-			<Tooltip placement="top" content={$i18n.t('Edit')}>
+			<Tooltip placement="top" content={'Edit'}>
 				<button
 					class=" text-transparent group-hover:text-gray-500 dark:hover:text-gray-300 transition"
 					on:click={() => {
@@ -49,7 +46,7 @@
 				</button>
 			</Tooltip>
 
-			<Tooltip placement="top" content={$i18n.t('Delete')}>
+			<Tooltip placement="top" content={'Delete'}>
 				<button
 					class=" text-transparent group-hover:text-gray-500 dark:hover:text-gray-300 transition"
 					on:click={() => {
@@ -76,8 +73,8 @@
 	</div>
 
 	<div class="flex-1">
-		<!-- $i18n.t('a user') -->
-		<!-- $i18n.t('an assistant') -->
+		<!-- 'a user' -->
+		<!-- 'an assistant' -->
 
 		{#if !(message?.done ?? true) && message?.content === ''}
 			<div class="">
@@ -86,9 +83,7 @@
 		{:else if message?.edit === true}
 			<Textarea
 				className="w-full bg-transparent outline-hidden text-sm resize-none overflow-hidden"
-				placeholder={$i18n.t(`Enter {{role}} message here`, {
-					role: message.role === 'user' ? $i18n.t('a user') : $i18n.t('an assistant')
-				})}
+				placeholder={`Enter ${message.role === 'user' ? 'a user' : 'an assistant'} message here`}
 				bind:value={message.content}
 				onBlur={() => {
 					message.edit = false;

@@ -28,8 +28,6 @@
 	import ViewSelector from './common/ViewSelector.svelte';
 
 	let shiftKey = false;
-
-	const i18n = getContext('i18n');
 	let promptsImportInputElement: HTMLInputElement;
 	let loaded = false;
 
@@ -67,7 +65,7 @@
 	};
 
 	const shareHandler = async (prompt) => {
-		toast.success($i18n.t('Redirecting you to Open WebUI Community'));
+		toast.success('Redirecting you to Open WebUI Community');
 
 		const url = 'https://openwebui.com';
 
@@ -113,7 +111,7 @@
 		});
 
 		if (res) {
-			toast.success($i18n.t(`Deleted {{name}}`, { name: command }));
+			toast.success(`Deleted ${command}`);
 		}
 
 		await init();
@@ -159,20 +157,20 @@
 
 <svelte:head>
 	<title>
-		{$i18n.t('Prompts')} • {$WEBUI_NAME}
+		{'Prompts'} • {$WEBUI_NAME}
 	</title>
 </svelte:head>
 
 {#if loaded}
 	<DeleteConfirmDialog
 		bind:show={showDeleteConfirm}
-		title={$i18n.t('Delete prompt?')}
+		title={'Delete prompt?'}
 		on:confirm={() => {
 			deleteHandler(deletePrompt);
 		}}
 	>
 		<div class=" text-sm text-gray-500 truncate">
-			{$i18n.t('This will delete')} <span class="  font-medium">{deletePrompt.command}</span>.
+			{'This will delete'} <span class="  font-medium">{deletePrompt.command}</span>.
 		</div>
 	</DeleteConfirmDialog>
 
@@ -216,7 +214,7 @@
 		<div class="flex justify-between items-center">
 			<div class="flex items-center md:self-center text-xl font-medium px-0.5 gap-2 shrink-0">
 				<div>
-					{$i18n.t('Prompts')}
+					{'Prompts'}
 				</div>
 
 				<div class="text-lg font-medium text-gray-500 dark:text-gray-500">
@@ -233,7 +231,7 @@
 						}}
 					>
 						<div class=" self-center font-medium line-clamp-1">
-							{$i18n.t('Import')}
+							{'Import'}
 						</div>
 					</button>
 				{/if}
@@ -249,7 +247,7 @@
 						}}
 					>
 						<div class=" self-center font-medium line-clamp-1">
-							{$i18n.t('Export')}
+							{'Export'}
 						</div>
 					</button>
 				{/if}
@@ -259,7 +257,7 @@
 				>
 					<Plus className="size-3" strokeWidth="2.5" />
 
-					<div class=" hidden md:block md:ml-1 text-xs">{$i18n.t('New Prompt')}</div>
+					<div class=" hidden md:block md:ml-1 text-xs">{'New Prompt'}</div>
 				</a>
 			</div>
 		</div>
@@ -276,7 +274,7 @@
 				<input
 					class=" w-full text-sm pr-4 py-1 rounded-r-xl outline-hidden bg-transparent"
 					bind:value={query}
-					placeholder={$i18n.t('Search Prompts')}
+					placeholder={'Search Prompts'}
 				/>
 
 				{#if query}
@@ -336,23 +334,21 @@
 
 							<div class=" text-xs">
 								<Tooltip
-									content={prompt?.user?.email ?? $i18n.t('Deleted User')}
+									content={prompt?.user?.email ?? 'Deleted User'}
 									className="flex shrink-0"
 									placement="top-start"
 								>
 									<div class="shrink-0 text-gray-500">
-										{$i18n.t('By {{name}}', {
-											name: capitalizeFirstLetter(
-												prompt?.user?.name ?? prompt?.user?.email ?? $i18n.t('Deleted User')
-											)
-										})}
+										{`By ${capitalizeFirstLetter(
+											prompt?.user?.name ?? prompt?.user?.email ?? 'Deleted User'
+										)}`}
 									</div>
 								</Tooltip>
 							</div>
 						</div>
 						<div class="flex flex-row gap-0.5 self-center">
 							{#if shiftKey}
-								<Tooltip content={$i18n.t('Delete')}>
+								<Tooltip content={'Delete'}>
 									<button
 										class="self-center w-fit text-sm px-2 py-2 dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
 										type="button"
@@ -396,9 +392,9 @@
 			<div class=" w-full h-full flex flex-col justify-center items-center my-16 mb-24">
 				<div class="max-w-md text-center">
 					<div class=" text-3xl mb-3">😕</div>
-					<div class=" text-lg font-medium mb-1">{$i18n.t('No prompts found')}</div>
+					<div class=" text-lg font-medium mb-1">{'No prompts found'}</div>
 					<div class=" text-gray-500 text-center text-xs">
-						{$i18n.t('Try adjusting your search or filter to find what you are looking for.')}
+						{'Try adjusting your search or filter to find what you are looking for.'}
 					</div>
 				</div>
 			</div>
@@ -408,7 +404,7 @@
 	{#if $config?.features.enable_community_sharing}
 		<div class=" my-16">
 			<div class=" text-xl font-medium mb-1 line-clamp-1">
-				{$i18n.t('Made by Open WebUI Community')}
+				{'Made by Open WebUI Community'}
 			</div>
 
 			<a
@@ -417,9 +413,9 @@
 				target="_blank"
 			>
 				<div class=" self-center">
-					<div class=" font-medium line-clamp-1">{$i18n.t('Discover a prompt')}</div>
+					<div class=" font-medium line-clamp-1">{'Discover a prompt'}</div>
 					<div class=" text-sm line-clamp-1">
-						{$i18n.t('Discover, download, and explore custom prompts')}
+						{'Discover, download, and explore custom prompts'}
 					</div>
 				</div>
 

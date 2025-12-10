@@ -22,9 +22,6 @@
 	import Valves from '$lib/components/common/Valves.svelte';
 
 	const dispatch = createEventDispatcher();
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 
 	let tab = 'tools';
@@ -88,7 +85,7 @@
 				);
 
 				if (res) {
-					toast.success($i18n.t('Valves updated'));
+					toast.success('Valves updated');
 					valves = res;
 				}
 			} else if (tab === 'functions') {
@@ -102,7 +99,7 @@
 				});
 
 				if (res) {
-					toast.success($i18n.t('Valves updated'));
+					toast.success('Valves updated');
 					valves = res;
 				}
 			}
@@ -150,12 +147,10 @@
 						<select
 							class="  w-full rounded-sm text-xs py-2 px-1 bg-transparent outline-hidden"
 							bind:value={tab}
-							placeholder={$i18n.t('Select')}
+							placeholder={'Select'}
 						>
-							<option value="tools" class="bg-gray-100 dark:bg-gray-800">{$i18n.t('Tools')}</option>
-							<option value="functions" class="bg-gray-100 dark:bg-gray-800"
-								>{$i18n.t('Functions')}</option
-							>
+							<option value="tools" class="bg-gray-100 dark:bg-gray-800">{'Tools'}</option>
+							<option value="functions" class="bg-gray-100 dark:bg-gray-800">{'Functions'}</option>
 						</select>
 					</div>
 
@@ -169,7 +164,7 @@
 						>
 							{#if tab === 'tools'}
 								<option value="" selected disabled class="bg-gray-100 dark:bg-gray-800"
-									>{$i18n.t('Select a tool')}</option
+									>{'Select a tool'}</option
 								>
 
 								{#each $tools.filter((tool) => !tool?.id?.startsWith('server:')) as tool, toolIdx}
@@ -177,7 +172,7 @@
 								{/each}
 							{:else if tab === 'functions'}
 								<option value="" selected disabled class="bg-gray-100 dark:bg-gray-800"
-									>{$i18n.t('Select a function')}</option
+									>{'Select a function'}</option
 								>
 
 								{#each $functions as func, funcIdx}

@@ -7,9 +7,6 @@
 	import { toast } from 'svelte-sonner';
 	import SensitiveInput from '$lib/components/common/SensitiveInput.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let saveHandler: Function;
 
 	let webSearchEngines = [
@@ -94,13 +91,13 @@
 		{#if webConfig}
 			<div class="">
 				<div class="mb-3">
-					<div class=" mt-0.5 mb-2.5 text-base font-medium">{$i18n.t('General')}</div>
+					<div class=" mt-0.5 mb-2.5 text-base font-medium">{'General'}</div>
 
 					<hr class=" border-gray-100 dark:border-gray-850 my-2" />
 
 					<div class="  mb-2.5 flex w-full justify-between">
 						<div class=" self-center text-xs font-medium">
-							{$i18n.t('Web Search')}
+							{'Web Search'}
 						</div>
 						<div class="flex items-center relative">
 							<Switch bind:state={webConfig.ENABLE_WEB_SEARCH} />
@@ -109,16 +106,16 @@
 
 					<div class="  mb-2.5 flex w-full justify-between">
 						<div class=" self-center text-xs font-medium">
-							{$i18n.t('Web Search Engine')}
+							{'Web Search Engine'}
 						</div>
 						<div class="flex items-center relative">
 							<select
 								class="dark:bg-gray-900 w-fit pr-8 rounded-sm px-2 p-1 text-xs bg-transparent outline-hidden text-right"
 								bind:value={webConfig.WEB_SEARCH_ENGINE}
-								placeholder={$i18n.t('Select a engine')}
+								placeholder={'Select a engine'}
 								required
 							>
-								<option disabled selected value="">{$i18n.t('Select a engine')}</option>
+								<option disabled selected value="">{'Select a engine'}</option>
 								{#each webSearchEngines as engine}
 									{#if engine === 'duckduckgo' || engine === 'ddgs'}
 										<option value={engine}>DDGS</option>
@@ -135,7 +132,7 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Perplexity Search API URL')}
+										{'Perplexity Search API URL'}
 									</div>
 
 									<div class="flex w-full">
@@ -143,7 +140,7 @@
 											<input
 												class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 												type="text"
-												placeholder={$i18n.t('Enter Perplexity Search API URL')}
+												placeholder={'Enter Perplexity Search API URL'}
 												bind:value={webConfig.PERPLEXITY_SEARCH_API_URL}
 												autocomplete="off"
 											/>
@@ -155,13 +152,13 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Perplexity API Key')}
+										{'Perplexity API Key'}
 									</div>
 
 									<div class="flex w-full">
 										<div class="flex-1">
 											<SensitiveInput
-												placeholder={$i18n.t('Enter Perplexity API Key')}
+												placeholder={'Enter Perplexity API Key'}
 												bind:value={webConfig.PERPLEXITY_API_KEY}
 											/>
 										</div>
@@ -172,7 +169,7 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Searxng Query URL')}
+										{'Searxng Query URL'}
 									</div>
 
 									<div class="flex w-full">
@@ -180,7 +177,7 @@
 											<input
 												class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 												type="text"
-												placeholder={$i18n.t('Enter Searxng Query URL')}
+												placeholder={'Enter Searxng Query URL'}
 												bind:value={webConfig.SEARXNG_QUERY_URL}
 												autocomplete="off"
 												required
@@ -193,7 +190,7 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Yacy Instance URL')}
+										{'Yacy Instance URL'}
 									</div>
 
 									<div class="flex w-full">
@@ -201,7 +198,7 @@
 											<input
 												class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 												type="text"
-												placeholder={$i18n.t('Enter Yacy URL (e.g. http://yacy.example.com:8090)')}
+												placeholder={'Enter Yacy URL (e.g. http://yacy.example.com:8090)'}
 												bind:value={webConfig.YACY_QUERY_URL}
 												autocomplete="off"
 											/>
@@ -213,12 +210,12 @@
 								<div class="flex gap-2">
 									<div class="w-full">
 										<div class=" self-center text-xs font-medium mb-1">
-											{$i18n.t('Yacy Username')}
+											{'Yacy Username'}
 										</div>
 
 										<input
 											class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
-											placeholder={$i18n.t('Enter Yacy Username')}
+											placeholder={'Enter Yacy Username'}
 											bind:value={webConfig.YACY_USERNAME}
 											required
 										/>
@@ -226,11 +223,11 @@
 
 									<div class="w-full">
 										<div class=" self-center text-xs font-medium mb-1">
-											{$i18n.t('Yacy Password')}
+											{'Yacy Password'}
 										</div>
 
 										<SensitiveInput
-											placeholder={$i18n.t('Enter Yacy Password')}
+											placeholder={'Enter Yacy Password'}
 											bind:value={webConfig.YACY_PASSWORD}
 										/>
 									</div>
@@ -240,17 +237,17 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Google PSE API Key')}
+										{'Google PSE API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Google PSE API Key')}
+										placeholder={'Enter Google PSE API Key'}
 										bind:value={webConfig.GOOGLE_PSE_API_KEY}
 									/>
 								</div>
 								<div class="mt-1.5">
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Google PSE Engine Id')}
+										{'Google PSE Engine Id'}
 									</div>
 
 									<div class="flex w-full">
@@ -258,7 +255,7 @@
 											<input
 												class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 												type="text"
-												placeholder={$i18n.t('Enter Google PSE Engine Id')}
+												placeholder={'Enter Google PSE Engine Id'}
 												bind:value={webConfig.GOOGLE_PSE_ENGINE_ID}
 												autocomplete="off"
 											/>
@@ -270,11 +267,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Brave Search API Key')}
+										{'Brave Search API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Brave Search API Key')}
+										placeholder={'Enter Brave Search API Key'}
 										bind:value={webConfig.BRAVE_SEARCH_API_KEY}
 									/>
 								</div>
@@ -283,11 +280,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Kagi Search API Key')}
+										{'Kagi Search API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Kagi Search API Key')}
+										placeholder={'Enter Kagi Search API Key'}
 										bind:value={webConfig.KAGI_SEARCH_API_KEY}
 									/>
 								</div>
@@ -296,11 +293,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Mojeek Search API Key')}
+										{'Mojeek Search API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Mojeek Search API Key')}
+										placeholder={'Enter Mojeek Search API Key'}
 										bind:value={webConfig.MOJEEK_SEARCH_API_KEY}
 									/>
 								</div>
@@ -309,11 +306,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Bocha Search API Key')}
+										{'Bocha Search API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Bocha Search API Key')}
+										placeholder={'Enter Bocha Search API Key'}
 										bind:value={webConfig.BOCHA_SEARCH_API_KEY}
 									/>
 								</div>
@@ -322,11 +319,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Serpstack API Key')}
+										{'Serpstack API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Serpstack API Key')}
+										placeholder={'Enter Serpstack API Key'}
 										bind:value={webConfig.SERPSTACK_API_KEY}
 									/>
 								</div>
@@ -335,11 +332,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Serper API Key')}
+										{'Serper API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Serper API Key')}
+										placeholder={'Enter Serper API Key'}
 										bind:value={webConfig.SERPER_API_KEY}
 									/>
 								</div>
@@ -348,11 +345,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Serply API Key')}
+										{'Serply API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Serply API Key')}
+										placeholder={'Enter Serply API Key'}
 										bind:value={webConfig.SERPLY_API_KEY}
 									/>
 								</div>
@@ -361,11 +358,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Tavily API Key')}
+										{'Tavily API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Tavily API Key')}
+										placeholder={'Enter Tavily API Key'}
 										bind:value={webConfig.TAVILY_API_KEY}
 									/>
 								</div>
@@ -374,17 +371,17 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('SearchApi API Key')}
+										{'SearchApi API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter SearchApi API Key')}
+										placeholder={'Enter SearchApi API Key'}
 										bind:value={webConfig.SEARCHAPI_API_KEY}
 									/>
 								</div>
 								<div class="mt-1.5">
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('SearchApi Engine')}
+										{'SearchApi Engine'}
 									</div>
 
 									<div class="flex w-full">
@@ -392,7 +389,7 @@
 											<input
 												class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 												type="text"
-												placeholder={$i18n.t('Enter SearchApi Engine')}
+												placeholder={'Enter SearchApi Engine'}
 												bind:value={webConfig.SEARCHAPI_ENGINE}
 												autocomplete="off"
 											/>
@@ -404,17 +401,17 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('SerpApi API Key')}
+										{'SerpApi API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter SerpApi API Key')}
+										placeholder={'Enter SerpApi API Key'}
 										bind:value={webConfig.SERPAPI_API_KEY}
 									/>
 								</div>
 								<div class="mt-1.5">
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('SerpApi Engine')}
+										{'SerpApi Engine'}
 									</div>
 
 									<div class="flex w-full">
@@ -422,7 +419,7 @@
 											<input
 												class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 												type="text"
-												placeholder={$i18n.t('Enter SerpApi Engine')}
+												placeholder={'Enter SerpApi Engine'}
 												bind:value={webConfig.SERPAPI_ENGINE}
 												autocomplete="off"
 											/>
@@ -434,11 +431,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Jina API Key')}
+										{'Jina API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Jina API Key')}
+										placeholder={'Enter Jina API Key'}
 										bind:value={webConfig.JINA_API_KEY}
 									/>
 								</div>
@@ -447,7 +444,7 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Bing Search V7 Endpoint')}
+										{'Bing Search V7 Endpoint'}
 									</div>
 
 									<div class="flex w-full">
@@ -455,7 +452,7 @@
 											<input
 												class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 												type="text"
-												placeholder={$i18n.t('Enter Bing Search V7 Endpoint')}
+												placeholder={'Enter Bing Search V7 Endpoint'}
 												bind:value={webConfig.BING_SEARCH_V7_ENDPOINT}
 												autocomplete="off"
 											/>
@@ -465,11 +462,11 @@
 
 								<div class="mt-2">
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Bing Search V7 Subscription Key')}
+										{'Bing Search V7 Subscription Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Bing Search V7 Subscription Key')}
+										placeholder={'Enter Bing Search V7 Subscription Key'}
 										bind:value={webConfig.BING_SEARCH_V7_SUBSCRIPTION_KEY}
 									/>
 								</div>
@@ -478,11 +475,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Exa API Key')}
+										{'Exa API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Exa API Key')}
+										placeholder={'Enter Exa API Key'}
 										bind:value={webConfig.EXA_API_KEY}
 									/>
 								</div>
@@ -491,11 +488,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Perplexity API Key')}
+										{'Perplexity API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Perplexity API Key')}
+										placeholder={'Enter Perplexity API Key'}
 										bind:value={webConfig.PERPLEXITY_API_KEY}
 									/>
 								</div>
@@ -504,7 +501,7 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class="self-center text-xs font-medium mb-1">
-										{$i18n.t('Perplexity Model')}
+										{'Perplexity Model'}
 									</div>
 									<input
 										list="perplexity-model-list"
@@ -513,11 +510,11 @@
 									/>
 
 									<datalist id="perplexity-model-list">
-										<option value="sonar">{$i18n.t('Sonar')}</option>
-										<option value="sonar-pro">{$i18n.t('Sonar Pro')}</option>
-										<option value="sonar-reasoning">{$i18n.t('Sonar Reasoning')}</option>
-										<option value="sonar-reasoning-pro">{$i18n.t('Sonar Reasoning Pro')}</option>
-										<option value="sonar-deep-research">{$i18n.t('Sonar Deep Research')}</option>
+										<option value="sonar">{'Sonar'}</option>
+										<option value="sonar-pro">{'Sonar Pro'}</option>
+										<option value="sonar-reasoning">{'Sonar Reasoning'}</option>
+										<option value="sonar-reasoning-pro">{'Sonar Reasoning Pro'}</option>
+										<option value="sonar-deep-research">{'Sonar Deep Research'}</option>
 									</datalist>
 								</div>
 							</div>
@@ -525,15 +522,15 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Perplexity Search Context Usage')}
+										{'Perplexity Search Context Usage'}
 									</div>
 									<select
 										class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 										bind:value={webConfig.PERPLEXITY_SEARCH_CONTEXT_USAGE}
 									>
-										<option value="low">{$i18n.t('Low')}</option>
-										<option value="medium">{$i18n.t('Medium')}</option>
-										<option value="high">{$i18n.t('High')}</option>
+										<option value="low">{'Low'}</option>
+										<option value="medium">{'Medium'}</option>
+										<option value="high">{'High'}</option>
 									</select>
 								</div>
 							</div>
@@ -541,11 +538,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Sougou Search API sID')}
+										{'Sougou Search API sID'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Sougou Search API sID')}
+										placeholder={'Enter Sougou Search API sID'}
 										bind:value={webConfig.SOUGOU_API_SID}
 									/>
 								</div>
@@ -553,11 +550,11 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Sougou Search API SK')}
+										{'Sougou Search API SK'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Sougou Search API SK')}
+										placeholder={'Enter Sougou Search API SK'}
 										bind:value={webConfig.SOUGOU_API_SK}
 									/>
 								</div>
@@ -566,7 +563,7 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Firecrawl API Base URL')}
+										{'Firecrawl API Base URL'}
 									</div>
 
 									<div class="flex w-full">
@@ -574,7 +571,7 @@
 											<input
 												class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 												type="text"
-												placeholder={$i18n.t('Enter Firecrawl API Base URL')}
+												placeholder={'Enter Firecrawl API Base URL'}
 												bind:value={webConfig.FIRECRAWL_API_BASE_URL}
 												autocomplete="off"
 											/>
@@ -584,11 +581,11 @@
 
 								<div class="mt-2">
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Firecrawl API Key')}
+										{'Firecrawl API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Firecrawl API Key')}
+										placeholder={'Enter Firecrawl API Key'}
 										bind:value={webConfig.FIRECRAWL_API_KEY}
 									/>
 								</div>
@@ -596,12 +593,12 @@
 						{:else if webConfig.WEB_SEARCH_ENGINE === 'ddgs' || webConfig.WEB_SEARCH_ENGINE === 'duckduckgo'}
 							<div class="w-full mb-2.5">
 								<div class=" self-center text-xs font-medium mb-1">
-									{$i18n.t('Concurrent Requests')}
+									{'Concurrent Requests'}
 								</div>
 
 								<input
 									class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
-									placeholder={$i18n.t('Concurrent Requests')}
+									placeholder={'Concurrent Requests'}
 									bind:value={webConfig.WEB_SEARCH_CONCURRENT_REQUESTS}
 									required
 								/>
@@ -610,7 +607,7 @@
 							<div class="mb-2.5 flex w-full flex-col">
 								<div>
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('External Web Search URL')}
+										{'External Web Search URL'}
 									</div>
 
 									<div class="flex w-full">
@@ -618,7 +615,7 @@
 											<input
 												class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 												type="text"
-												placeholder={$i18n.t('Enter External Web Search URL')}
+												placeholder={'Enter External Web Search URL'}
 												bind:value={webConfig.EXTERNAL_WEB_SEARCH_URL}
 												autocomplete="off"
 											/>
@@ -628,11 +625,11 @@
 
 								<div class="mt-2">
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('External Web Search API Key')}
+										{'External Web Search API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter External Web Search API Key')}
+										placeholder={'Enter External Web Search API Key'}
 										bind:value={webConfig.EXTERNAL_WEB_SEARCH_API_KEY}
 									/>
 								</div>
@@ -645,12 +642,12 @@
 							<div class="flex gap-2">
 								<div class="w-full">
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Search Result Count')}
+										{'Search Result Count'}
 									</div>
 
 									<input
 										class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
-										placeholder={$i18n.t('Search Result Count')}
+										placeholder={'Search Result Count'}
 										bind:value={webConfig.WEB_SEARCH_RESULT_COUNT}
 										required
 									/>
@@ -660,14 +657,12 @@
 
 						<div class="mb-2.5 flex w-full flex-col">
 							<div class="  text-xs font-medium mb-1">
-								{$i18n.t('Domain Filter List')}
+								{'Domain Filter List'}
 							</div>
 
 							<input
 								class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
-								placeholder={$i18n.t(
-									'Enter domains separated by commas (e.g., example.com,site.org,!excludedsite.com)'
-								)}
+								placeholder={'Enter domains separated by commas (e.g., example.com,site.org,!excludedsite.com)'}
 								bind:value={webConfig.WEB_SEARCH_DOMAIN_FILTER_LIST}
 							/>
 						</div>
@@ -675,19 +670,15 @@
 
 					<div class="  mb-2.5 flex w-full justify-between">
 						<div class=" self-center text-xs font-medium">
-							<Tooltip content={$i18n.t('Full Context Mode')} placement="top-start">
-								{$i18n.t('Bypass Embedding and Retrieval')}
+							<Tooltip content={'Full Context Mode'} placement="top-start">
+								{'Bypass Embedding and Retrieval'}
 							</Tooltip>
 						</div>
 						<div class="flex items-center relative">
 							<Tooltip
 								content={webConfig.BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL
-									? $i18n.t(
-											'Inject the entire content as context for comprehensive processing, this is recommended for complex queries.'
-										)
-									: $i18n.t(
-											'Default to segmented retrieval for focused and relevant content extraction, this is recommended for most cases.'
-										)}
+									? 'Inject the entire content as context for comprehensive processing, this is recommended for complex queries.'
+									: 'Default to segmented retrieval for focused and relevant content extraction, this is recommended for most cases.'}
 							>
 								<Switch bind:state={webConfig.BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL} />
 							</Tooltip>
@@ -696,8 +687,8 @@
 
 					<div class="  mb-2.5 flex w-full justify-between">
 						<div class=" self-center text-xs font-medium">
-							<Tooltip content={$i18n.t('Bypass Web Loader')} placement="top-start">
-								{$i18n.t('Bypass Web Loader')}
+							<Tooltip content={'Bypass Web Loader'} placement="top-start">
+								{'Bypass Web Loader'}
 							</Tooltip>
 						</div>
 						<div class="flex items-center relative">
@@ -709,15 +700,13 @@
 
 					<div class="  mb-2.5 flex w-full justify-between">
 						<div class=" self-center text-xs font-medium">
-							{$i18n.t('Trust Proxy Environment')}
+							{'Trust Proxy Environment'}
 						</div>
 						<div class="flex items-center relative">
 							<Tooltip
 								content={webConfig.WEB_SEARCH_TRUST_ENV
-									? $i18n.t(
-											'Use proxy designated by http_proxy and https_proxy environment variables to fetch page contents.'
-										)
-									: $i18n.t('Use no proxy to fetch page contents.')}
+									? 'Use proxy designated by http_proxy and https_proxy environment variables to fetch page contents.'
+									: 'Use no proxy to fetch page contents.'}
 							>
 								<Switch bind:state={webConfig.WEB_SEARCH_TRUST_ENV} />
 							</Tooltip>
@@ -726,21 +715,21 @@
 				</div>
 
 				<div class="mb-3">
-					<div class=" mt-0.5 mb-2.5 text-base font-medium">{$i18n.t('Loader')}</div>
+					<div class=" mt-0.5 mb-2.5 text-base font-medium">{'Loader'}</div>
 
 					<hr class=" border-gray-100 dark:border-gray-850 my-2" />
 
 					<div class="  mb-2.5 flex w-full justify-between">
 						<div class=" self-center text-xs font-medium">
-							{$i18n.t('Web Loader Engine')}
+							{'Web Loader Engine'}
 						</div>
 						<div class="flex items-center relative">
 							<select
 								class="dark:bg-gray-900 w-fit pr-8 rounded-sm px-2 p-1 text-xs bg-transparent outline-hidden text-right"
 								bind:value={webConfig.WEB_LOADER_ENGINE}
-								placeholder={$i18n.t('Select a engine')}
+								placeholder={'Select a engine'}
 							>
-								<option value="">{$i18n.t('Default')}</option>
+								<option value="">{'Default'}</option>
 								{#each webLoaderEngines as engine}
 									<option value={engine}>{engine}</option>
 								{/each}
@@ -751,7 +740,7 @@
 					{#if webConfig.WEB_LOADER_ENGINE === '' || webConfig.WEB_LOADER_ENGINE === 'safe_web'}
 						<div class="  mb-2.5 flex w-full justify-between">
 							<div class=" self-center text-xs font-medium">
-								{$i18n.t('Verify SSL Certificate')}
+								{'Verify SSL Certificate'}
 							</div>
 							<div class="flex items-center relative">
 								<Switch bind:state={webConfig.ENABLE_WEB_LOADER_SSL_VERIFICATION} />
@@ -761,7 +750,7 @@
 						<div class="mb-2.5 flex w-full flex-col">
 							<div>
 								<div class=" self-center text-xs font-medium mb-1">
-									{$i18n.t('Playwright WebSocket URL')}
+									{'Playwright WebSocket URL'}
 								</div>
 
 								<div class="flex w-full">
@@ -769,7 +758,7 @@
 										<input
 											class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 											type="text"
-											placeholder={$i18n.t('Enter Playwright WebSocket URL')}
+											placeholder={'Enter Playwright WebSocket URL'}
 											bind:value={webConfig.PLAYWRIGHT_WS_URL}
 											autocomplete="off"
 										/>
@@ -779,14 +768,14 @@
 
 							<div class="mt-2">
 								<div class=" self-center text-xs font-medium mb-1">
-									{$i18n.t('Playwright Timeout (ms)')}
+									{'Playwright Timeout (ms)'}
 								</div>
 
 								<div class="flex w-full">
 									<div class="flex-1">
 										<input
 											class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
-											placeholder={$i18n.t('Enter Playwright Timeout')}
+											placeholder={'Enter Playwright Timeout'}
 											bind:value={webConfig.PLAYWRIGHT_TIMEOUT}
 											autocomplete="off"
 										/>
@@ -798,7 +787,7 @@
 						<div class="mb-2.5 flex w-full flex-col">
 							<div>
 								<div class=" self-center text-xs font-medium mb-1">
-									{$i18n.t('Firecrawl API Base URL')}
+									{'Firecrawl API Base URL'}
 								</div>
 
 								<div class="flex w-full">
@@ -806,7 +795,7 @@
 										<input
 											class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 											type="text"
-											placeholder={$i18n.t('Enter Firecrawl API Base URL')}
+											placeholder={'Enter Firecrawl API Base URL'}
 											bind:value={webConfig.FIRECRAWL_API_BASE_URL}
 											autocomplete="off"
 										/>
@@ -816,11 +805,11 @@
 
 							<div class="mt-2">
 								<div class=" self-center text-xs font-medium mb-1">
-									{$i18n.t('Firecrawl API Key')}
+									{'Firecrawl API Key'}
 								</div>
 
 								<SensitiveInput
-									placeholder={$i18n.t('Enter Firecrawl API Key')}
+									placeholder={'Enter Firecrawl API Key'}
 									bind:value={webConfig.FIRECRAWL_API_KEY}
 								/>
 							</div>
@@ -829,7 +818,7 @@
 						<div class="mb-2.5 flex w-full flex-col">
 							<div>
 								<div class=" self-center text-xs font-medium mb-1">
-									{$i18n.t('Tavily Extract Depth')}
+									{'Tavily Extract Depth'}
 								</div>
 
 								<div class="flex w-full">
@@ -837,7 +826,7 @@
 										<input
 											class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 											type="text"
-											placeholder={$i18n.t('Enter Tavily Extract Depth')}
+											placeholder={'Enter Tavily Extract Depth'}
 											bind:value={webConfig.TAVILY_EXTRACT_DEPTH}
 											autocomplete="off"
 										/>
@@ -848,11 +837,11 @@
 							{#if webConfig.WEB_SEARCH_ENGINE !== 'tavily'}
 								<div class="mt-2">
 									<div class=" self-center text-xs font-medium mb-1">
-										{$i18n.t('Tavily API Key')}
+										{'Tavily API Key'}
 									</div>
 
 									<SensitiveInput
-										placeholder={$i18n.t('Enter Tavily API Key')}
+										placeholder={'Enter Tavily API Key'}
 										bind:value={webConfig.TAVILY_API_KEY}
 									/>
 								</div>
@@ -862,7 +851,7 @@
 						<div class="mb-2.5 flex w-full flex-col">
 							<div>
 								<div class=" self-center text-xs font-medium mb-1">
-									{$i18n.t('External Web Loader URL')}
+									{'External Web Loader URL'}
 								</div>
 
 								<div class="flex w-full">
@@ -870,7 +859,7 @@
 										<input
 											class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
 											type="text"
-											placeholder={$i18n.t('Enter External Web Loader URL')}
+											placeholder={'Enter External Web Loader URL'}
 											bind:value={webConfig.EXTERNAL_WEB_LOADER_URL}
 											autocomplete="off"
 										/>
@@ -880,11 +869,11 @@
 
 							<div class="mt-2">
 								<div class=" self-center text-xs font-medium mb-1">
-									{$i18n.t('External Web Loader API Key')}
+									{'External Web Loader API Key'}
 								</div>
 
 								<SensitiveInput
-									placeholder={$i18n.t('Enter External Web Loader API Key')}
+									placeholder={'Enter External Web Loader API Key'}
 									bind:value={webConfig.EXTERNAL_WEB_LOADER_API_KEY}
 								/>
 							</div>
@@ -893,12 +882,12 @@
 
 					<div class="mb-2.5 w-full">
 						<div class=" self-center text-xs font-medium mb-1">
-							{$i18n.t('Concurrent Requests')}
+							{'Concurrent Requests'}
 						</div>
 
 						<input
 							class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:text-gray-300 dark:bg-gray-850 outline-hidden"
-							placeholder={$i18n.t('Concurrent Requests')}
+							placeholder={'Concurrent Requests'}
 							bind:value={webConfig.WEB_LOADER_CONCURRENT_REQUESTS}
 							required
 						/>
@@ -906,13 +895,13 @@
 
 					<div class="  mb-2.5 flex w-full justify-between">
 						<div class=" self-center text-xs font-medium">
-							{$i18n.t('Youtube Language')}
+							{'Youtube Language'}
 						</div>
 						<div class="flex items-center relative">
 							<input
 								class="flex-1 w-full rounded-lg text-sm bg-transparent outline-hidden"
 								type="text"
-								placeholder={$i18n.t('Enter language codes')}
+								placeholder={'Enter language codes'}
 								bind:value={webConfig.YOUTUBE_LOADER_LANGUAGE}
 								autocomplete="off"
 							/>
@@ -921,13 +910,13 @@
 
 					<div class="  mb-2.5 flex flex-col w-full justify-between">
 						<div class=" mb-1 text-xs font-medium">
-							{$i18n.t('Youtube Proxy URL')}
+							{'Youtube Proxy URL'}
 						</div>
 						<div class="flex items-center relative">
 							<input
 								class="flex-1 w-full rounded-lg text-sm bg-transparent outline-hidden"
 								type="text"
-								placeholder={$i18n.t('Enter proxy URL (e.g. https://user:password@host:port)')}
+								placeholder={'Enter proxy URL (e.g. https://user:password@host:port)'}
 								bind:value={webConfig.YOUTUBE_LOADER_PROXY_URL}
 								autocomplete="off"
 							/>
@@ -942,7 +931,7 @@
 			class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
 			type="submit"
 		>
-			{$i18n.t('Save')}
+			{'Save'}
 		</button>
 	</div>
 </form>

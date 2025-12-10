@@ -15,9 +15,6 @@
 	export let edit = false;
 	export let prompt = null;
 	export let clone = false;
-
-	const i18n = getContext('i18n');
-
 	let loading = false;
 
 	let title = '';
@@ -50,9 +47,7 @@
 				access_control: accessControl
 			});
 		} else {
-			toast.error(
-				$i18n.t('Only alphanumeric characters and hyphens are allowed in the command string.')
-			);
+			toast.error('Only alphanumeric characters and hyphens are allowed in the command string.');
 		}
 
 		loading = false;
@@ -96,19 +91,14 @@
 	>
 		<div class="my-2">
 			<Tooltip
-				content={`${$i18n.t('Only alphanumeric characters and hyphens are allowed')} - ${$i18n.t(
-					'Activate this command by typing "/{{COMMAND}}" to chat input.',
-					{
-						COMMAND: command
-					}
-				)}`}
+				content={`Only alphanumeric characters and hyphens are allowed - Activate this command by typing "/${command}" to chat input.`}
 				placement="bottom-start"
 			>
 				<div class="flex flex-col w-full">
 					<div class="flex items-center">
 						<input
 							class="text-2xl font-medium w-full bg-transparent outline-hidden"
-							placeholder={$i18n.t('Title')}
+							placeholder={'Title'}
 							bind:value={title}
 							required
 						/>
@@ -124,7 +114,7 @@
 								<LockClosed strokeWidth="2.5" className="size-3.5" />
 
 								<div class="text-sm font-medium shrink-0">
-									{$i18n.t('Access')}
+									{'Access'}
 								</div>
 							</button>
 						</div>
@@ -134,7 +124,7 @@
 						<div class="">/</div>
 						<input
 							class=" w-full bg-transparent outline-hidden"
-							placeholder={$i18n.t('Command')}
+							placeholder={'Command'}
 							bind:value={command}
 							on:input={handleCommandInput}
 							required
@@ -147,14 +137,14 @@
 
 		<div class="my-2">
 			<div class="flex w-full justify-between">
-				<div class=" self-center text-sm font-medium">{$i18n.t('Prompt Content')}</div>
+				<div class=" self-center text-sm font-medium">{'Prompt Content'}</div>
 			</div>
 
 			<div class="mt-2">
 				<div>
 					<Textarea
 						className="text-sm w-full bg-transparent outline-hidden overflow-y-hidden resize-none"
-						placeholder={$i18n.t('Write a summary in 50 words that summarizes {{topic}}.')}
+						placeholder={'Write a summary in 50 words that summarizes {{topic}}.'}
 						bind:value={content}
 						rows={6}
 						required
@@ -162,19 +152,18 @@
 				</div>
 
 				<div class="text-xs text-gray-400 dark:text-gray-500">
-					ⓘ {$i18n.t('Format your variables using brackets like this:')}&nbsp;<span
-						class=" text-gray-600 dark:text-gray-300 font-medium"
-						>{'{{'}{$i18n.t('variable')}{'}}'}</span
+					ⓘ {'Format your variables using brackets like this:'}&nbsp;<span
+						class=" text-gray-600 dark:text-gray-300 font-medium">{'{{'}{'variable'}{'}}'}</span
 					>.
-					{$i18n.t('Make sure to enclose them with')}
+					{'Make sure to enclose them with'}
 					<span class=" text-gray-600 dark:text-gray-300 font-medium">{'{{'}</span>
-					{$i18n.t('and')}
+					{'and'}
 					<span class=" text-gray-600 dark:text-gray-300 font-medium">{'}}'}</span>.
 				</div>
 
 				<div class="text-xs text-gray-400 dark:text-gray-500 underline">
 					<a href="https://docs.openwebui.com/features/workspace/prompts" target="_blank">
-						{$i18n.t('To learn more about powerful prompt variables, click here')}
+						{'To learn more about powerful prompt variables, click here'}
 					</a>
 				</div>
 			</div>
@@ -188,7 +177,7 @@
 				type="submit"
 				disabled={loading}
 			>
-				<div class=" self-center font-medium">{$i18n.t('Save & Create')}</div>
+				<div class=" self-center font-medium">{'Save & Create'}</div>
 
 				{#if loading}
 					<div class="ml-1.5 self-center">

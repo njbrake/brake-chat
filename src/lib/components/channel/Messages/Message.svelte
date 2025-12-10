@@ -12,8 +12,6 @@
 
 	import { getContext, onMount } from 'svelte';
 	import type { Writable } from 'svelte/store';
-	import type { i18nType } from '$lib/i18n';
-	const i18n = getContext<Writable<i18nType>>('i18n');
 
 	import { formatDate } from '$lib/utils';
 
@@ -61,8 +59,8 @@
 
 <ConfirmDialog
 	bind:show={showDeleteConfirmDialog}
-	title={$i18n.t('Delete Message')}
-	message={$i18n.t('Are you sure you want to delete this message?')}
+	title={'Delete Message'}
+	message={'Are you sure you want to delete this message?'}
 	onConfirm={async () => {
 		await onDelete();
 	}}
@@ -94,7 +92,7 @@
 							onReaction(name);
 						}}
 					>
-						<Tooltip content={$i18n.t('Add Reaction')}>
+						<Tooltip content={'Add Reaction'}>
 							<button
 								class="hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg p-1"
 								on:click={() => {
@@ -106,7 +104,7 @@
 						</Tooltip>
 					</EmojiPicker>
 
-					<Tooltip content={$i18n.t('Reply')}>
+					<Tooltip content={'Reply'}>
 						<button
 							class="hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg p-0.5"
 							on:click={() => {
@@ -118,7 +116,7 @@
 					</Tooltip>
 
 					{#if !thread}
-						<Tooltip content={$i18n.t('Reply in Thread')}>
+						<Tooltip content={'Reply in Thread'}>
 							<button
 								class="hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg p-1"
 								on:click={() => {
@@ -131,7 +129,7 @@
 					{/if}
 
 					{#if message.user_id === $user?.id || $user?.role === 'admin'}
-						<Tooltip content={$i18n.t('Edit')}>
+						<Tooltip content={'Edit'}>
 							<button
 								class="hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg p-1"
 								on:click={() => {
@@ -143,7 +141,7 @@
 							</button>
 						</Tooltip>
 
-						<Tooltip content={$i18n.t('Delete')}>
+						<Tooltip content={'Delete'}>
 							<button
 								class="hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg p-1"
 								on:click={() => (showDeleteConfirmDialog = true)}
@@ -188,7 +186,7 @@
 					{:else}
 						<img
 							src={`${WEBUI_API_BASE_URL}/users/${message.reply_to_message.user?.id}/profile/image`}
-							alt={message.reply_to_message.user?.name ?? $i18n.t('Unknown User')}
+							alt={message.reply_to_message.user?.name ?? 'Unknown User'}
 							class="size-4 ml-0.5 rounded-full object-cover"
 						/>
 					{/if}
@@ -196,7 +194,7 @@
 					<div class="shrink-0">
 						{message?.reply_to_message.meta?.model_name ??
 							message?.reply_to_message.user?.name ??
-							$i18n.t('Unknown User')}
+							'Unknown User'}
 					</div>
 
 					<div class="italic text-sm text-gray-500 dark:text-gray-400 line-clamp-1 w-full flex-1">
@@ -258,10 +256,7 @@
 							>
 								<Tooltip content={dayjs(message.created_at / 1000000).format('LLLL')}>
 									<span class="line-clamp-1">
-										{$i18n.t(formatDate(message.created_at / 1000000), {
-											LOCALIZED_TIME: dayjs(message.created_at / 1000000).format('LT'),
-											LOCALIZED_DATE: dayjs(message.created_at / 1000000).format('L')
-										})}
+										{dayjs(message.created_at / 1000000).fromNow()}
 									</span>
 								</Tooltip>
 							</div>
@@ -318,7 +313,7 @@
 										editedContent = null;
 									}}
 								>
-									{$i18n.t('Cancel')}
+									{'Cancel'}
 								</button>
 
 								<button
@@ -330,7 +325,7 @@
 										editedContent = null;
 									}}
 								>
-									{$i18n.t('Save')}
+									{'Save'}
 								</button>
 							</div>
 						</div>
@@ -344,7 +339,7 @@
 								id={message.id}
 								content={message.content}
 							/>{#if message.created_at !== message.updated_at && (message?.meta?.model_id ?? null) === null}<span
-									class="text-gray-500 text-[10px]">({$i18n.t('edited')})</span
+									class="text-gray-500 text-[10px]">({'edited'})</span
 								>{/if}
 						{/if}
 					</div>
@@ -380,7 +375,7 @@
 										onReaction(name);
 									}}
 								>
-									<Tooltip content={$i18n.t('Add Reaction')}>
+									<Tooltip content={'Add Reaction'}>
 										<div
 											class="flex items-center gap-1.5 bg-gray-500/10 hover:outline hover:outline-gray-700/30 dark:hover:outline-gray-300/30 hover:outline-1 transition rounded-xl px-1 py-1 cursor-pointer text-gray-500 dark:text-gray-400"
 										>
@@ -400,17 +395,15 @@
 									onThread(message.id);
 								}}
 							>
-								<span class="font-medium mr-1">
-									{$i18n.t('{{COUNT}} Replies', { COUNT: message.reply_count })}</span
-								><span>
-									{' - '}{$i18n.t('Last reply')}
+								<span class="font-medium mr-1"> {`${message.reply_count} Replies`}</span><span>
+									{' - '}{'Last reply'}
 									{dayjs.unix(message.latest_reply_at / 1000000000).fromNow()}</span
 								>
 
 								<span class="ml-1">
 									<ChevronRight className="size-2.5" strokeWidth="3" />
 								</span>
-								<!-- {$i18n.t('View Replies')} -->
+								<!-- {'View Replies'} -->
 							</button>
 						</div>
 					{/if}

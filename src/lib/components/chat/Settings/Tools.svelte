@@ -4,8 +4,6 @@
 	import { getModels as _getModels, getToolServersData } from '$lib/apis';
 
 	const dispatch = createEventDispatcher();
-	const i18n = getContext('i18n');
-
 	import { models, settings, toolServers, user } from '$lib/stores';
 
 	import Switch from '$lib/components/common/Switch.svelte';
@@ -34,11 +32,7 @@
 		let toolServersData = await getToolServersData($settings?.toolServers ?? []);
 		toolServersData = toolServersData.filter((data) => {
 			if (data.error) {
-				toast.error(
-					$i18n.t(`Failed to connect to {{URL}} OpenAPI tool server`, {
-						URL: data?.url
-					})
-				);
+				toast.error(`Failed to connect to ${data?.url} OpenAPI tool server`);
 				return false;
 			}
 
@@ -65,16 +59,14 @@
 		{#if servers !== null}
 			<div class="">
 				<div class="pr-1.5">
-					<!-- {$i18n.t(`Failed to connect to {{URL}} OpenAPI tool server`, {
-						URL: 'server?.url'
-					})} -->
+					<!-- {`Failed to connect to ${'server?.url'} OpenAPI tool server`} -->
 					<div class="">
 						<div class="flex justify-between items-center mb-0.5">
-							<div class="font-medium">{$i18n.t('Manage Tool Servers')}</div>
+							<div class="font-medium">{'Manage Tool Servers'}</div>
 
-							<Tooltip content={$i18n.t(`Add Connection`)}>
+							<Tooltip content={'Add Connection'}>
 								<button
-									aria-label={$i18n.t(`Add Connection`)}
+									aria-label={'Add Connection'}
 									class="px-1"
 									on:click={() => {
 										showConnectionModal = true;
@@ -108,11 +100,9 @@
 							class={`text-xs
 								${($settings?.highContrastMode ?? false) ? 'text-gray-800 dark:text-gray-100' : 'text-gray-500'}`}
 						>
-							{$i18n.t('Connect to your own OpenAPI compatible external tool servers.')}
+							{'Connect to your own OpenAPI compatible external tool servers.'}
 							<br />
-							{$i18n.t(
-								'CORS must be properly configured by the provider to allow requests from Open WebUI.'
-							)}
+							{'CORS must be properly configured by the provider to allow requests from Open WebUI.'}
 						</div>
 					</div>
 
@@ -120,7 +110,7 @@
 						<a
 							class="underline"
 							href="https://github.com/open-webui/openapi-servers"
-							target="_blank">{$i18n.t('Learn more about OpenAPI tool servers.')}</a
+							target="_blank">{'Learn more about OpenAPI tool servers.'}</a
 						>
 					</div>
 				</div>
@@ -139,7 +129,7 @@
 			class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
 			type="submit"
 		>
-			{$i18n.t('Save')}
+			{'Save'}
 		</button>
 	</div>
 </form>

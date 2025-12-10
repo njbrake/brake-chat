@@ -5,8 +5,6 @@
 	import { PaneGroup, Pane, PaneResizer } from 'paneforge';
 
 	import { onMount, getContext, onDestroy, tick } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import {
@@ -143,7 +141,7 @@
 		};
 
 		if (fileItem.size == 0) {
-			toast.error($i18n.t('You cannot upload an empty file.'));
+			toast.error('You cannot upload an empty file.');
 			return null;
 		}
 
@@ -155,11 +153,7 @@
 				fileSize: file.size,
 				maxSize: ($config?.file?.max_size ?? 0) * 1024 * 1024
 			});
-			toast.error(
-				$i18n.t(`File size should not exceed {{maxSize}} MB.`, {
-					maxSize: $config?.file?.max_size
-				})
-			);
+			toast.error(`File size should not exceed ${$config?.file?.max_size} MB.`);
 			return;
 		}
 
@@ -202,7 +196,7 @@
 					await addFileHandler(uploadedFile.id);
 				}
 			} else {
-				toast.error($i18n.t('Failed to upload file.'));
+				toast.error('Failed to upload file.');
 			}
 		} catch (e) {
 			toast.error(`${e}`);
@@ -240,13 +234,7 @@
 		// Function to update the UI with the progress
 		const updateProgress = () => {
 			const percentage = (uploadedFiles / totalFiles) * 100;
-			toast.info(
-				$i18n.t('Upload Progress: {{uploadedFiles}}/{{totalFiles}} ({{percentage}}%)', {
-					uploadedFiles: uploadedFiles,
-					totalFiles: totalFiles,
-					percentage: percentage.toFixed(2)
-				})
-			);
+			toast.info(`Upload Progress: ${uploadedFiles}/${totalFiles} (${percentage.toFixed(2)}%)`);
 		};
 
 		// Recursive function to count all files excluding hidden ones
@@ -330,11 +318,7 @@
 					const updateProgress = () => {
 						const percentage = (uploadedFiles / totalFiles) * 100;
 						toast.info(
-							$i18n.t('Upload Progress: {{uploadedFiles}}/{{totalFiles}} ({{percentage}}%)', {
-								uploadedFiles: uploadedFiles,
-								totalFiles: totalFiles,
-								percentage: percentage.toFixed(2)
-							})
+							`Upload Progress: ${uploadedFiles}/${totalFiles} (${percentage.toFixed(2)}%)`
 						);
 					};
 
@@ -374,9 +358,9 @@
 	// Error handler
 	const handleUploadError = (error) => {
 		if (error.name === 'AbortError') {
-			toast.info($i18n.t('Directory selection was cancelled'));
+			toast.info('Directory selection was cancelled');
 		} else {
-			toast.error($i18n.t('Error accessing directory'));
+			toast.error('Error accessing directory');
 			console.error('Directory access error:', error);
 		}
 	};
@@ -390,7 +374,7 @@
 
 			if (res) {
 				knowledge = res;
-				toast.success($i18n.t('Knowledge reset successfully.'));
+				toast.success('Knowledge reset successfully.');
 
 				// Upload directory
 				uploadDirectoryHandler();
@@ -410,9 +394,9 @@
 
 		if (updatedKnowledge) {
 			knowledge = updatedKnowledge;
-			toast.success($i18n.t('File added successfully.'));
+			toast.success('File added successfully.');
 		} else {
-			toast.error($i18n.t('Failed to add file.'));
+			toast.error('Failed to add file.');
 			knowledge.files = knowledge.files.filter((file) => file.id !== fileId);
 		}
 	};
@@ -428,7 +412,7 @@
 
 			if (updatedKnowledge) {
 				knowledge = updatedKnowledge;
-				toast.success($i18n.t('File removed successfully.'));
+				toast.success('File removed successfully.');
 			}
 		} catch (e) {
 			console.error('Error in deleteFileHandler:', e);
@@ -461,7 +445,7 @@
 			});
 			if (res && updatedKnowledge) {
 				knowledge = updatedKnowledge;
-				toast.success($i18n.t('File content updated successfully.'));
+				toast.success('File content updated successfully.');
 			}
 		} finally {
 			isSaving = false;
@@ -476,7 +460,7 @@
 
 		debounceTimeout = setTimeout(async () => {
 			if (knowledge.name.trim() === '' || knowledge.description.trim() === '') {
-				toast.error($i18n.t('Please fill in all fields.'));
+				toast.error('Please fill in all fields.');
 				return;
 			}
 
@@ -490,7 +474,7 @@
 			});
 
 			if (res) {
-				toast.success($i18n.t('Knowledge updated successfully'));
+				toast.success('Knowledge updated successfully');
 				_knowledge.set(await getKnowledgeBases(localStorage.token));
 			}
 		}, 1000);
@@ -520,10 +504,10 @@
 				// Cache the content
 				fileContentCache.set(file.id, response.data.content);
 			} else {
-				toast.error($i18n.t('No content found in file.'));
+				toast.error('No content found in file.');
 			}
 		} catch (e) {
-			toast.error($i18n.t('Failed to load file content.'));
+			toast.error('Failed to load file content.');
 		}
 	};
 
@@ -569,9 +553,9 @@
 						}
 					);
 				} else {
-					toast.info($i18n.t('Uploading file...'));
+					toast.info('Uploading file...');
 					uploadFileHandler(item.getAsFile());
-					toast.success($i18n.t('File uploaded!'));
+					toast.success('File uploaded!');
 				}
 			}
 		};
@@ -583,7 +567,7 @@
 				if (inputItems && inputItems.length > 0) {
 					handleUploadingFileFolder(inputItems);
 				} else {
-					toast.error($i18n.t(`File not found.`));
+					toast.error('File not found.');
 				}
 			}
 		}
@@ -665,9 +649,7 @@
 <FilesOverlay show={dragged} />
 <SyncConfirmDialog
 	bind:show={showSyncConfirmModal}
-	message={$i18n.t(
-		'This will reset the knowledge base and sync all files. Do you wish to continue?'
-	)}
+	message={'This will reset the knowledge base and sync all files. Do you wish to continue?'}
 	on:confirm={() => {
 		syncDirectoryHandler();
 	}}
@@ -700,7 +682,7 @@
 				fileInputElement.value = '';
 			}
 		} else {
-			toast.error($i18n.t(`File not found.`));
+			toast.error('File not found.');
 		}
 	}}
 />
@@ -726,7 +708,7 @@
 								type="text"
 								class="text-left w-full font-medium text-2xl font-primary bg-transparent outline-hidden"
 								bind:value={knowledge.name}
-								placeholder={$i18n.t('Knowledge Name')}
+								placeholder={'Knowledge Name'}
 								on:input={() => {
 									changeDebounceHandler();
 								}}
@@ -744,7 +726,7 @@
 								<LockClosed strokeWidth="2.5" className="size-3.5" />
 
 								<div class="text-sm font-medium shrink-0">
-									{$i18n.t('Access')}
+									{'Access'}
 								</div>
 							</button>
 						</div>
@@ -755,7 +737,7 @@
 							type="text"
 							class="text-left text-xs w-full text-gray-500 bg-transparent outline-hidden"
 							bind:value={knowledge.description}
-							placeholder={$i18n.t('Knowledge Description')}
+							placeholder={'Knowledge Description'}
 							on:input={() => {
 								changeDebounceHandler();
 							}}
@@ -802,7 +784,7 @@
 											updateFileContentHandler();
 										}}
 									>
-										{$i18n.t('Save')}
+										{'Save'}
 										{#if isSaving}
 											<div class="ml-2 self-center">
 												<Spinner />
@@ -819,7 +801,7 @@
 									<textarea
 										class="w-full h-full outline-none resize-none"
 										bind:value={selectedFileContent}
-										placeholder={$i18n.t('Add content here')}
+										placeholder={'Add content here'}
 									/>
 								{/key}
 							</div>
@@ -827,7 +809,7 @@
 					{:else}
 						<div class="h-full flex w-full">
 							<div class="m-auto text-xs text-center text-gray-200 dark:text-gray-700">
-								{$i18n.t('Drag and drop a file to upload or select a file to view')}
+								{'Drag and drop a file to upload or select a file to view'}
 							</div>
 						</div>
 					{/if}
@@ -865,7 +847,7 @@
 											updateFileContentHandler();
 										}}
 									>
-										{$i18n.t('Save')}
+										{'Save'}
 										{#if isSaving}
 											<div class="ml-2 self-center">
 												<Spinner />
@@ -882,7 +864,7 @@
 									<textarea
 										class="w-full h-full outline-none resize-none"
 										bind:value={selectedFileContent}
-										placeholder={$i18n.t('Add content here')}
+										placeholder={'Add content here'}
 									/>
 								{/key}
 							</div>
@@ -911,7 +893,7 @@
 								<input
 									class=" w-full text-sm pr-4 py-1 rounded-r-xl outline-hidden bg-transparent"
 									bind:value={query}
-									placeholder={`${$i18n.t('Search Collection')}${(knowledge?.files ?? []).length ? ` (${(knowledge?.files ?? []).length})` : ''}`}
+									placeholder={`${'Search Collection'}${(knowledge?.files ?? []).length ? ` (${(knowledge?.files ?? []).length})` : ''}`}
 									on:focus={() => {
 										selectedFileId = null;
 									}}
@@ -956,7 +938,7 @@
 						{:else}
 							<div class="my-3 flex flex-col justify-center text-center text-gray-500 text-xs">
 								<div>
-									{$i18n.t('No content found')}
+									{'No content found'}
 								</div>
 							</div>
 						{/if}

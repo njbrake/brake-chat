@@ -17,9 +17,6 @@
 
 	import OpenAIConnection from './Connections/OpenAIConnection.svelte';
 	import AddConnectionModal from '$lib/components/AddConnectionModal.svelte';
-
-	const i18n = getContext('i18n');
-
 	const getModels = async () => {
 		const models = await _getModels(
 			localStorage.token,
@@ -73,7 +70,7 @@
 			});
 
 			if (res) {
-				toast.success($i18n.t('OpenAI API settings updated'));
+				toast.success('OpenAI API settings updated');
 				try {
 					await models.set(await getModels());
 				} catch (error) {
@@ -89,7 +86,7 @@
 		});
 
 		if (res) {
-			toast.success($i18n.t('Connections settings updated'));
+			toast.success('Connections settings updated');
 			try {
 				await models.set(await getModels());
 				await config.set(await getBackendConfig());
@@ -167,14 +164,14 @@
 	<div class=" overflow-y-scroll scrollbar-hidden h-full">
 		{#if ENABLE_OPENAI_API !== null && connectionsConfig !== null}
 			<div class="mb-3.5">
-				<div class=" mt-0.5 mb-2.5 text-base font-medium">{$i18n.t('General')}</div>
+				<div class=" mt-0.5 mb-2.5 text-base font-medium">{'General'}</div>
 
 				<hr class=" border-gray-100 dark:border-gray-850 my-2" />
 
 				<div class="my-2">
 					<div class="mt-2 space-y-2">
 						<div class="flex justify-between items-center text-sm">
-							<div class="  font-medium">{$i18n.t('OpenAI API')}</div>
+							<div class="  font-medium">{'OpenAI API'}</div>
 
 							<div class="flex items-center">
 								<div class="">
@@ -191,9 +188,9 @@
 						{#if ENABLE_OPENAI_API}
 							<div class="">
 								<div class="flex justify-between items-center">
-									<div class="font-medium text-xs">{$i18n.t('Manage OpenAI API Connections')}</div>
+									<div class="font-medium text-xs">{'Manage OpenAI API Connections'}</div>
 
-									<Tooltip content={$i18n.t(`Add Connection`)}>
+									<Tooltip content={'Add Connection'}>
 										<button
 											class="px-1"
 											on:click={() => {
@@ -240,7 +237,7 @@
 
 				<div class="my-2">
 					<div class="flex justify-between items-center text-sm">
-						<div class="  font-medium">{$i18n.t('Direct Connections')}</div>
+						<div class="  font-medium">{'Direct Connections'}</div>
 
 						<div class="flex items-center">
 							<div class="">
@@ -255,9 +252,7 @@
 					</div>
 
 					<div class="mt-1 text-xs text-gray-400 dark:text-gray-500">
-						{$i18n.t(
-							'Direct Connections allow users to connect to their own OpenAI compatible API endpoints.'
-						)}
+						{'Direct Connections allow users to connect to their own OpenAI compatible API endpoints.'}
 					</div>
 				</div>
 
@@ -265,7 +260,7 @@
 
 				<div class="my-2">
 					<div class="flex justify-between items-center text-sm">
-						<div class=" text-xs font-medium">{$i18n.t('Cache Base Model List')}</div>
+						<div class=" text-xs font-medium">{'Cache Base Model List'}</div>
 
 						<div class="flex items-center">
 							<div class="">
@@ -280,9 +275,7 @@
 					</div>
 
 					<div class="mt-1 text-xs text-gray-400 dark:text-gray-500">
-						{$i18n.t(
-							'Base Model List Cache speeds up access by fetching base models only at startup or on settings save—faster, but may not show recent base model changes.'
-						)}
+						{'Base Model List Cache speeds up access by fetching base models only at startup or on settings save—faster, but may not show recent base model changes.'}
 					</div>
 				</div>
 			</div>
@@ -300,7 +293,7 @@
 			class="px-3.5 py-1.5 text-sm font-medium bg-black hover:bg-gray-900 text-white dark:bg-white dark:text-black dark:hover:bg-gray-100 transition rounded-full"
 			type="submit"
 		>
-			{$i18n.t('Save')}
+			{'Save'}
 		</button>
 	</div>
 </form>

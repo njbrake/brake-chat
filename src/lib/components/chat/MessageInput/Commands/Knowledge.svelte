@@ -15,9 +15,6 @@
 	import Youtube from '$lib/components/icons/Youtube.svelte';
 	import { folders } from '$lib/stores';
 	import Folder from '$lib/components/icons/Folder.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let query = '';
 	export let onSelect = (e) => {};
 
@@ -95,7 +92,7 @@
 							legacy: true,
 							type: 'collection',
 							description: 'Deprecated (legacy collection), please create a new knowledge base.',
-							title: $i18n.t('All Documents'),
+							title: 'All Documents',
 							collection_names: legacy_documents.map((item) => item.id)
 						},
 
@@ -149,7 +146,7 @@
 		let folder_items = $folders.map((folder) => ({
 			...folder,
 			type: 'folder',
-			description: $i18n.t('Folder'),
+			description: 'Folder',
 			title: folder.name
 		}));
 
@@ -189,7 +186,7 @@
 </script>
 
 <div class="px-2 text-xs text-gray-500 py-1">
-	{$i18n.t('Knowledge')}
+	{'Knowledge'}
 </div>
 
 {#if filteredItems.length > 0 || query.startsWith('http')}
@@ -216,11 +213,11 @@
 				<div class="  text-black dark:text-gray-100 flex items-center gap-1">
 					<Tooltip
 						content={item?.legacy
-							? $i18n.t('Legacy')
+							? 'Legacy'
 							: item?.type === 'file'
-								? $i18n.t('File')
+								? 'File'
 								: item?.type === 'collection'
-									? $i18n.t('Collection')
+									? 'Collection'
 									: ''}
 						placement="top"
 					>
@@ -255,14 +252,12 @@
 						data: query
 					});
 				} else {
-					toast.error(
-						$i18n.t('Oops! Looks like the URL is invalid. Please double-check and try again.')
-					);
+					toast.error('Oops! Looks like the URL is invalid. Please double-check and try again.');
 				}
 			}}
 		>
 			<div class="  text-black dark:text-gray-100 line-clamp-1 flex items-center gap-1">
-				<Tooltip content={$i18n.t('YouTube')} placement="top">
+				<Tooltip content={'YouTube'} placement="top">
 					<Youtube className="size-4" />
 				</Tooltip>
 
@@ -283,14 +278,12 @@
 						data: query
 					});
 				} else {
-					toast.error(
-						$i18n.t('Oops! Looks like the URL is invalid. Please double-check and try again.')
-					);
+					toast.error('Oops! Looks like the URL is invalid. Please double-check and try again.');
 				}
 			}}
 		>
 			<div class="  text-black dark:text-gray-100 line-clamp-1 flex items-center gap-1">
-				<Tooltip content={$i18n.t('Web')} placement="top">
+				<Tooltip content={'Web'} placement="top">
 					<GlobeAlt className="size-4" />
 				</Tooltip>
 

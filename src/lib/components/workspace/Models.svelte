@@ -9,8 +9,6 @@
 
 	import { onMount, getContext, tick } from 'svelte';
 	import { goto } from '$app/navigation';
-	const i18n = getContext('i18n');
-
 	import { WEBUI_NAME, config, mobile, models as _models, settings, user } from '$lib/stores';
 	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
 	import {
@@ -114,7 +112,7 @@
 		});
 
 		if (res) {
-			toast.success($i18n.t(`Deleted {{name}}`, { name: model.id }));
+			toast.success(`Deleted ${model.id}`);
 
 			page = 1;
 			getModelList();
@@ -138,7 +136,7 @@
 	};
 
 	const shareModelHandler = async (model) => {
-		toast.success($i18n.t('Redirecting you to Open WebUI Community'));
+		toast.success('Redirecting you to Open WebUI Community');
 
 		const url = 'https://openwebui.com';
 
@@ -166,12 +164,7 @@
 		const res = await updateModelById(localStorage.token, model.id, model);
 
 		if (res) {
-			toast.success(
-				$i18n.t(`Model {{name}} is now {{status}}`, {
-					name: model.id,
-					status: model.meta.hidden ? 'hidden' : 'visible'
-				})
-			);
+			toast.success(`Model ${model.id} is now ${model.meta.hidden ? 'hidden' : 'visible'}`);
 
 			page = 1;
 			getModelList();
@@ -190,9 +183,9 @@
 		const res = await copyToClipboard(`${baseUrl}/?model=${encodeURIComponent(model.id)}`);
 
 		if (res) {
-			toast.success($i18n.t('Copied link to clipboard'));
+			toast.success('Copied link to clipboard');
 		} else {
-			toast.error($i18n.t('Failed to copy link'));
+			toast.error('Failed to copy link');
 		}
 	};
 
@@ -251,7 +244,7 @@
 
 <svelte:head>
 	<title>
-		{$i18n.t('Models')} • {$WEBUI_NAME}
+		{'Models'} • {$WEBUI_NAME}
 	</title>
 </svelte:head>
 
@@ -281,7 +274,7 @@
 						savedModels = JSON.parse(event.target.result);
 						console.log(savedModels);
 					} catch (e) {
-						toast.error($i18n.t('Invalid JSON file'));
+						toast.error('Invalid JSON file');
 						return;
 					}
 
@@ -325,7 +318,7 @@
 		<div class="flex justify-between items-center">
 			<div class="flex items-center md:self-center text-xl font-medium px-0.5 gap-2 shrink-0">
 				<div>
-					{$i18n.t('Models')}
+					{'Models'}
 				</div>
 
 				<div class="text-lg font-medium text-gray-500 dark:text-gray-500">
@@ -342,7 +335,7 @@
 						}}
 					>
 						<div class=" self-center font-medium line-clamp-1">
-							{$i18n.t('Import')}
+							{'Import'}
 						</div>
 					</button>
 				{/if}
@@ -355,7 +348,7 @@
 						}}
 					>
 						<div class=" self-center font-medium line-clamp-1">
-							{$i18n.t('Export')}
+							{'Export'}
 						</div>
 					</button>
 				{/if}
@@ -365,7 +358,7 @@
 				>
 					<Plus className="size-3" strokeWidth="2.5" />
 
-					<div class=" hidden md:block md:ml-1 text-xs">{$i18n.t('New Model')}</div>
+					<div class=" hidden md:block md:ml-1 text-xs">{'New Model'}</div>
 				</a>
 			</div>
 		</div>
@@ -382,7 +375,7 @@
 				<input
 					class=" w-full text-sm py-1 rounded-r-xl outline-hidden bg-transparent"
 					bind:value={query}
-					placeholder={$i18n.t('Search Models')}
+					placeholder={'Search Models'}
 				/>
 
 				{#if query}
@@ -459,7 +452,7 @@
 											: 'opacity-50 dark:opacity-50'} bg-transparent rounded-2xl"
 									>
 										<img
-											src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${model.id}&lang=${$i18n.language}`}
+											src={`${WEBUI_API_BASE_URL}/models/model/profile/image?id=${model.id}&lang=${'en-US'}`}
 											alt="modelfile profile"
 											class=" rounded-2xl size-12 object-cover"
 										/>
@@ -488,9 +481,7 @@
 														<div class=""></div>
 														<div class="flex flex-row gap-0.5 items-center">
 															{#if shiftKey}
-																<Tooltip
-																	content={model?.meta?.hidden ? $i18n.t('Show') : $i18n.t('Hide')}
-																>
+																<Tooltip content={model?.meta?.hidden ? 'Show' : 'Hide'}>
 																	<button
 																		class="self-center w-fit text-sm p-1.5 dark:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
 																		type="button"
@@ -507,7 +498,7 @@
 																	</button>
 																</Tooltip>
 
-																<Tooltip content={$i18n.t('Delete')}>
+																<Tooltip content={'Delete'}>
 																	<button
 																		class="self-center w-fit text-sm p-1.5 dark:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
 																		type="button"
@@ -565,9 +556,7 @@
 														e.stopPropagation();
 													}}
 												>
-													<Tooltip
-														content={model.is_active ? $i18n.t('Enabled') : $i18n.t('Disabled')}
-													>
+													<Tooltip content={model.is_active ? 'Enabled' : 'Disabled'}>
 														<Switch
 															bind:state={model.is_active}
 															on:change={async () => {
@@ -588,16 +577,14 @@
 
 										<div class=" flex gap-1 pr-2 -mt-1 items-center">
 											<Tooltip
-												content={model?.user?.email ?? $i18n.t('Deleted User')}
+												content={model?.user?.email ?? 'Deleted User'}
 												className="flex shrink-0"
 												placement="top-start"
 											>
 												<div class="shrink-0 text-gray-500 text-xs">
-													{$i18n.t('By {{name}}', {
-														name: capitalizeFirstLetter(
-															model?.user?.name ?? model?.user?.email ?? $i18n.t('Deleted User')
-														)
-													})}
+													{`By ${capitalizeFirstLetter(
+														model?.user?.name ?? model?.user?.email ?? 'Deleted User'
+													)}`}
 												</div>
 											</Tooltip>
 
@@ -634,9 +621,9 @@
 			<div class=" w-full h-full flex flex-col justify-center items-center my-16 mb-24">
 				<div class="max-w-md text-center">
 					<div class=" text-3xl mb-3">😕</div>
-					<div class=" text-lg font-medium mb-1">{$i18n.t('No models found')}</div>
+					<div class=" text-lg font-medium mb-1">{'No models found'}</div>
 					<div class=" text-gray-500 text-center text-xs">
-						{$i18n.t('Try adjusting your search or filter to find what you are looking for.')}
+						{'Try adjusting your search or filter to find what you are looking for.'}
 					</div>
 				</div>
 			</div>
@@ -646,7 +633,7 @@
 	{#if $config?.features.enable_community_sharing}
 		<div class=" my-16">
 			<div class=" text-xl font-medium mb-1 line-clamp-1">
-				{$i18n.t('Made by Open WebUI Community')}
+				{'Made by Open WebUI Community'}
 			</div>
 
 			<a
@@ -655,9 +642,9 @@
 				target="_blank"
 			>
 				<div class=" self-center">
-					<div class=" font-medium line-clamp-1">{$i18n.t('Discover a model')}</div>
+					<div class=" font-medium line-clamp-1">{'Discover a model'}</div>
 					<div class=" text-sm line-clamp-1">
-						{$i18n.t('Discover, download, and explore model presets')}
+						{'Discover, download, and explore model presets'}
 					</div>
 				</div>
 

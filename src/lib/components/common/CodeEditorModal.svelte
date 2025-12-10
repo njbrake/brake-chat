@@ -3,9 +3,6 @@
 
 	import CodeEditor from './CodeEditor.svelte';
 	import Drawer from './Drawer.svelte';
-
-	const i18n = getContext('i18n');
-
 	let {
 		show = $bindable(),
 		value = $bindable(),
@@ -32,7 +29,7 @@
 			class=" sticky top-0 z-30 flex justify-between bg-white px-4.5 pt-3 pb-3 dark:bg-gray-900 dark:text-gray-100"
 		>
 			<div class=" font-primary self-center text-lg font-medium">
-				{$i18n.t('Code Editor')}
+				{'Code Editor'}
 			</div>
 			<button
 				class="self-center"

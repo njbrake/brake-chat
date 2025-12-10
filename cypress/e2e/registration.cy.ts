@@ -42,11 +42,5 @@ describe('Registration and Login', () => {
 		cy.get('button[type="submit"]').click();
 		// Wait until the user is redirected to the home page
 		cy.contains(adminUser.name);
-		// Dismiss the changelog dialog if it is visible
-		cy.getAllLocalStorage().then((ls) => {
-			if (!ls['version']) {
-				cy.get('button').contains("Okay, Let's Go!").click();
-			}
-		});
 	});
 });

@@ -1,8 +1,5 @@
 <script>
 	import { getContext } from 'svelte';
-
-	const i18n = getContext('i18n');
-
 	import Tooltip from '../Tooltip.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
 
@@ -13,7 +10,7 @@
 {#if tag}
 	<Tooltip content={tag.name}>
 		<button
-			aria-label={$i18n.t('Remove this tag from list')}
+			aria-label={'Remove this tag from list'}
 			class="relative group/tags px-1.5 py-[0.5px] gap-0.5 flex justify-between h-fit max-h-fit w-fit items-center rounded-lg bg-gray-500/20 text-gray-700 dark:text-gray-200 transition cursor-pointer"
 			on:click={() => {
 				onDelete();

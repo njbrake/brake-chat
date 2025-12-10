@@ -3,9 +3,6 @@
 	import TagList from './Tags/TagList.svelte';
 	import { getContext, createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
-
-	const i18n = getContext('i18n');
-
 	export let tags = [];
 	export let suggestionTags = [];
 </script>
@@ -19,7 +16,7 @@
 	/>
 
 	<TagInput
-		label={tags.length == 0 ? $i18n.t('Add Tags') : ''}
+		label={tags.length == 0 ? 'Add Tags' : ''}
 		{suggestionTags}
 		on:add={(e) => {
 			dispatch('add', e.detail);

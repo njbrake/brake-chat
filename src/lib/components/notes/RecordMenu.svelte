@@ -9,9 +9,6 @@
 	import CursorArrowRays from '../icons/CursorArrowRays.svelte';
 	import DocumentArrowUp from '../icons/DocumentArrowUp.svelte';
 	import CloudArrowUp from '../icons/CloudArrowUp.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 	export let className = 'max-w-[170px]';
 
@@ -50,7 +47,7 @@
 				<div class=" self-center mr-2">
 					<Mic className="size-4" strokeWidth="2" />
 				</div>
-				<div class=" self-center truncate">{$i18n.t('Record')}</div>
+				<div class=" self-center truncate">{'Record'}</div>
 			</button>
 
 			<button
@@ -63,7 +60,7 @@
 				<div class=" self-center mr-2">
 					<CursorArrowRays className="size-4" strokeWidth="2" />
 				</div>
-				<div class=" self-center truncate">{$i18n.t('Capture Audio')}</div>
+				<div class=" self-center truncate">{'Capture Audio'}</div>
 			</button>
 
 			<button
@@ -76,7 +73,7 @@
 				<div class=" self-center mr-2">
 					<CloudArrowUp className="size-4" strokeWidth="2" />
 				</div>
-				<div class=" self-center truncate">{$i18n.t('Upload Audio')}</div>
+				<div class=" self-center truncate">{'Upload Audio'}</div>
 			</button>
 		</DropdownMenu.Content>
 	</slot>

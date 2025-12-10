@@ -7,8 +7,6 @@
 	import XMark from '$lib/components/icons/XMark.svelte';
 
 	const dispatch = createEventDispatcher();
-	const i18n = getContext('i18n');
-
 	export let placeholder = '';
 	export let value = '';
 	export let showClearButton = false;
@@ -25,23 +23,23 @@
 	let options = [
 		{
 			name: 'tag:',
-			description: $i18n.t('search for tags')
+			description: 'search for tags'
 		},
 		{
 			name: 'folder:',
-			description: $i18n.t('search for folders')
+			description: 'search for folders'
 		},
 		{
 			name: 'pinned:',
-			description: $i18n.t('search for pinned chats')
+			description: 'search for pinned chats'
 		},
 		{
 			name: 'shared:',
-			description: $i18n.t('search for shared chats')
+			description: 'search for shared chats'
 		},
 		{
 			name: 'archived:',
-			description: $i18n.t('search for archived chats')
+			description: 'search for archived chats'
 		}
 	];
 	let focused = false;
@@ -70,7 +68,7 @@
 				...$tags,
 				{
 					id: 'none',
-					name: $i18n.t('Untagged')
+					name: 'Untagged'
 				}
 			]
 				.filter((tag) => {
@@ -207,7 +205,7 @@
 		<input
 			id="search-input"
 			class="w-full rounded-r-xl py-1.5 pl-2.5 text-sm bg-transparent dark:text-gray-300 outline-hidden"
-			placeholder={placeholder ? placeholder : $i18n.t('Search')}
+			placeholder={placeholder ? placeholder : 'Search'}
 			autocomplete="off"
 			bind:value
 			on:input={() => {
@@ -349,7 +347,7 @@
 					</div>
 				{:else if filteredOptions.length > 0}
 					<div class="px-1 font-medium dark:text-gray-300 text-gray-700 mb-1">
-						{$i18n.t('Search options')}
+						{'Search options'}
 					</div>
 
 					<div class=" max-h-60 overflow-auto">

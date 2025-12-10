@@ -17,8 +17,6 @@
 	import DeleteConfirmDialog from '$lib/components/common/ConfirmDialog.svelte';
 
 	import localizedFormat from 'dayjs/plugin/localizedFormat';
-
-	const i18n = getContext('i18n');
 	dayjs.extend(localizedFormat);
 
 	export let user;
@@ -61,7 +59,7 @@
 	const copyToClipboard = async (text) => {
 		const res = await _copyToClipboard(text);
 		if (res) {
-			toast.success($i18n.t('Copying to clipboard was successful!'));
+			toast.success('Copying to clipboard was successful!');
 		}
 	};
 
@@ -82,7 +80,7 @@
 
 	const editMessageConfirmHandler = async (submit = true) => {
 		if (!editedContent && (editedFiles ?? []).length === 0) {
-			toast.error($i18n.t('Please enter a message or attach a file.'));
+			toast.error('Please enter a message or attach a file.');
 			return;
 		}
 
@@ -110,7 +108,7 @@
 
 <DeleteConfirmDialog
 	bind:show={showDeleteConfirm}
-	title={$i18n.t('Delete message?')}
+	title={'Delete message?'}
 	on:confirm={() => {
 		deleteMessageHandler();
 	}}
@@ -134,12 +132,12 @@
 			<div>
 				<Name>
 					{#if message.user}
-						{$i18n.t('You')}
+						{'You'}
 						<span class=" text-gray-500 text-sm font-medium">{message?.user ?? ''}</span>
 					{:else if $settings.showUsername || $_user.name !== user.name}
 						{user.name}
 					{:else}
-						{$i18n.t('You')}
+						{'You'}
 					{/if}
 
 					{#if message.timestamp}
@@ -150,16 +148,11 @@
 								: 'invisible group-hover:visible transition'}"
 						>
 							<Tooltip content={dayjs(message.timestamp * 1000).format('LLLL')}>
-								<!-- $i18n.t('Today at {{LOCALIZED_TIME}}') -->
-								<!-- $i18n.t('Yesterday at {{LOCALIZED_TIME}}') -->
-								<!-- $i18n.t('{{LOCALIZED_DATE}} at {{LOCALIZED_TIME}}') -->
+								<!-- 'Today at {{"LOCALIZED_TIME"}}') -->
+								<!-- 'Yesterday at {{"LOCALIZED_TIME"}}' -->
+								<!-- '{{"LOCALIZED_DATE"}} at {{"LOCALIZED_TIME"}}' -->
 
-								<span class="line-clamp-1"
-									>{$i18n.t(formatDate(message.timestamp * 1000), {
-										LOCALIZED_TIME: dayjs(message.timestamp * 1000).format('LT'),
-										LOCALIZED_DATE: dayjs(message.timestamp * 1000).format('L')
-									})}</span
-								>
+								<span class="line-clamp-1">{dayjs(message.timestamp * 1000).fromNow()}</span>
 							</Tooltip>
 						</div>
 					{/if}
@@ -174,12 +167,7 @@
 						: 'invisible group-hover:visible transition text-gray-400'}"
 				>
 					<Tooltip content={dayjs(message.timestamp * 1000).format('LLLL')}>
-						<span class="line-clamp-1"
-							>{$i18n.t(formatDate(message.timestamp * 1000), {
-								LOCALIZED_TIME: dayjs(message.timestamp * 1000).format('LT'),
-								LOCALIZED_DATE: dayjs(message.timestamp * 1000).format('L')
-							})}</span
-						>
+						<span class="line-clamp-1">{dayjs(message.timestamp * 1000).fromNow()}</span>
 					</Tooltip>
 				</div>
 			</div>
@@ -306,7 +294,7 @@
 									editMessageConfirmHandler(false);
 								}}
 							>
-								{$i18n.t('Save')}
+								{'Save'}
 							</button>
 						</div>
 
@@ -318,7 +306,7 @@
 									cancelEditMessage();
 								}}
 							>
-								{$i18n.t('Cancel')}
+								{'Cancel'}
 							</button>
 
 							<button
@@ -328,7 +316,7 @@
 									editMessageConfirmHandler();
 								}}
 							>
-								{$i18n.t('Send')}
+								{'Send'}
 							</button>
 						</div>
 					</div>
@@ -457,7 +445,7 @@
 						{/if}
 					{/if}
 					{#if !readOnly}
-						<Tooltip content={$i18n.t('Edit')} placement="bottom">
+						<Tooltip content={'Edit'} placement="bottom">
 							<button
 								class="{($settings?.highContrastMode ?? false)
 									? ''
@@ -485,7 +473,7 @@
 					{/if}
 
 					{#if message?.content}
-						<Tooltip content={$i18n.t('Copy')} placement="bottom">
+						<Tooltip content={'Copy'} placement="bottom">
 							<button
 								class="{($settings?.highContrastMode ?? false)
 									? ''
@@ -514,7 +502,7 @@
 
 					{#if $_user?.role === 'admin' || ($_user?.permissions?.chat?.delete_message ?? false)}
 						{#if !readOnly && (!isFirstMessage || siblings.length > 1)}
-							<Tooltip content={$i18n.t('Delete')} placement="bottom">
+							<Tooltip content={'Delete'} placement="bottom">
 								<button
 									class="{($settings?.highContrastMode ?? false)
 										? ''

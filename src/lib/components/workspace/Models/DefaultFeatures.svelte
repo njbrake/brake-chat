@@ -3,21 +3,18 @@
 	import Checkbox from '$lib/components/common/Checkbox.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import { marked } from 'marked';
-
-	const i18n = getContext('i18n');
-
 	const featureLabels = {
 		web_search: {
-			label: $i18n.t('Web Search'),
-			description: $i18n.t('Model can search the web for information')
+			label: 'Web Search',
+			description: 'Model can search the web for information'
 		},
 		image_generation: {
-			label: $i18n.t('Image Generation'),
-			description: $i18n.t('Model can generate images based on text prompts')
+			label: 'Image Generation',
+			description: 'Model can generate images based on text prompts'
 		},
 		code_interpreter: {
-			label: $i18n.t('Code Interpreter'),
-			description: $i18n.t('Model can execute code and perform calculations')
+			label: 'Code Interpreter',
+			description: 'Model can execute code and perform calculations'
 		}
 	};
 
@@ -27,7 +24,7 @@
 
 <div>
 	<div class="flex w-full justify-between mb-1">
-		<div class=" self-center text-sm font-medium">{$i18n.t('Default Features')}</div>
+		<div class=" self-center text-sm font-medium">{'Default Features'}</div>
 	</div>
 	<div class="flex items-center mt-2 flex-wrap">
 		{#each availableFeatures as feature}
@@ -45,7 +42,7 @@
 
 				<div class=" py-0.5 text-sm capitalize">
 					<Tooltip content={marked.parse(featureLabels[feature].description)}>
-						{$i18n.t(featureLabels[feature].label)}
+						{featureLabels[feature].label}
 					</Tooltip>
 				</div>
 			</div>

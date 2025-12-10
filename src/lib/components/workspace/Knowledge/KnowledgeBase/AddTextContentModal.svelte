@@ -3,7 +3,6 @@
 	import dayjs from 'dayjs';
 
 	import { onMount, getContext, createEventDispatcher } from 'svelte';
-	const i18n = getContext('i18n');
 	const dispatch = createEventDispatcher();
 
 	import Modal from '$lib/components/common/Modal.svelte';
@@ -14,7 +13,7 @@
 	import VoiceRecording from '$lib/components/chat/MessageInput/VoiceRecording.svelte';
 	export let show = false;
 
-	let name = $i18n.t('Untitled');
+	let name = 'Untitled';
 	let content = '';
 
 	let voiceInput = false;
@@ -37,7 +36,7 @@
 			class="flex flex-col w-full h-full"
 			on:submit|preventDefault={() => {
 				if (name.trim() === '' || content.trim() === '') {
-					toast.error($i18n.t('Please fill in all fields.'));
+					toast.error('Please fill in all fields.');
 					name = name.trim();
 					content = content.trim();
 					return;
@@ -60,7 +59,7 @@
 								class="w-full text-3xl font-medium bg-transparent outline-hidden"
 								type="text"
 								bind:value={name}
-								placeholder={$i18n.t('Title')}
+								placeholder={'Title'}
 								required
 							/>
 						</div>
@@ -69,7 +68,7 @@
 					<div class=" flex-1 w-full h-full">
 						<MarkdownInput
 							bind:value={content}
-							placeholder={$i18n.t('Write something...')}
+							placeholder={'Write something...'}
 							preserveBreaks={true}
 						/>
 					</div>
@@ -97,7 +96,7 @@
 							/>
 						</div>
 					{:else}
-						<Tooltip content={$i18n.t('Voice Input')}>
+						<Tooltip content={'Voice Input'}>
 							<button
 								class=" p-2 bg-gray-50 text-gray-700 dark:bg-gray-700 dark:text-white transition rounded-full"
 								type="button"
@@ -106,11 +105,7 @@
 										let stream = await navigator.mediaDevices
 											.getUserMedia({ audio: true })
 											.catch(function (err) {
-												toast.error(
-													$i18n.t(`Permission denied when accessing microphone: {{error}}`, {
-														error: err
-													})
-												);
+												toast.error(`Permission denied when accessing microphone: ${err}`);
 												return null;
 											});
 
@@ -121,7 +116,7 @@
 										}
 										stream = null;
 									} catch {
-										toast.error($i18n.t('Permission denied when accessing microphone'));
+										toast.error('Permission denied when accessing microphone');
 									}
 								}}
 							>
@@ -132,12 +127,12 @@
 				</div>
 
 				<div class=" shrink-0">
-					<Tooltip content={$i18n.t('Save')}>
+					<Tooltip content={'Save'}>
 						<button
 							class=" px-3.5 py-2 bg-black text-white dark:bg-white dark:text-black transition rounded-full"
 							type="submit"
 						>
-							{$i18n.t('Save')}
+							{'Save'}
 						</button>
 					</Tooltip>
 				</div>

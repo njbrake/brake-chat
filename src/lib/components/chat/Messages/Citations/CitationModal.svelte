@@ -6,9 +6,6 @@
 
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import Textarea from '$lib/components/common/Textarea.svelte';
-
-	const i18n = getContext('i18n');
-
 	export let show = false;
 	export let citation;
 	export let showPercentage = false;
@@ -67,9 +64,7 @@
 					{#if document?.metadata?.file_id || document.source?.url?.includes('http')}
 						<Tooltip
 							className="w-fit"
-							content={document.source?.url?.includes('http')
-								? $i18n.t('Open link')
-								: $i18n.t('Open file')}
+							content={document.source?.url?.includes('http') ? 'Open link' : 'Open file'}
 							placement="top-start"
 							tippyOptions={{ duration: [500, 0] }}
 						>
@@ -89,7 +84,7 @@
 						{decodeString(citation?.source?.name)}
 					{/if}
 				{:else}
-					{$i18n.t('Citation')}
+					{'Citation'}
 				{/if}
 			</div>
 			<button
@@ -111,7 +106,7 @@
 						{#if document.metadata?.parameters}
 							<div>
 								<div class="text-sm font-medium dark:text-gray-300 mb-1">
-									{$i18n.t('Parameters')}
+									{'Parameters'}
 								</div>
 
 								<Textarea readonly value={JSON.stringify(document.metadata.parameters, null, 2)}
@@ -123,12 +118,12 @@
 							<div
 								class=" text-sm font-medium dark:text-gray-300 flex items-center gap-2 w-fit mb-1"
 							>
-								{$i18n.t('Content')}
+								{'Content'}
 
 								{#if showRelevance && document.distance !== undefined}
 									<Tooltip
 										className="w-fit"
-										content={$i18n.t('Relevance')}
+										content={'Relevance'}
 										placement="top-start"
 										tippyOptions={{ duration: [500, 0] }}
 									>
@@ -154,7 +149,7 @@
 
 								{#if Number.isInteger(document?.metadata?.page)}
 									<span class="text-sm text-gray-500 dark:text-gray-400">
-										({$i18n.t('page')}
+										({'page'}
 										{document.metadata.page + 1})
 									</span>
 								{/if}
@@ -165,7 +160,7 @@
 									class="w-full border-0 h-auto rounded-none"
 									sandbox="allow-scripts allow-forms allow-same-origin"
 									srcdoc={document.document}
-									title={$i18n.t('Content')}
+									title={'Content'}
 								></iframe>
 							{:else}
 								<pre class="text-sm dark:text-gray-400 whitespace-pre-line">{document.document

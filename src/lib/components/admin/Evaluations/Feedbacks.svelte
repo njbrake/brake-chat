@@ -8,8 +8,6 @@
 	dayjs.extend(relativeTime);
 
 	import { onMount, getContext } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import { deleteFeedbackById, exportAllFeedbacks, getFeedbackItems } from '$lib/apis/evaluations';
 
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
@@ -94,14 +92,14 @@
 			return null;
 		});
 		if (response) {
-			toast.success($i18n.t('Feedback deleted successfully'));
+			toast.success('Feedback deleted successfully');
 			page = 1;
 			getFeedbacks();
 		}
 	};
 
 	const shareHandler = async () => {
-		toast.success($i18n.t('Redirecting you to Open WebUI Community'));
+		toast.success('Redirecting you to Open WebUI Community');
 
 		// remove snapshot from feedbacks
 		const feedbacksToShare = items.map((f) => {
@@ -152,7 +150,7 @@
 	<div class="mt-0.5 mb-1 gap-1 flex flex-row justify-between">
 		<div class="flex items-center md:self-center text-xl font-medium px-0.5 gap-2 shrink-0">
 			<div>
-				{$i18n.t('Feedback History')}
+				{'Feedback History'}
 			</div>
 
 			<div class="text-lg font-medium text-gray-500 dark:text-gray-500">
@@ -162,7 +160,7 @@
 
 		{#if total > 0}
 			<div>
-				<Tooltip content={$i18n.t('Export')}>
+				<Tooltip content={'Export'}>
 					<button
 						class=" p-2 rounded-xl hover:bg-gray-100 dark:bg-gray-900 dark:hover:bg-gray-850 transition font-medium text-sm flex items-center space-x-1"
 						on:click={() => {
@@ -179,7 +177,7 @@
 	<div class="scrollbar-hidden relative whitespace-nowrap overflow-x-auto max-w-full">
 		{#if (items ?? []).length === 0}
 			<div class="text-center text-xs text-gray-500 dark:text-gray-400 py-1">
-				{$i18n.t('No feedbacks found')}
+				{'No feedbacks found'}
 			</div>
 		{:else}
 			<table
@@ -193,7 +191,7 @@
 							on:click={() => setSortKey('user')}
 						>
 							<div class="flex gap-1.5 items-center justify-end">
-								{$i18n.t('User')}
+								{'User'}
 								{#if orderBy === 'user'}
 									<span class="font-normal">
 										{#if direction === 'asc'}
@@ -216,7 +214,7 @@
 							on:click={() => setSortKey('model_id')}
 						>
 							<div class="flex gap-1.5 items-center">
-								{$i18n.t('Models')}
+								{'Models'}
 								{#if orderBy === 'model_id'}
 									<span class="font-normal">
 										{#if direction === 'asc'}
@@ -239,7 +237,7 @@
 							on:click={() => setSortKey('rating')}
 						>
 							<div class="flex gap-1.5 items-center justify-end">
-								{$i18n.t('Result')}
+								{'Result'}
 								{#if orderBy === 'rating'}
 									<span class="font-normal">
 										{#if direction === 'asc'}
@@ -262,7 +260,7 @@
 							on:click={() => setSortKey('updated_at')}
 						>
 							<div class="flex gap-1.5 items-center justify-end">
-								{$i18n.t('Updated At')}
+								{'Updated At'}
 								{#if orderBy === 'updated_at'}
 									<span class="font-normal">
 										{#if direction === 'asc'}
@@ -313,11 +311,8 @@
 											<Tooltip content={feedback.data.sibling_model_ids.join(', ')}>
 												<div class=" text-[0.65rem] text-gray-600 dark:text-gray-400 line-clamp-1">
 													{#if feedback.data.sibling_model_ids.length > 2}
-														<!-- {$i18n.t('and {{COUNT}} more')} -->
-														{feedback.data.sibling_model_ids.slice(0, 2).join(', ')}, {$i18n.t(
-															'and {{COUNT}} more',
-															{ COUNT: feedback.data.sibling_model_ids.length - 2 }
-														)}
+														<!-- {and {{COUNT}} more} -->
+														{feedback.data.sibling_model_ids.slice(0, 2).join(', ')}, {`and ${feedback.data.sibling_model_ids.length - 2} more`}
 													{:else}
 														{feedback.data.sibling_model_ids.join(', ')}
 													{/if}
@@ -338,11 +333,11 @@
 								<td class="px-3 py-1 text-right font-medium text-gray-900 dark:text-white w-max">
 									<div class=" flex justify-end">
 										{#if feedback?.data?.rating.toString() === '1'}
-											<Badge type="info" content={$i18n.t('Won')} />
+											<Badge type="info" content={'Won'} />
 										{:else if feedback?.data?.rating.toString() === '0'}
-											<Badge type="muted" content={$i18n.t('Draw')} />
+											<Badge type="muted" content={'Draw'} />
 										{:else if feedback?.data?.rating.toString() === '-1'}
-											<Badge type="error" content={$i18n.t('Lost')} />
+											<Badge type="error" content={'Lost'} />
 										{/if}
 									</div>
 								</td>
@@ -375,14 +370,12 @@
 	{#if total > 0 && $config?.features?.enable_community_sharing}
 		<div class=" flex flex-col justify-end w-full text-right gap-1">
 			<div class="line-clamp-1 text-gray-500 text-xs">
-				{$i18n.t('Help us create the best community leaderboard by sharing your feedback history!')}
+				{'Help us create the best community leaderboard by sharing your feedback history!'}
 			</div>
 
 			<div class="flex space-x-1 ml-auto">
 				<Tooltip
-					content={$i18n.t(
-						'To protect your privacy, only ratings, model IDs, tags, and metadata are shared from your feedback—your chat logs remain private and are not included.'
-					)}
+					content={'To protect your privacy, only ratings, model IDs, tags, and metadata are shared from your feedback—your chat logs remain private and are not included.'}
 				>
 					<button
 						class="flex text-xs items-center px-3 py-1.5 rounded-xl bg-gray-50 hover:bg-gray-100 dark:bg-gray-850 dark:hover:bg-gray-800 dark:text-gray-200 transition"
@@ -391,7 +384,7 @@
 						}}
 					>
 						<div class=" self-center mr-2 font-medium line-clamp-1">
-							{$i18n.t('Share to Open WebUI Community')}
+							{'Share to Open WebUI Community'}
 						</div>
 
 						<div class=" self-center">

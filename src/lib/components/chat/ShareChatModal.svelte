@@ -14,8 +14,6 @@
 
 	let chat = null;
 	let shareUrl = null;
-	const i18n = getContext('i18n');
-
 	const shareLocalChat = async () => {
 		const _chat = chat;
 
@@ -31,7 +29,7 @@
 		const _chat = chat.chat;
 		console.log('share', _chat);
 
-		toast.success($i18n.t('Redirecting you to Open WebUI Community'));
+		toast.success('Redirecting you to Open WebUI Community');
 		const url = 'https://openwebui.com';
 		// const url = 'http://localhost:5173';
 
@@ -84,7 +82,7 @@
 <Modal bind:show size="md">
 	<div>
 		<div class=" flex justify-between dark:text-gray-300 px-5 pt-4 pb-0.5">
-			<div class=" text-lg font-medium self-center">{$i18n.t('Share Chat')}</div>
+			<div class=" text-lg font-medium self-center">{'Share Chat'}</div>
 			<button
 				class="self-center"
 				on:click={() => {
@@ -100,10 +98,10 @@
 				<div class=" text-sm dark:text-gray-300 mb-1">
 					{#if chat.share_id}
 						<a href="/s/{chat.share_id}" target="_blank"
-							>{$i18n.t('You have shared this chat')}
-							<span class=" underline">{$i18n.t('before')}</span>.</a
+							>{'You have shared this chat'}
+							<span class=" underline">{'before'}</span>.</a
 						>
-						{$i18n.t('Click here to')}
+						{'Click here to'}
 						<button
 							class="underline"
 							on:click={async () => {
@@ -113,13 +111,11 @@
 									chat = await getChatById(localStorage.token, chatId);
 								}
 							}}
-							>{$i18n.t('delete this link')}
+							>{'delete this link'}
 						</button>
-						{$i18n.t('and create a new shared link.')}
+						{'and create a new shared link.'}
 					{:else}
-						{$i18n.t(
-							"Messages you send after creating your link won't be shared. Users with the URL will be able to view the shared chat."
-						)}
+						{"Messages you send after creating your link won't be shared. Users with the URL will be able to view the shared chat."}
 					{/if}
 				</div>
 
@@ -135,7 +131,7 @@
 										show = false;
 									}}
 								>
-									{$i18n.t('Share to Open WebUI Community')}
+									{'Share to Open WebUI Community'}
 								</button>
 							{/if}
 
@@ -173,16 +169,16 @@
 										copyToClipboard(await shareLocalChat());
 									}
 
-									toast.success($i18n.t('Copied shared chat URL to clipboard!'));
+									toast.success('Copied shared chat URL to clipboard!');
 									show = false;
 								}}
 							>
 								<Link />
 
 								{#if chat.share_id}
-									{$i18n.t('Update and Copy Link')}
+									{'Update and Copy Link'}
 								{:else}
-									{$i18n.t('Copy Link')}
+									{'Copy Link'}
 								{/if}
 							</button>
 						</div>

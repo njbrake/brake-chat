@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { getContext, onMount } from 'svelte';
 	import { LinkPreview } from 'bits-ui';
-
-	const i18n = getContext('i18n');
 	import { getUserById } from '$lib/apis/users';
 
 	import UserStatus from './UserStatus.svelte';

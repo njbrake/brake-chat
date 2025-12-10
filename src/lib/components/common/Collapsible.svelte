@@ -3,8 +3,6 @@
 	import { v4 as uuidv4 } from 'uuid';
 
 	import { getContext } from 'svelte';
-	const i18n = getContext('i18n');
-
 	import dayjs from '$lib/dayjs';
 	import duration from 'dayjs/plugin/duration';
 	import relativeTime from 'dayjs/plugin/relativeTime';
@@ -26,8 +24,8 @@
 		}
 	}
 
-	// Assuming $i18n.languages is an array of language codes
-	$: loadLocale($i18n.languages);
+	// Assuming ['en-US'] is an array of language codes
+	$: loadLocale(['en-US']);
 
 	import { slide } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
@@ -142,16 +140,12 @@
 						{#if attributes?.done === 'true'}
 							<Markdown
 								id={`${collapsibleId}-tool-calls-${attributes?.id}`}
-								content={$i18n.t('View Result from **{{NAME}}**', {
-									NAME: attributes.name
-								})}
+								content={`View Result from **${attributes.name}**`}
 							/>
 						{:else}
 							<Markdown
 								id={`${collapsibleId}-tool-calls-${attributes?.id}-executing`}
-								content={$i18n.t('Executing **{{NAME}}**...', {
-									NAME: attributes.name
-								})}
+								content={`Executing **${attributes.name}**...`}
 							/>
 						{/if}
 					</div>
@@ -246,24 +240,20 @@
 						{#if attributes?.type === 'reasoning'}
 							{#if attributes?.done === 'true' && attributes?.duration}
 								{#if attributes.duration < 1}
-									{$i18n.t('Thought for less than a second')}
+									{'Thought for less than a second'}
 								{:else if attributes.duration < 60}
-									{$i18n.t('Thought for {{DURATION}} seconds', {
-										DURATION: attributes.duration
-									})}
+									{`Thought for ${attributes.duration} seconds`}
 								{:else}
-									{$i18n.t('Thought for {{DURATION}}', {
-										DURATION: dayjs.duration(attributes.duration, 'seconds').humanize()
-									})}
+									{`Thought for ${dayjs.duration(attributes.duration, 'seconds').humanize()}`}
 								{/if}
 							{:else}
-								{$i18n.t('Thinking...')}
+								{'Thinking...'}
 							{/if}
 						{:else if attributes?.type === 'code_interpreter'}
 							{#if attributes?.done === 'true'}
-								{$i18n.t('Analyzed')}
+								{'Analyzed'}
 							{:else}
-								{$i18n.t('Analyzing...')}
+								{'Analyzing...'}
 							{/if}
 						{:else}
 							{title}
