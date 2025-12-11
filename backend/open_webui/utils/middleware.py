@@ -2528,6 +2528,28 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                                 )
 
                     if response_tool_calls:
+                        # Validate and fix incomplete JSON in tool calls before processing
+                        for tool_call in response_tool_calls:
+                            tool_args = tool_call.get("function", {}).get("arguments", "")
+                            if tool_args and tool_args.strip():
+                                # Count braces to detect incomplete JSON
+                                open_braces = tool_args.count("{")
+                                close_braces = tool_args.count("}")
+
+                                if open_braces > close_braces:
+                                    # Add missing closing braces
+                                    missing = open_braces - close_braces
+                                    tool_args += "}" * missing
+                                    tool_call["function"]["arguments"] = tool_args
+                                    log.warning(
+                                        f"Fixed incomplete tool call arguments for {tool_call.get('function', {}).get('name', 'unknown')}: added {missing} closing brace(s)"
+                                    )
+                                elif open_braces < close_braces:
+                                    # This shouldn't happen but log it if it does
+                                    log.error(
+                                        "Tool call has MORE closing braces than opening braces - this indicates a parsing error upstream"
+                                    )
+
                         tool_calls.append(response_tool_calls)
 
                     if response.background:
