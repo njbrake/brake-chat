@@ -60,15 +60,15 @@ async def get_tools(request: Request, user=Depends(get_verified_user)):
             )
         )
 
-    # OpenAPI Tool Servers
+    # MCP Tool Servers
     for server in await get_tool_servers(request):
         tools.append(
             ToolUserResponse(
                 id=f"server:{server.get('id')}",
                 user_id=f"server:{server.get('id')}",
-                name=server.get("openapi", {}).get("info", {}).get("title", "Tool Server"),
+                name=server.get("info", {}).get("title", "Tool Server"),
                 meta={
-                    "description": server.get("openapi", {}).get("info", {}).get("description", ""),
+                    "description": server.get("info", {}).get("description", ""),
                 },
                 access_control=request.app.state.config.TOOL_SERVER_CONNECTIONS[server.get("idx", 0)]
                 .get("config", {})

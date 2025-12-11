@@ -47,7 +47,7 @@
 					? 'opacity-50'
 					: ''}"
 			>
-				<Tooltip content={connection?.type === 'mcp' ? 'MCP' : 'OpenAPI'}>
+				<Tooltip content={'MCP'}>
 					<WrenchAlt />
 				</Tooltip>
 

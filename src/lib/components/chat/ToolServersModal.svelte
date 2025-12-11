@@ -83,11 +83,11 @@
 						<Collapsible buttonClassName="w-full" chevron>
 							<div>
 								<div class="text-sm font-medium dark:text-gray-100 text-gray-800">
-									{toolServer?.openapi?.info?.title} - v{toolServer?.openapi?.info?.version}
+									{toolServer?.info?.title} - v{toolServer?.info?.version}
 								</div>
 
 								<div class="text-xs text-gray-500">
-									{toolServer?.openapi?.info?.description}
+									{toolServer?.info?.description}
 								</div>
 
 								<div class="text-xs text-gray-500">

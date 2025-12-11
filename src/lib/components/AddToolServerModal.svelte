@@ -53,7 +53,6 @@
 	let loading = false;
 
 	let verifiedSpecs = null;
-	let verificationOpenApiInfo = null;
 	let showVerifiedTools = false;
 
 	const registerOAuthClientHandler = async () => {
@@ -133,7 +132,6 @@
 			console.debug('Connection successful', res);
 
 			verifiedSpecs = res?.specs || null;
-			verificationOpenApiInfo = res?.openapi?.info || res?.info || null;
 			showVerifiedTools = verifiedSpecs && verifiedSpecs.length > 0;
 		}
 	};
@@ -281,7 +279,6 @@
 		accessControl = null;
 
 		verifiedSpecs = null;
-		verificationOpenApiInfo = null;
 		showVerifiedTools = false;
 	};
 
@@ -311,7 +308,6 @@
 
 	$: if (url) {
 		verifiedSpecs = null;
-		verificationOpenApiInfo = null;
 		showVerifiedTools = false;
 	}
 
@@ -665,24 +661,6 @@
 									<div
 										class="border border-gray-100 dark:border-gray-800 rounded-lg max-h-[300px] overflow-y-auto"
 									>
-										{#if verificationOpenApiInfo}
-											<div
-												class="px-3 py-2 bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800"
-											>
-												<div class="text-xs font-medium text-gray-800 dark:text-gray-100">
-													{verificationOpenApiInfo.title}
-													{#if verificationOpenApiInfo.version}
-														<span class="text-gray-500">v{verificationOpenApiInfo.version}</span>
-													{/if}
-												</div>
-												{#if verificationOpenApiInfo.description}
-													<div class="text-xs text-gray-500 mt-0.5">
-														{verificationOpenApiInfo.description}
-													</div>
-												{/if}
-											</div>
-										{/if}
-
 										<div class="divide-y divide-gray-100 dark:divide-gray-800">
 											{#each verifiedSpecs as spec, idx}
 												<div
