@@ -102,8 +102,6 @@
 								href="/workspace/prompts">{'Prompts'}</a
 							>
 						{/if}
-
-
 					</div>
 				</div>
 
