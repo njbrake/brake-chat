@@ -89,7 +89,6 @@ from open_webui.utils.task import (
     rag_template,
     tools_function_calling_generation_template,
 )
-from open_webui.utils.tools import get_tools, get_updated_tool_function
 from open_webui.utils.webhook import post_webhook
 from starlette.responses import JSONResponse, StreamingResponse
 
@@ -1058,13 +1057,6 @@ async def process_chat_payload(request, form_data, user, metadata, model):
     else:
         models = request.app.state.MODELS
 
-    task_model_id = get_task_model_id(
-        form_data["model"],
-        request.app.state.config.TASK_MODEL,
-        request.app.state.config.TASK_MODEL_EXTERNAL,
-        models,
-    )
-
     events = []
     sources = []
 
@@ -1338,20 +1330,8 @@ async def process_chat_payload(request, form_data, user, metadata, model):
                         )
                     continue
 
-        tools_dict = await get_tools(
-            request,
-            tool_ids,
-            user,
-            {
-                **extra_params,
-                "__model__": models[task_model_id],
-                "__messages__": form_data["messages"],
-                "__files__": metadata.get("files", []),
-            },
-        )
-
-        if mcp_tools_dict:
-            tools_dict = {**tools_dict, **mcp_tools_dict}
+        # Initialize tools dict with MCP tools only (Python tools removed)
+        tools_dict = mcp_tools_dict if mcp_tools_dict else {}
 
     if direct_tool_servers:
         for tool_server in direct_tool_servers:
@@ -2634,15 +2614,8 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                                     )
 
                                 else:
-                                    tool_function = get_updated_tool_function(
-                                        function=tool["callable"],
-                                        extra_params={
-                                            "__messages__": form_data.get("messages", []),
-                                            "__files__": metadata.get("files", []),
-                                        },
-                                    )
-
-                                    tool_result = await tool_function(**tool_function_params)
+                                    # Call MCP tool directly (Python tools have been removed)
+                                    tool_result = await tool["callable"](**tool_function_params)
 
                             except Exception as e:
                                 tool_result = str(e)

@@ -520,9 +520,8 @@ async def lifespan(app: FastAPI):
     if LICENSE_KEY:
         get_license_data(app, LICENSE_KEY)
 
-    # This should be blocking (sync) so functions are not deactivated on first /get_models calls
-    # when the first user lands on the / route.
-    log.info("Installing external dependencies of functions and tools...")
+    # Install function dependencies on startup (tool dependencies removed)
+    log.info("Installing external dependencies of functions...")
     install_tool_and_function_dependencies()
 
     app.state.redis = get_redis_connection(
@@ -741,8 +740,7 @@ app.state.EXTERNAL_PWA_MANIFEST_URL = EXTERNAL_PWA_MANIFEST_URL
 
 app.state.USER_COUNT = None
 
-app.state.TOOLS = {}
-app.state.TOOL_CONTENTS = {}
+# Note: TOOLS state removed as Python tools have been deprecated
 
 app.state.FUNCTIONS = {}
 app.state.FUNCTION_CONTENTS = {}
