@@ -72,10 +72,10 @@
 
 			<div class="px-5 pb-5 w-full flex flex-col justify-center">
 				<div class=" text-xs text-gray-600 dark:text-gray-300 mb-2">
-					{'Open WebUI can use tools provided by any OpenAPI server.'} <br /><a
+					{'Open WebUI can use tools provided by MCP servers.'} <br /><a
 						class="underline"
-						href="https://github.com/open-webui/openapi-servers"
-						target="_blank">{'Learn more about OpenAPI tool servers.'}</a
+						href="https://modelcontextprotocol.io/"
+						target="_blank">{'Learn more about MCP tool servers.'}</a
 					>
 				</div>
 				<div class=" text-sm dark:text-gray-300 mb-1">
@@ -83,11 +83,11 @@
 						<Collapsible buttonClassName="w-full" chevron>
 							<div>
 								<div class="text-sm font-medium dark:text-gray-100 text-gray-800">
-									{toolServer?.openapi?.info?.title} - v{toolServer?.openapi?.info?.version}
+									{toolServer?.info?.title} - v{toolServer?.info?.version}
 								</div>
 
 								<div class="text-xs text-gray-500">
-									{toolServer?.openapi?.info?.description}
+									{toolServer?.info?.description}
 								</div>
 
 								<div class="text-xs text-gray-500">

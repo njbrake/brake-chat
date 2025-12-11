@@ -39,7 +39,7 @@
 	import '../app.css';
 	import 'tippy.js/dist/tippy.css';
 
-	import { executeToolServer, getBackendConfig, getVersion } from '$lib/apis';
+	import { getBackendConfig, getVersion } from '$lib/apis';
 	import { getSessionUser, userSignOut } from '$lib/apis/auths';
 	import { getAllChatTags, getChatList } from '$lib/apis/chats';
 	import { chatCompletion } from '$lib/apis/openai';
@@ -153,46 +153,15 @@
 	};
 
 	const executeTool = async (data, cb) => {
-		const toolServer = $settings?.toolServers?.find((server) => server.url === data.server?.url);
-		const toolServerData = $toolServers?.find((server) => server.url === data.server?.url);
-
-		console.log('executeTool', data, toolServer);
-
-		if (toolServer) {
-			console.log(toolServer);
-
-			let toolServerToken = null;
-			const auth_type = toolServer?.auth_type ?? 'bearer';
-			if (auth_type === 'bearer') {
-				toolServerToken = toolServer?.key;
-			} else if (auth_type === 'none') {
-				// No authentication
-			} else if (auth_type === 'session') {
-				toolServerToken = localStorage.token;
-			}
-
-			const res = await executeToolServer(
-				toolServerToken,
-				toolServer.url,
-				data?.name,
-				data?.params,
-				toolServerData
+		// MCP tool servers are now handled server-side
+		if (cb) {
+			cb(
+				JSON.parse(
+					JSON.stringify({
+						error: 'Tool Server execution is now handled server-side'
+					})
+				)
 			);
-
-			console.log('executeToolServer', res);
-			if (cb) {
-				cb(JSON.parse(JSON.stringify(res)));
-			}
-		} else {
-			if (cb) {
-				cb(
-					JSON.parse(
-						JSON.stringify({
-							error: 'Tool Server Not Found'
-						})
-					)
-				);
-			}
 		}
 	};
 

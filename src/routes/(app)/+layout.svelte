@@ -11,7 +11,7 @@
 
 	import { getKnowledgeBases } from '$lib/apis/knowledge';
 	import { getFunctions } from '$lib/apis/functions';
-	import { getModels, getToolServersData, getVersionUpdates } from '$lib/apis';
+	import { getModels, getVersionUpdates } from '$lib/apis';
 	import { getAllChatTags } from '$lib/apis/chats';
 	import { getPrompts } from '$lib/apis/prompts';
 	import { getTools } from '$lib/apis/tools';
@@ -122,15 +122,8 @@
 	};
 
 	const setToolServers = async () => {
-		let toolServersData = await getToolServersData($settings?.toolServers ?? []);
-		toolServersData = toolServersData.filter((data) => {
-			if (!data || data.error) {
-				toast.error(`Failed to connect to ${data?.url} OpenAPI tool server`);
-				return false;
-			}
-			return true;
-		});
-		toolServers.set(toolServersData);
+		// MCP tool servers are now handled server-side
+		toolServers.set([]);
 	};
 
 	const setBanners = async () => {

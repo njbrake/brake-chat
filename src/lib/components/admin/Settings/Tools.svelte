@@ -62,7 +62,6 @@
 					<hr class=" border-gray-100 dark:border-gray-850 my-2" />
 
 					<div class="mb-2.5 flex flex-col w-full justify-between">
-						<!-- {`Failed to connect to ${'server?.url'} OpenAPI tool server`} -->
 						<div class="flex justify-between items-center mb-0.5">
 							<div class="font-medium">{'Manage Tool Servers'}</div>
 
@@ -96,7 +95,7 @@
 
 						<div class="my-1.5">
 							<div class="text-xs text-gray-500">
-								{'Connect to your own OpenAPI compatible external tool servers.'}
+								{'Connect to your own MCP compatible external tool servers.'}
 							</div>
 						</div>
 					</div>

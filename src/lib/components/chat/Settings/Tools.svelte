@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { createEventDispatcher, onMount, getContext, tick } from 'svelte';
-	import { getModels as _getModels, getToolServersData } from '$lib/apis';
+	import { getModels as _getModels } from '$lib/apis';
 
 	const dispatch = createEventDispatcher();
 	import { models, settings, toolServers, user } from '$lib/stores';
@@ -29,16 +29,8 @@
 			toolServers: servers
 		});
 
-		let toolServersData = await getToolServersData($settings?.toolServers ?? []);
-		toolServersData = toolServersData.filter((data) => {
-			if (data.error) {
-				toast.error(`Failed to connect to ${data?.url} OpenAPI tool server`);
-				return false;
-			}
-
-			return true;
-		});
-		toolServers.set(toolServersData);
+		// MCP tool servers are now handled server-side
+		toolServers.set([]);
 	};
 
 	onMount(async () => {
@@ -59,7 +51,6 @@
 		{#if servers !== null}
 			<div class="">
 				<div class="pr-1.5">
-					<!-- {`Failed to connect to ${'server?.url'} OpenAPI tool server`} -->
 					<div class="">
 						<div class="flex justify-between items-center mb-0.5">
 							<div class="font-medium">{'Manage Tool Servers'}</div>
@@ -100,17 +91,15 @@
 							class={`text-xs
 								${($settings?.highContrastMode ?? false) ? 'text-gray-800 dark:text-gray-100' : 'text-gray-500'}`}
 						>
-							{'Connect to your own OpenAPI compatible external tool servers.'}
+							{'Connect to your own MCP compatible external tool servers.'}
 							<br />
 							{'CORS must be properly configured by the provider to allow requests from Open WebUI.'}
 						</div>
 					</div>
 
 					<div class=" text-xs text-gray-600 dark:text-gray-300 mb-2">
-						<a
-							class="underline"
-							href="https://github.com/open-webui/openapi-servers"
-							target="_blank">{'Learn more about OpenAPI tool servers.'}</a
+						<a class="underline" href="https://docs.openwebui.com/features/mcp" target="_blank"
+							>{'Learn more about MCP tool servers.'}</a
 						>
 					</div>
 				</div>

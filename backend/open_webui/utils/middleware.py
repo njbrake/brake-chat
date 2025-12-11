@@ -202,49 +202,38 @@ def process_tool_result(
 
     tool_result_files = []
 
-    if isinstance(tool_result, list):
-        if tool_type == "mcp":  # MCP
-            tool_response = []
-            for item in tool_result:
-                if isinstance(item, dict):
-                    if item.get("type") == "text":
-                        text = item.get("text", "")
-                        if isinstance(text, str):
-                            try:
-                                text = json.loads(text)
-                            except json.JSONDecodeError:
-                                pass
-                        tool_response.append(text)
-                    elif item.get("type") in ["image", "audio"]:
-                        file_url = get_file_url_from_base64(
-                            request,
-                            f"data:{item.get('mimeType')};base64,{item.get('data', item.get('blob', ''))}",
-                            {
-                                "chat_id": metadata.get("chat_id", None),
-                                "message_id": metadata.get("message_id", None),
-                                "session_id": metadata.get("session_id", None),
-                                "result": item,
-                            },
-                            user,
-                        )
+    if isinstance(tool_result, list) and tool_type == "mcp":
+        tool_response = []
+        for item in tool_result:
+            if isinstance(item, dict):
+                if item.get("type") == "text":
+                    text = item.get("text", "")
+                    if isinstance(text, str):
+                        try:
+                            text = json.loads(text)
+                        except json.JSONDecodeError:
+                            pass
+                    tool_response.append(text)
+                elif item.get("type") in ["image", "audio"]:
+                    file_url = get_file_url_from_base64(
+                        request,
+                        f"data:{item.get('mimeType')};base64,{item.get('data', item.get('blob', ''))}",
+                        {
+                            "chat_id": metadata.get("chat_id", None),
+                            "message_id": metadata.get("message_id", None),
+                            "session_id": metadata.get("session_id", None),
+                            "result": item,
+                        },
+                        user,
+                    )
 
-                        tool_result_files.append(
-                            {
-                                "type": item.get("type", "data"),
-                                "url": file_url,
-                            }
-                        )
-            tool_result = tool_response[0] if len(tool_response) == 1 else tool_response
-        else:  # OpenAPI
-            for item in tool_result:
-                if isinstance(item, str) and item.startswith("data:"):
                     tool_result_files.append(
                         {
-                            "type": "data",
-                            "content": item,
+                            "type": item.get("type", "data"),
+                            "url": file_url,
                         }
                     )
-                    tool_result.remove(item)
+        tool_result = tool_response[0] if len(tool_response) == 1 else tool_response
 
     if isinstance(tool_result, list):
         tool_result = {"results": tool_result}
@@ -1249,10 +1238,7 @@ async def process_chat_payload(request, form_data, user, metadata, model):
 
                     mcp_server_connection = None
                     for server_connection in request.app.state.config.TOOL_SERVER_CONNECTIONS:
-                        if (
-                            server_connection.get("type", "") == "mcp"
-                            and server_connection.get("info", {}).get("id") == server_id
-                        ):
+                        if server_connection.get("info", {}).get("id") == server_id:
                             mcp_server_connection = server_connection
                             break
 
