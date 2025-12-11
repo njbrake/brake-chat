@@ -1878,21 +1878,20 @@ async def get_current_usage(user=Depends(get_verified_user)):
 # Initialize OAuth client manager with any MCP tool servers using OAuth 2.1
 if len(app.state.config.TOOL_SERVER_CONNECTIONS) > 0:
     for tool_server_connection in app.state.config.TOOL_SERVER_CONNECTIONS:
-        if tool_server_connection.get("type", "openapi") == "mcp":
-            server_id = tool_server_connection.get("info", {}).get("id")
-            auth_type = tool_server_connection.get("auth_type", "none")
+        server_id = tool_server_connection.get("info", {}).get("id")
+        auth_type = tool_server_connection.get("auth_type", "none")
 
-            if server_id and auth_type == "oauth_2.1":
-                oauth_client_info = tool_server_connection.get("info", {}).get("oauth_client_info", "")
+        if server_id and auth_type == "oauth_2.1":
+            oauth_client_info = tool_server_connection.get("info", {}).get("oauth_client_info", "")
 
-                try:
-                    oauth_client_info = decrypt_data(oauth_client_info)
-                    app.state.oauth_client_manager.add_client(
-                        f"mcp:{server_id}",
-                        OAuthClientInformationFull(**oauth_client_info),
-                    )
-                except Exception as e:
-                    log.error(f"Error adding OAuth client for MCP tool server {server_id}: {e}")
+            try:
+                oauth_client_info = decrypt_data(oauth_client_info)
+                app.state.oauth_client_manager.add_client(
+                    f"mcp:{server_id}",
+                    OAuthClientInformationFull(**oauth_client_info),
+                )
+            except Exception as e:
+                log.error(f"Error adding OAuth client for MCP tool server {server_id}: {e}")
 
 try:
     if ENABLE_STAR_SESSIONS_MIDDLEWARE:
@@ -1929,12 +1928,11 @@ async def register_client(self, request, client_id: str) -> bool:
     connection_idx = None
 
     for idx, conn in enumerate(request.app.state.config.TOOL_SERVER_CONNECTIONS or []):
-        if conn.get("type", "openapi") == server_type:
-            info = conn.get("info", {})
-            if info.get("id") == server_id:
-                connection = conn
-                connection_idx = idx
-                break
+        info = conn.get("info", {})
+        if info.get("id") == server_id:
+            connection = conn
+            connection_idx = idx
+            break
 
     if connection is None or connection_idx is None:
         log.warning(f"Unable to locate MCP tool server configuration for client {client_id} during re-registration")

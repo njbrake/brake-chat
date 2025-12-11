@@ -15,8 +15,6 @@ from open_webui.utils.oauth import (
     get_oauth_client_info_with_dynamic_client_registration,
 )
 from open_webui.utils.tools import (
-    get_tool_server_data,
-    get_tool_server_url,
     set_tool_servers,
 )
 from pydantic import BaseModel, ConfigDict
@@ -125,8 +123,6 @@ async def register_oauth_client(
 
 class ToolServerConnection(BaseModel):
     url: str
-    path: str
-    type: str | None = "openapi"  # openapi, mcp
     auth_type: str | None
     headers: dict | str | None = None
     key: str | None
@@ -153,13 +149,12 @@ async def set_tool_servers_config(
     user=Depends(get_admin_user),
 ):
     for connection in request.app.state.config.TOOL_SERVER_CONNECTIONS:
-        server_type = connection.get("type", "openapi")
         auth_type = connection.get("auth_type", "none")
 
         if auth_type == "oauth_2.1":
             # Remove existing OAuth clients for tool servers
             server_id = connection.get("info", {}).get("id")
-            client_key = f"{server_type}:{server_id}"
+            client_key = f"mcp:{server_id}"
 
             try:
                 request.app.state.oauth_client_manager.remove_client(client_key)
@@ -174,23 +169,21 @@ async def set_tool_servers_config(
     await set_tool_servers(request)
 
     for connection in request.app.state.config.TOOL_SERVER_CONNECTIONS:
-        server_type = connection.get("type", "openapi")
-        if server_type == "mcp":
-            server_id = connection.get("info", {}).get("id")
-            auth_type = connection.get("auth_type", "none")
+        server_id = connection.get("info", {}).get("id")
+        auth_type = connection.get("auth_type", "none")
 
-            if auth_type == "oauth_2.1" and server_id:
-                try:
-                    oauth_client_info = connection.get("info", {}).get("oauth_client_info", "")
-                    oauth_client_info = decrypt_data(oauth_client_info)
+        if auth_type == "oauth_2.1" and server_id:
+            try:
+                oauth_client_info = connection.get("info", {}).get("oauth_client_info", "")
+                oauth_client_info = decrypt_data(oauth_client_info)
 
-                    request.app.state.oauth_client_manager.add_client(
-                        f"{server_type}:{server_id}",
-                        OAuthClientInformationFull(**oauth_client_info),
-                    )
-                except Exception as e:
-                    log.debug(f"Failed to add OAuth client for MCP tool server: {e}")
-                    continue
+                request.app.state.oauth_client_manager.add_client(
+                    f"mcp:{server_id}",
+                    OAuthClientInformationFull(**oauth_client_info),
+                )
+            except Exception as e:
+                log.debug(f"Failed to add OAuth client for MCP tool server: {e}")
+                continue
 
     return {
         "TOOL_SERVER_CONNECTIONS": request.app.state.config.TOOL_SERVER_CONNECTIONS,
@@ -201,86 +194,43 @@ async def set_tool_servers_config(
 async def verify_tool_servers_config(request: Request, form_data: ToolServerConnection, user=Depends(get_admin_user)):
     """Verify the connection to the tool server."""
     try:
-        if form_data.type == "mcp":
-            if form_data.auth_type == "oauth_2.1":
-                discovery_urls = get_discovery_urls(form_data.url)
-                for discovery_url in discovery_urls:
-                    log.debug(f"Trying to fetch OAuth 2.1 discovery document from {discovery_url}")
-                    async with aiohttp.ClientSession(trust_env=True) as session:
-                        async with session.get(discovery_url) as oauth_server_metadata_response:
-                            if oauth_server_metadata_response.status == 200:
-                                try:
-                                    oauth_server_metadata = OAuthMetadata.model_validate(
-                                        await oauth_server_metadata_response.json()
-                                    )
-                                    return {
-                                        "status": True,
-                                        "oauth_server_metadata": oauth_server_metadata.model_dump(mode="json"),
-                                    }
-                                except Exception as e:
-                                    log.info(f"Failed to parse OAuth 2.1 discovery document: {e}")
-                                    raise HTTPException(
-                                        status_code=400,
-                                        detail=f"Failed to parse OAuth 2.1 discovery document from {discovery_url}",
-                                    )
+        if form_data.auth_type == "oauth_2.1":
+            discovery_urls = get_discovery_urls(form_data.url)
+            for discovery_url in discovery_urls:
+                log.debug(f"Trying to fetch OAuth 2.1 discovery document from {discovery_url}")
+                async with aiohttp.ClientSession(trust_env=True) as session:
+                    async with session.get(discovery_url) as oauth_server_metadata_response:
+                        if oauth_server_metadata_response.status == 200:
+                            try:
+                                oauth_server_metadata = OAuthMetadata.model_validate(
+                                    await oauth_server_metadata_response.json()
+                                )
+                                return {
+                                    "status": True,
+                                    "oauth_server_metadata": oauth_server_metadata.model_dump(mode="json"),
+                                }
+                            except Exception as e:
+                                log.info(f"Failed to parse OAuth 2.1 discovery document: {e}")
+                                raise HTTPException(
+                                    status_code=400,
+                                    detail=f"Failed to parse OAuth 2.1 discovery document from {discovery_url}",
+                                )
 
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Failed to fetch OAuth 2.1 discovery document from {discovery_urls}",
-                )
-            try:
-                client = MCPClient()
-                headers = None
-
-                token = None
-                if form_data.auth_type == "bearer":
-                    token = form_data.key
-                elif form_data.auth_type == "session":
-                    token = request.state.token.credentials
-                elif form_data.auth_type == "system_oauth":
-                    oauth_token = None
-                    try:
-                        if request.cookies.get("oauth_session_id", None):
-                            oauth_token = await request.app.state.oauth_manager.get_oauth_token(
-                                user.id,
-                                request.cookies.get("oauth_session_id", None),
-                            )
-
-                            if oauth_token:
-                                token = oauth_token.get("access_token", "")
-                    except Exception:
-                        pass
-                if token:
-                    headers = {"Authorization": f"Bearer {token}"}
-
-                if form_data.headers and isinstance(form_data.headers, dict):
-                    if headers is None:
-                        headers = {}
-                    headers.update(form_data.headers)
-
-                await client.connect(form_data.url, headers=headers)
-                specs = await client.list_tool_specs()
-                return {
-                    "status": True,
-                    "specs": specs,
-                }
-            except Exception as e:
-                log.debug(f"Failed to create MCP client: {e}")
-                raise HTTPException(
-                    status_code=400,
-                    detail="Failed to create MCP client",
-                )
-            finally:
-                if client:
-                    await client.disconnect()
-        else:  # openapi
-            token = None
+            raise HTTPException(
+                status_code=400,
+                detail=f"Failed to fetch OAuth 2.1 discovery document from {discovery_urls}",
+            )
+        try:
+            client = MCPClient()
             headers = None
+
+            token = None
             if form_data.auth_type == "bearer":
                 token = form_data.key
             elif form_data.auth_type == "session":
                 token = request.state.token.credentials
             elif form_data.auth_type == "system_oauth":
+                oauth_token = None
                 try:
                     if request.cookies.get("oauth_session_id", None):
                         oauth_token = await request.app.state.oauth_manager.get_oauth_token(
@@ -290,10 +240,8 @@ async def verify_tool_servers_config(request: Request, form_data: ToolServerConn
 
                         if oauth_token:
                             token = oauth_token.get("access_token", "")
-
                 except Exception:
                     pass
-
             if token:
                 headers = {"Authorization": f"Bearer {token}"}
 
@@ -302,8 +250,21 @@ async def verify_tool_servers_config(request: Request, form_data: ToolServerConn
                     headers = {}
                 headers.update(form_data.headers)
 
-            url = get_tool_server_url(form_data.url, form_data.path)
-            return await get_tool_server_data(url, headers=headers)
+            await client.connect(form_data.url, headers=headers)
+            specs = await client.list_tool_specs()
+            return {
+                "status": True,
+                "specs": specs,
+            }
+        except Exception as e:
+            log.debug(f"Failed to create MCP client: {e}")
+            raise HTTPException(
+                status_code=400,
+                detail="Failed to create MCP client",
+            )
+        finally:
+            if client:
+                await client.disconnect()
     except HTTPException as e:
         raise e
     except Exception as e:

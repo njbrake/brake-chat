@@ -34,13 +34,7 @@
 
 	let inputElement = null;
 
-	let type = 'openapi'; // 'openapi', 'mcp'
-
 	let url = '';
-
-	let spec_type = 'url'; // 'url', 'json'
-	let spec = ''; // used when spec_type is 'json'
-	let path = 'openapi.json';
 
 	let auth_type = 'bearer';
 	let key = '';
@@ -102,18 +96,6 @@
 			return;
 		}
 
-		if (['openapi', ''].includes(type)) {
-			if (spec_type === 'json' && spec === '') {
-				toast.error('Please enter a valid JSON spec');
-				return;
-			}
-
-			if (spec_type === 'url' && path === '') {
-				toast.error('Please enter a valid path');
-				return;
-			}
-		}
-
 		if (headers) {
 			try {
 				let _headers = JSON.parse(headers);
@@ -128,47 +110,31 @@
 			}
 		}
 
-		if (direct) {
-			const res = await getToolServerData(
-				auth_type === 'bearer' ? key : localStorage.token,
-				path.includes('://') ? path : `${url}${path.startsWith('/') ? '' : '/'}${path}`
-			).catch((err) => {
-				toast.error('Connection failed');
-			});
-
-			if (res) {
-				toast.success('Connection successful');
-				console.debug('Connection successful', res);
+		const res = await verifyToolServerConnection(localStorage.token, {
+			url,
+			auth_type,
+			headers: headers ? JSON.parse(headers) : undefined,
+			key,
+			config: {
+				enable: enable,
+				access_control: accessControl
+			},
+			info: {
+				id,
+				name,
+				description
 			}
-		} else {
-			const res = await verifyToolServerConnection(localStorage.token, {
-				url,
-				path,
-				type,
-				auth_type,
-				headers: headers ? JSON.parse(headers) : undefined,
-				key,
-				config: {
-					enable: enable,
-					access_control: accessControl
-				},
-				info: {
-					id,
-					name,
-					description
-				}
-			}).catch((err) => {
-				toast.error('Connection failed');
-			});
+		}).catch((err) => {
+			toast.error('Connection failed');
+		});
 
-			if (res) {
-				toast.success('Connection successful');
-				console.debug('Connection successful', res);
+		if (res) {
+			toast.success('Connection successful');
+			console.debug('Connection successful', res);
 
-				verifiedSpecs = res?.specs || null;
-				verificationOpenApiInfo = res?.openapi?.info || res?.info || null;
-				showVerifiedTools = verifiedSpecs && verifiedSpecs.length > 0;
-			}
+			verifiedSpecs = res?.specs || null;
+			verificationOpenApiInfo = res?.openapi?.info || res?.info || null;
+			showVerifiedTools = verifiedSpecs && verifiedSpecs.length > 0;
 		}
 	};
 
@@ -192,12 +158,7 @@
 					data = data[0];
 				}
 
-				if (data.type) type = data.type;
 				if (data.url) url = data.url;
-
-				if (data.spec_type) spec_type = data.spec_type;
-				if (data.spec) spec = data.spec;
-				if (data.path) path = data.path;
 
 				if (data.auth_type) auth_type = data.auth_type;
 				if (data.headers) headers = JSON.stringify(data.headers, null, 2);
@@ -226,12 +187,7 @@
 		// export current connection as json file
 		const json = JSON.stringify([
 			{
-				type,
 				url,
-
-				spec_type,
-				spec,
-				path,
 
 				auth_type,
 				headers: headers ? JSON.parse(headers) : undefined,
@@ -263,22 +219,10 @@
 			return;
 		}
 
-		if (type === 'mcp' && auth_type === 'oauth_2.1' && !oauthClientInfo) {
+		if (auth_type === 'oauth_2.1' && !oauthClientInfo) {
 			toast.error('Please register the OAuth client');
 			loading = false;
 			return;
-		}
-
-		// validate spec
-		if (spec_type === 'json') {
-			try {
-				const specJSON = JSON.parse(spec);
-				spec = JSON.stringify(specJSON, null, 2);
-			} catch (e) {
-				toast.error('Please enter a valid JSON spec');
-				loading = false;
-				return;
-			}
 		}
 
 		if (headers) {
@@ -296,12 +240,7 @@
 		}
 
 		const connection = {
-			type,
 			url,
-
-			spec_type,
-			spec,
-			path,
 
 			auth_type,
 			headers: headers ? JSON.parse(headers) : undefined,
@@ -326,12 +265,7 @@
 		show = false;
 
 		// reset form
-		type = 'openapi';
 		url = '';
-
-		spec_type = 'url';
-		spec = '';
-		path = 'openapi.json';
 
 		key = '';
 		auth_type = 'bearer';
@@ -353,12 +287,7 @@
 
 	const init = () => {
 		if (connection) {
-			type = connection?.type ?? 'openapi';
 			url = connection.url;
-
-			spec_type = connection?.spec_type ?? 'url';
-			spec = connection?.spec ?? '';
-			path = connection?.path ?? 'openapi.json';
 
 			auth_type = connection?.auth_type ?? 'bearer';
 			headers = connection?.headers ? JSON.stringify(connection.headers, null, 2) : '';
@@ -380,7 +309,7 @@
 		init();
 	}
 
-	$: if (url || type) {
+	$: if (url) {
 		verifiedSpecs = null;
 		verificationOpenApiInfo = null;
 		showVerifiedTools = false;
@@ -450,31 +379,6 @@
 					}}
 				>
 					<div class="px-1">
-						{#if !direct}
-							<div class="flex gap-2 mb-1.5">
-								<div class="flex w-full justify-between items-center">
-									<div class=" text-xs text-gray-500">{'Type'}</div>
-
-									<div class="">
-										<button
-											on:click={() => {
-												type = ['', 'openapi'].includes(type) ? 'mcp' : 'openapi';
-											}}
-											type="button"
-											class=" text-xs text-gray-700 dark:text-gray-300"
-										>
-											{#if ['', 'openapi'].includes(type)}
-												{'OpenAPI'}
-											{:else if type === 'mcp'}
-												{'MCP'}
-												<span class="text-gray-500">{'Streamable HTTP'}</span>
-											{/if}
-										</button>
-									</div>
-								</div>
-							</div>
-						{/if}
-
 						<div class="flex gap-2">
 							<div class="flex flex-col w-full">
 								<div class="flex justify-between mb-0.5">
@@ -530,77 +434,6 @@
 								</div>
 							</div>
 						</div>
-
-						{#if ['', 'openapi'].includes(type)}
-							<div class="flex gap-2 mt-2">
-								<div class="flex flex-col w-full">
-									<div class="flex justify-between items-center mb-0.5">
-										<div class="flex gap-2 items-center">
-											<div
-												for="select-bearer-or-session"
-												class={`text-xs ${($settings?.highContrastMode ?? false) ? 'text-gray-800 dark:text-gray-100' : 'text-gray-500'}`}
-											>
-												{'OpenAPI Spec'}
-											</div>
-										</div>
-									</div>
-
-									<div class="flex gap-2">
-										<div class="flex-shrink-0 self-start">
-											<select
-												id="select-bearer-or-session"
-												class={`w-full text-sm bg-transparent pr-5 ${($settings?.highContrastMode ?? false) ? 'placeholder:text-gray-700 dark:placeholder:text-gray-100' : 'outline-hidden placeholder:text-gray-300 dark:placeholder:text-gray-700'}`}
-												bind:value={spec_type}
-											>
-												<option value="url">{'URL'}</option>
-												<option value="json">{'JSON'}</option>
-											</select>
-										</div>
-
-										<div class="flex flex-1 items-center">
-											{#if spec_type === 'url'}
-												<div class="flex-1 flex items-center">
-													<label for="url-or-path" class="sr-only"
-														>{'openapi.json URL or Path'}</label
-													>
-													<input
-														class={`w-full text-sm bg-transparent ${($settings?.highContrastMode ?? false) ? 'placeholder:text-gray-700 dark:placeholder:text-gray-100' : 'outline-hidden placeholder:text-gray-300 dark:placeholder:text-gray-700'}`}
-														type="text"
-														id="url-or-path"
-														bind:value={path}
-														placeholder={'openapi.json URL or Path'}
-														autocomplete="off"
-														required
-													/>
-												</div>
-											{:else if spec_type === 'json'}
-												<div
-													class={`text-xs w-full self-center translate-y-[1px] ${($settings?.highContrastMode ?? false) ? 'text-gray-800 dark:text-gray-100' : 'text-gray-500'}`}
-												>
-													<label for="url-or-path" class="sr-only">{'JSON Spec'}</label>
-													<textarea
-														class={`w-full text-sm bg-transparent ${($settings?.highContrastMode ?? false) ? 'placeholder:text-gray-700 dark:placeholder:text-gray-100' : 'outline-hidden placeholder:text-gray-300 dark:placeholder:text-gray-700 text-black dark:text-white'}`}
-														bind:value={spec}
-														placeholder={'JSON Spec'}
-														autocomplete="off"
-														required
-														rows="5"
-													/>
-												</div>
-											{/if}
-										</div>
-									</div>
-
-									{#if ['', 'url'].includes(spec_type)}
-										<div
-											class={`text-xs mt-1 ${($settings?.highContrastMode ?? false) ? 'text-gray-800 dark:text-gray-100' : 'text-gray-500'}`}
-										>
-											{`WebUI will make requests to "${path.includes('://') ? path : `${url}${path.startsWith('/') ? '' : '/'}${path}`}"`}
-										</div>
-									{/if}
-								</div>
-							</div>
-						{/if}
 
 						<div class="flex gap-2 mt-2">
 							<div class="flex flex-col w-full">
@@ -661,9 +494,7 @@
 
 											{#if !direct}
 												<option value="system_oauth">{'OAuth'}</option>
-												{#if type === 'mcp'}
-													<option value="oauth_2.1">{'OAuth 2.1'}</option>
-												{/if}
+												<option value="oauth_2.1">{'OAuth 2.1'}</option>
 											{/if}
 										</select>
 									</div>
@@ -735,12 +566,6 @@
 										for="enter-id"
 										class={`mb-0.5 text-xs ${($settings?.highContrastMode ?? false) ? 'text-gray-800 dark:text-gray-100' : 'text-gray-500'}`}
 										>{'ID'}
-
-										{#if type !== 'mcp'}
-											<span class="text-xs text-gray-200 dark:text-gray-800 ml-0.5"
-												>{'Optional'}</span
-											>
-										{/if}
 									</label>
 
 									<div class="flex-1">
@@ -751,7 +576,7 @@
 											bind:value={id}
 											placeholder={'Enter ID'}
 											autocomplete="off"
-											required={type === 'mcp'}
+											required
 										/>
 									</div>
 								</div>
@@ -976,22 +801,20 @@
 						{/if}
 					</div>
 
-					{#if type === 'mcp'}
-						<div
-							class=" bg-yellow-500/20 text-yellow-700 dark:text-yellow-200 rounded-2xl text-xs px-4 py-3 mb-2"
-						>
-							<span class="font-medium">
-								{'Warning'}:
-							</span>
-							{'MCP support is experimental and its specification changes often, which can lead to incompatibilities. OpenAPI specification support is directly maintained by the Open WebUI team, making it the more reliable option for compatibility.'}
+					<div
+						class=" bg-yellow-500/20 text-yellow-700 dark:text-yellow-200 rounded-2xl text-xs px-4 py-3 mb-2"
+					>
+						<span class="font-medium">
+							{'Warning'}:
+						</span>
+						{'MCP support is experimental and its specification changes often, which can lead to incompatibilities.'}
 
-							<a
-								class="font-medium underline"
-								href="https://docs.openwebui.com/features/mcp"
-								target="_blank">{'Read more →'}</a
-							>
-						</div>
-					{/if}
+						<a
+							class="font-medium underline"
+							href="https://docs.openwebui.com/features/mcp"
+							target="_blank">{'Read more →'}</a
+						>
+					</div>
 
 					<div class="flex justify-between pt-3 text-sm font-medium gap-1.5">
 						<div></div>
