@@ -2569,16 +2569,20 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                         tool_args = tool_call.get("function", {}).get("arguments", "{}")
 
                         tool_function_params = {}
-                        try:
-                            # json.loads cannot be used because some models do not produce valid JSON
-                            tool_function_params = ast.literal_eval(tool_args)
-                        except Exception as e:
-                            log.debug(e)
-                            # Fallback to JSON parsing
+                        if tool_args and tool_args.strip() not in ["{}", ""]:
                             try:
+                                log.debug(f"Attempting to parse tool_args (len={len(tool_args)}): {tool_args[:200]}...")
                                 tool_function_params = json.loads(tool_args)
-                            except Exception as e:
-                                log.error(f"Error parsing tool call arguments: {tool_args}")
+                                log.debug(f"Successfully parsed with json.loads: {list(tool_function_params.keys())}")
+                            except json.JSONDecodeError as e:
+                                log.warning(f"JSON parse failed at position {e.pos}: {e.msg}")
+                                log.warning(f"Context: ...{tool_args[max(0, e.pos - 50) : e.pos + 50]}...")
+                                try:
+                                    tool_function_params = ast.literal_eval(tool_args)
+                                    log.debug("Successfully parsed with ast.literal_eval")
+                                except Exception as e:
+                                    log.error(f"Error parsing tool call arguments: {tool_args}")
+                                    log.error(f"Parse error: {e}")
 
                         # Mutate the original tool call response params as they are passed back to the passed
                         # back to the LLM via the content blocks. If they are in a json block and are invalid json,
