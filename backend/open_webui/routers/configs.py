@@ -124,6 +124,7 @@ async def register_oauth_client(
 class ToolServerConnection(BaseModel):
     url: str
     auth_type: str | None
+    protocol: str | None = "streamable_http"  # Default to current streamable HTTP protocol
     headers: dict | str | None = None
     key: str | None
     config: dict | None
@@ -223,6 +224,7 @@ async def verify_tool_servers_config(request: Request, form_data: ToolServerConn
         try:
             client = MCPClient()
             headers = None
+            protocol = form_data.protocol or "streamable_http"
 
             token = None
             if form_data.auth_type == "bearer":
@@ -250,7 +252,7 @@ async def verify_tool_servers_config(request: Request, form_data: ToolServerConn
                     headers = {}
                 headers.update(form_data.headers)
 
-            await client.connect(form_data.url, headers=headers)
+            await client.connect(form_data.url, headers=headers, protocol=protocol)
             specs = await client.list_tool_specs()
             return {
                 "status": True,
