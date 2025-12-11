@@ -7,7 +7,7 @@ from mcp.client.streamable_http import streamablehttp_client
 
 
 class MCPClient:
-    def __init__(self):
+    def __init__(self) -> None:
         self.session: ClientSession | None = None
         self.exit_stack = None
 
