@@ -35,7 +35,7 @@
 		// Advanced
 		stream_response: null,
 		stream_delta_chunk_size: null,
-		function_calling: null,
+		function_calling: 'native',
 		seed: null,
 		temperature: null,
 		reasoning_effort: null,

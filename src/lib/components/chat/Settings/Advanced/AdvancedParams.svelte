@@ -13,7 +13,7 @@
 		// Advanced
 		stream_response: null, // Set stream responses for this model individually
 		stream_delta_chunk_size: null, // Set the chunk size for streaming responses
-		function_calling: null,
+		function_calling: 'native',
 		reasoning_tags: null,
 		seed: null,
 		stop: null,
@@ -45,6 +45,11 @@
 	};
 
 	export let params = defaultParams;
+
+	$: if ((params?.function_calling ?? null) === null) {
+		params.function_calling = 'native';
+	}
+
 	$: if (params) {
 		onChange(params);
 	}
@@ -153,7 +158,7 @@
 				<button
 					class="p-1 px-3 text-xs flex rounded-sm transition"
 					on:click={() => {
-						params.function_calling = (params?.function_calling ?? null) === null ? 'native' : null;
+						params.function_calling = params.function_calling === 'native' ? 'default' : 'native';
 					}}
 					type="button"
 				>
