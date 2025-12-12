@@ -61,7 +61,6 @@ log_sources = [
     "IMAGES",
     "MAIN",
     "MODELS",
-    "OLLAMA",
     "OPENAI",
     "RAG",
     "WEBHOOK",
