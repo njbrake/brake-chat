@@ -36,7 +36,6 @@
 		AUTOCOMPLETE_GENERATION_INPUT_MAX_LENGTH: -1,
 		TAGS_GENERATION_PROMPT_TEMPLATE: '',
 		ENABLE_TAGS_GENERATION: true,
-		ENABLE_SEARCH_QUERY_GENERATION: true,
 		ENABLE_RETRIEVAL_QUERY_GENERATION: true,
 		QUERY_GENERATION_PROMPT_TEMPLATE: '',
 		TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE: '',
@@ -315,14 +314,6 @@
 					</div>
 
 					<Switch bind:state={taskConfig.ENABLE_RETRIEVAL_QUERY_GENERATION} />
-				</div>
-
-				<div class="mb-2.5 flex w-full items-center justify-between">
-					<div class=" self-center text-xs font-medium">
-						{'Web Search Query Generation'}
-					</div>
-
-					<Switch bind:state={taskConfig.ENABLE_SEARCH_QUERY_GENERATION} />
 				</div>
 
 				<div class="mb-2.5">

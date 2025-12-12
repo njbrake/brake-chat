@@ -1,6 +1,5 @@
 <script>
 	import { getContext } from 'svelte';
-	import WebSearchResults from '../WebSearchResults.svelte';
 	import Search from '$lib/components/icons/Search.svelte';
 
 	export let status = null;
@@ -9,30 +8,7 @@
 
 {#if !status?.hidden}
 	<div class="status-description flex items-center gap-2 py-0.5 w-full text-left">
-		{#if status?.action === 'web_search' && (status?.urls || status?.items)}
-			<WebSearchResults {status}>
-				<div class="flex flex-col justify-center -space-y-0.5">
-					<div
-						class="{(done || status?.done) === false
-							? 'shimmer'
-							: ''} text-base line-clamp-1 text-wrap"
-					>
-						<!-- 'Generating search query' -->
-						<!-- 'No search query generated' -->
-						<!-- 'Searched {{count}} sites') -->
-						{#if status?.description?.includes('{{count}}')}
-							{status?.description.replace('{{count}}', (status?.urls || status?.items).length)}
-						{:else if status?.description === 'No search query generated'}
-							{'No search query generated'}
-						{:else if status?.description === 'Generating search query'}
-							{'Generating search query'}
-						{:else}
-							{status?.description}
-						{/if}
-					</div>
-				</div>
-			</WebSearchResults>
-		{:else if status?.action === 'knowledge_search'}
+		{#if status?.action === 'knowledge_search'}
 			<div class="flex flex-col justify-center -space-y-0.5">
 				<div
 					class="{(done || status?.done) === false
@@ -43,32 +19,6 @@
 						'{{' + 'searchQuery' + '}}',
 						status.query
 					)}
-				</div>
-			</div>
-		{:else if status?.action === 'web_search_queries_generated' && status?.queries}
-			<div class="flex flex-col justify-center -space-y-0.5">
-				<div
-					class="{(done || status?.done) === false
-						? 'shimmer'
-						: ''} text-gray-500 dark:text-gray-500 text-base line-clamp-1 text-wrap"
-				>
-					{'Searching'}
-				</div>
-
-				<div class=" flex gap-1 flex-wrap mt-2">
-					{#each status.queries as query, idx (query)}
-						<div
-							class="bg-gray-50 dark:bg-gray-850 flex rounded-lg py-1 px-2 items-center gap-1 text-xs"
-						>
-							<div>
-								<Search className="size-3" />
-							</div>
-
-							<span class="line-clamp-1">
-								{query}
-							</span>
-						</div>
-					{/each}
 				</div>
 			</div>
 		{:else if status?.action === 'queries_generated' && status?.queries}

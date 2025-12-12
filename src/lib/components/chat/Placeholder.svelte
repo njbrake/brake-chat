@@ -49,7 +49,6 @@
 	export let showCommands = false;
 
 	export let imageGenerationEnabled = false;
-	export let webSearchEnabled = false;
 
 	export let onSelect = (e) => {};
 	export let onChange = (e) => {};
@@ -202,7 +201,6 @@
 					bind:selectedToolIds
 					bind:selectedFilterIds
 					bind:imageGenerationEnabled
-					bind:webSearchEnabled
 					bind:atSelectedModel
 					bind:showCommands
 					{toolServers}
