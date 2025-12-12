@@ -31,23 +31,26 @@ class MCPClient:
 
         async with AsyncExitStack() as exit_stack:
             try:
+                streams_context = None
                 if protocol == "streamable_http":
                     log.debug("Using streamable_http protocol")
-                    self._streams_context = streamablehttp_client(url, headers=headers)
-                    transport = await exit_stack.enter_async_context(self._streams_context)
-                    read_stream, write_stream, _ = transport
-                    self._session_context = ClientSession(read_stream, write_stream)
+                    streams_context = streamablehttp_client(url, headers=headers)
                 elif protocol == "http_sse":
                     log.debug("Using HTTP+SSE protocol")
                     # Use the official MCP SSE client implementation
-                    self._sse_context = sse_client(url, headers=headers)
-                    transport = await exit_stack.enter_async_context(self._sse_context)
-                    read_stream, write_stream = transport
-                    self._session_context = ClientSession(read_stream, write_stream)
+                    streams_context = sse_client(url, headers=headers)
                 else:
                     raise ValueError(f"Unsupported MCP protocol: {protocol}")
 
-                self.session = await exit_stack.enter_async_context(self._session_context)
+                if not streams_context:
+                    raise ValueError(f"Unsupported MCP protocol: {protocol}")
+                log.debug(f"Streams context: {streams_context}")
+                transport = await exit_stack.enter_async_context(streams_context)
+                log.debug(f"Transport: {transport}")
+                read_stream, write_stream, _ = transport
+                session_context = ClientSession(read_stream, write_stream)
+                log.debug(f"Session context: {session_context}")
+                self.session = await exit_stack.enter_async_context(session_context)
                 log.debug("Session created, initializing...")
                 with anyio.fail_after(10):
                     await self.session.initialize()
