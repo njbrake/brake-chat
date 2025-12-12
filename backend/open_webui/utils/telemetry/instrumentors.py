@@ -7,7 +7,13 @@ from aiohttp import (
     TraceRequestExceptionParams,
     TraceRequestStartParams,
 )
-from chromadb.telemetry.opentelemetry.fastapi import instrument_fastapi
+import importlib.util
+
+if importlib.util.find_spec("chromadb"):
+    from chromadb.telemetry.opentelemetry.fastapi import instrument_fastapi
+else:
+    def instrument_fastapi(app):  # type: ignore
+        return app
 from fastapi import FastAPI, status
 from open_webui.env import SRC_LOG_LEVELS
 from open_webui.utils.telemetry.constants import SPAN_REDIS_TYPE, SpanAttributes

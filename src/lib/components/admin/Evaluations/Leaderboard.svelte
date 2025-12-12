@@ -10,11 +10,7 @@
 
 	import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
 	import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
-	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
-	const EMBEDDING_MODEL = 'TaylorAI/bge-micro-v2';
-
-	let tokenizer = null;
-	let model = null;
+        import { WEBUI_API_BASE_URL } from '$lib/constants';
 
 	export let feedbacks = [];
 
@@ -22,8 +18,7 @@
 
 	let query = '';
 
-	let tagEmbeddings = new Map();
-	let loadingLeaderboard = true;
+        let loadingLeaderboard = true;
 	let debounceTimer;
 
 	let orderBy: string = 'rating'; // default sort column
@@ -177,125 +172,49 @@
 		return stats;
 	}
 
-	//////////////////////
-	//
-	// Calculate cosine similarity
-	//
-	//////////////////////
+        //////////////////////
+        //
+        // Query matching
+        //
+        //////////////////////
 
-	const cosineSimilarity = (vecA, vecB) => {
-		// Ensure the lengths of the vectors are the same
-		if (vecA.length !== vecB.length) {
-			throw new Error('Vectors must be the same length');
-		}
+        const getTagMatchScore = (search: string, tags: string[]) => {
+                const normalizedQuery = search.trim().toLowerCase();
 
-		// Calculate the dot product
-		let dotProduct = 0;
-		let normA = 0;
-		let normB = 0;
+                if (normalizedQuery === '') {
+                        return 1;
+                }
 
-		for (let i = 0; i < vecA.length; i++) {
-			dotProduct += vecA[i] * vecB[i];
-			normA += vecA[i] ** 2;
-			normB += vecB[i] ** 2;
-		}
+                if (!tags || tags.length === 0) {
+                        return 0;
+                }
 
-		// Calculate the magnitudes
-		normA = Math.sqrt(normA);
-		normB = Math.sqrt(normB);
+                return tags.some((tag) => tag.toLowerCase().includes(normalizedQuery)) ? 1 : 0;
+        };
 
-		// Avoid division by zero
-		if (normA === 0 || normB === 0) {
-			return 0;
-		}
+        const debouncedQueryHandler = () => {
+                loadingLeaderboard = true;
 
-		// Return the cosine similarity
-		return dotProduct / (normA * normB);
-	};
+                clearTimeout(debounceTimer);
 
-	const calculateMaxSimilarity = (queryEmbedding, tagEmbeddings: Map<string, number[]>) => {
-		let maxSimilarity = 0;
-		for (const tagEmbedding of tagEmbeddings.values()) {
-			const similarity = cosineSimilarity(queryEmbedding, tagEmbedding);
-			maxSimilarity = Math.max(maxSimilarity, similarity);
-		}
-		return maxSimilarity;
-	};
+                debounceTimer = setTimeout(() => {
+                        const normalizedQuery = query.trim().toLowerCase();
 
-	//////////////////////
-	//
-	// Embedding functions
-	//
-	//////////////////////
+                        if (normalizedQuery === '') {
+                                rankHandler();
+                                return;
+                        }
 
-	const loadEmbeddingModel = async () => {
-		const { env, AutoModel, AutoTokenizer } = await import('@huggingface/transformers');
-		if (env.backends.onnx.wasm) {
-			env.backends.onnx.wasm.wasmPaths = '/wasm/';
-		}
+                        const similarities = new Map<string, number>();
 
-		// Check if the tokenizer and model are already loaded and stored in the window object
-		if (!window.tokenizer) {
-			window.tokenizer = await AutoTokenizer.from_pretrained(EMBEDDING_MODEL);
-		}
+                        for (const feedback of feedbacks) {
+                                const feedbackTags = feedback.data.tags || [];
+                                similarities.set(feedback.id, getTagMatchScore(normalizedQuery, feedbackTags));
+                        }
 
-		if (!window.model) {
-			window.model = await AutoModel.from_pretrained(EMBEDDING_MODEL);
-		}
-
-		// Use the tokenizer and model from the window object
-		tokenizer = window.tokenizer;
-		model = window.model;
-
-		// Pre-compute embeddings for all unique tags
-		const allTags = new Set(feedbacks.flatMap((feedback) => feedback.data.tags || []));
-		await getTagEmbeddings(Array.from(allTags));
-	};
-
-	const getEmbeddings = async (text: string) => {
-		const tokens = await tokenizer(text);
-		const output = await model(tokens);
-
-		// Perform mean pooling on the last hidden states
-		const embeddings = output.last_hidden_state.mean(1);
-		return embeddings.ort_tensor.data;
-	};
-
-	const getTagEmbeddings = async (tags: string[]) => {
-		const embeddings = new Map();
-		for (const tag of tags) {
-			if (!tagEmbeddings.has(tag)) {
-				tagEmbeddings.set(tag, await getEmbeddings(tag));
-			}
-			embeddings.set(tag, tagEmbeddings.get(tag));
-		}
-		return embeddings;
-	};
-
-	const debouncedQueryHandler = async () => {
-		loadingLeaderboard = true;
-
-		if (query.trim() === '') {
-			rankHandler();
-			return;
-		}
-
-		clearTimeout(debounceTimer);
-
-		debounceTimer = setTimeout(async () => {
-			const queryEmbedding = await getEmbeddings(query);
-			const similarities = new Map<string, number>();
-
-			for (const feedback of feedbacks) {
-				const feedbackTags = feedback.data.tags || [];
-				const tagEmbeddings = await getTagEmbeddings(feedbackTags);
-				const maxSimilarity = calculateMaxSimilarity(queryEmbedding, tagEmbeddings);
-				similarities.set(feedback.id, maxSimilarity);
-			}
-
-			rankHandler(similarities);
-		}, 1500); // Debounce for 1.5 seconds
-	};
+                        rankHandler(similarities);
+                }, 300);
+        };
 
 	$: query, debouncedQueryHandler();
 
@@ -352,14 +271,11 @@
 				<div class=" self-center ml-1 mr-3">
 					<Search className="size-3" />
 				</div>
-				<input
-					class=" w-full text-sm pr-4 py-1 rounded-r-xl outline-hidden bg-transparent"
-					bind:value={query}
-					placeholder={'Search'}
-					on:focus={() => {
-						loadEmbeddingModel();
-					}}
-				/>
+                                <input
+                                        class=" w-full text-sm pr-4 py-1 rounded-r-xl outline-hidden bg-transparent"
+                                        bind:value={query}
+                                        placeholder={'Search'}
+                                />
 			</div>
 		</Tooltip>
 	</div>
