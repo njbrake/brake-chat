@@ -1,10 +1,6 @@
 <script lang="ts">
 	import hljs from 'highlight.js';
-	import { toast } from 'svelte-sonner';
 	import { getContext, onMount, tick } from 'svelte';
-	import { config } from '$lib/stores';
-
-	import { executeCode } from '$lib/apis/utils';
 	import {
 		copyToClipboard,
 		initMermaid,
@@ -57,12 +53,6 @@
 	let renderError = null;
 
 	let highlightedCode = null;
-	let executing = false;
-
-	let stdout = null;
-	let stderr = null;
-	let result = null;
-	let files = null;
 
 	let copied = false;
 	let saved = false;
@@ -130,88 +120,6 @@
 		return false;
 	};
 
-	const executePython = async (code) => {
-		result = null;
-		stdout = null;
-		stderr = null;
-
-		executing = true;
-
-		if ($config?.code?.engine === 'jupyter') {
-			const output = await executeCode(localStorage.token, code).catch((error) => {
-				toast.error(`${error}`);
-				return null;
-			});
-
-			if (output) {
-				if (output['stdout']) {
-					stdout = output['stdout'];
-					const stdoutLines = stdout.split('\n');
-
-					for (const [idx, line] of stdoutLines.entries()) {
-						if (line.startsWith('data:image/png;base64')) {
-							if (files) {
-								files.push({
-									type: 'image/png',
-									data: line
-								});
-							} else {
-								files = [
-									{
-										type: 'image/png',
-										data: line
-									}
-								];
-							}
-
-							if (stdout.includes(`${line}\n`)) {
-								stdout = stdout.replace(`${line}\n`, ``);
-							} else if (stdout.includes(`${line}`)) {
-								stdout = stdout.replace(`${line}`, ``);
-							}
-						}
-					}
-				}
-
-				if (output['result']) {
-					result = output['result'];
-					const resultLines = result.split('\n');
-
-					for (const [idx, line] of resultLines.entries()) {
-						if (line.startsWith('data:image/png;base64')) {
-							if (files) {
-								files.push({
-									type: 'image/png',
-									data: line
-								});
-							} else {
-								files = [
-									{
-										type: 'image/png',
-										data: line
-									}
-								];
-							}
-
-							if (result.includes(`${line}\n`)) {
-								result = result.replace(`${line}\n`, ``);
-							} else if (result.includes(`${line}`)) {
-								result = result.replace(`${line}`, ``);
-							}
-						}
-					}
-				}
-
-				output['stderr'] && (stderr = output['stderr']);
-			}
-
-			executing = false;
-		} else {
-			executing = false;
-			stderr = 'Code execution engine not configured. Please configure Jupyter in admin settings.';
-		}
-	};
-
 	let mermaid = null;
 	const renderMermaid = async (code) => {
 		if (!mermaid) {
@@ -255,36 +163,6 @@
 	$: if (_token) {
 		render();
 	}
-
-	$: if (attributes) {
-		onAttributesUpdate();
-	}
-
-	const onAttributesUpdate = () => {
-		if (attributes?.output) {
-			// Create a helper function to unescape HTML entities
-			const unescapeHtml = (html) => {
-				const textArea = document.createElement('textarea');
-				textArea.innerHTML = html;
-				return textArea.value;
-			};
-
-			try {
-				// Unescape the HTML-encoded string
-				const unescapedOutput = unescapeHtml(attributes.output);
-
-				// Parse the unescaped string into JSON
-				const output = JSON.parse(unescapedOutput);
-
-				// Assign the parsed values to variables
-				stdout = output.stdout;
-				stderr = output.stderr;
-				result = output.result;
-			} catch (error) {
-				console.error('Error:', error);
-			}
-		}
-	};
 
 	onMount(async () => {
 		if (token) {
@@ -341,29 +219,6 @@
 						</div>
 					</button>
 
-					{#if ($config?.features?.enable_code_execution ?? true) && (lang.toLowerCase() === 'python' || lang.toLowerCase() === 'py' || (lang === '' && checkPythonCode(code)))}
-						{#if executing}
-							<div
-								class="run-code-button bg-none border-none p-0.5 cursor-not-allowed bg-white dark:bg-black"
-							>
-								{'Running'}
-							</div>
-						{:else if run}
-							<button
-								class="flex gap-1 items-center run-code-button bg-none border-none transition rounded-md px-1.5 py-0.5 bg-white dark:bg-black"
-								on:click={async () => {
-									code = _code;
-									await tick();
-									executePython(code);
-								}}
-							>
-								<div>
-									{'Run'}
-								</div>
-							</button>
-						{/if}
-					{/if}
-
 					{#if save}
 						<button
 							class="save-code-button bg-none border-none transition rounded-md px-1.5 py-0.5 bg-white dark:bg-black"
@@ -394,9 +249,7 @@
 			<div
 				class="language-{lang} rounded-t-3xl -mt-9 {editorClassName
 					? editorClassName
-					: executing || stdout || stderr || result
-						? ''
-						: 'rounded-b-3xl'} overflow-hidden"
+					: 'rounded-b-3xl'} overflow-hidden"
 			>
 				<div class=" pt-8 bg-white dark:bg-black"></div>
 
@@ -416,11 +269,7 @@
 					{:else}
 						<pre
 							class=" hljs p-4 px-5 overflow-x-auto"
-							style="border-top-left-radius: 0px; border-top-right-radius: 0px; {(executing ||
-								stdout ||
-								stderr ||
-								result) &&
-								'border-bottom-left-radius: 0px; border-bottom-right-radius: 0px;'}"><code
+							style="border-top-left-radius: 0px; border-top-right-radius: 0px;"><code
 								class="language-{lang} rounded-t-none whitespace-pre text-sm"
 								>{@html hljs.highlightAuto(code, hljs.getLanguage(lang)?.aliases).value ||
 									code}</code
@@ -442,49 +291,6 @@
 					id="plt-canvas-{id}"
 					class="bg-gray-50 dark:bg-black dark:text-white max-w-full overflow-x-auto scrollbar-hidden"
 				/>
-
-				{#if executing || stdout || stderr || result || files}
-					<div
-						class="bg-gray-50 dark:bg-black dark:text-white rounded-b-3xl! py-4 px-4 flex flex-col gap-2"
-					>
-						{#if executing}
-							<div class=" ">
-								<div class=" text-gray-500 text-sm mb-1">{'STDOUT/STDERR'}</div>
-								<div class="text-sm">{'Running...'}</div>
-							</div>
-						{:else}
-							{#if stdout || stderr}
-								<div class=" ">
-									<div class=" text-gray-500 text-sm mb-1">{'STDOUT/STDERR'}</div>
-									<div
-										class="text-sm font-mono whitespace-pre-wrap {stdout?.split('\n')?.length > 100
-											? `max-h-96`
-											: ''}  overflow-y-auto"
-									>
-										{stdout || stderr}
-									</div>
-								</div>
-							{/if}
-							{#if result || files}
-								<div class=" ">
-									<div class=" text-gray-500 text-sm mb-1">{'RESULT'}</div>
-									{#if result}
-										<div class="text-sm">{`${JSON.stringify(result)}`}</div>
-									{/if}
-									{#if files}
-										<div class="flex flex-col gap-2">
-											{#each files as file}
-												{#if file.type.startsWith('image')}
-													<img src={file.data} alt="Output" class=" w-full max-w-[36rem]" />
-												{/if}
-											{/each}
-										</div>
-									{/if}
-								</div>
-							{/if}
-						{/if}
-					</div>
-				{/if}
 			{/if}
 		{/if}
 	</div>

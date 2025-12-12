@@ -18,7 +18,6 @@
 	import Sparkles from '$lib/components/icons/Sparkles.svelte';
 	import GlobeAlt from '$lib/components/icons/GlobeAlt.svelte';
 	import Photo from '$lib/components/icons/Photo.svelte';
-	import Terminal from '$lib/components/icons/Terminal.svelte';
 	import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
 	import ChevronLeft from '$lib/components/icons/ChevronLeft.svelte';
 	export let selectedToolIds: string[] = [];
@@ -34,8 +33,6 @@
 	export let webSearchEnabled = false;
 	export let showImageGenerationButton = false;
 	export let imageGenerationEnabled = false;
-	export let showCodeInterpreterButton = false;
-	export let codeInterpreterEnabled = false;
 
 	export let onShowValves: Function;
 	export let onClose: Function;
@@ -262,41 +259,6 @@
 								<div class=" shrink-0">
 									<Switch
 										state={imageGenerationEnabled}
-										on:change={async (e) => {
-											const state = e.detail;
-											await tick();
-										}}
-									/>
-								</div>
-							</button>
-						</Tooltip>
-					{/if}
-
-					{#if showCodeInterpreterButton}
-						<Tooltip content={'Execute code for analysis'} placement="top-start">
-							<button
-								class="flex w-full justify-between gap-2 items-center px-3 py-1.5 text-sm cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800/50"
-								aria-pressed={codeInterpreterEnabled}
-								aria-label={codeInterpreterEnabled
-									? 'Disable Code Interpreter'
-									: 'Enable Code Interpreter'}
-								on:click={() => {
-									codeInterpreterEnabled = !codeInterpreterEnabled;
-								}}
-							>
-								<div class="flex-1 truncate">
-									<div class="flex flex-1 gap-2 items-center">
-										<div class="shrink-0">
-											<Terminal className="size-3.5" strokeWidth="1.75" />
-										</div>
-
-										<div class=" truncate">{'Code Interpreter'}</div>
-									</div>
-								</div>
-
-								<div class=" shrink-0">
-									<Switch
-										state={codeInterpreterEnabled}
 										on:change={async (e) => {
 											const state = e.detail;
 											await tick();

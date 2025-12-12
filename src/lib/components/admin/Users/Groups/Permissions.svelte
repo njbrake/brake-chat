@@ -55,7 +55,6 @@
 			direct_tool_servers: false,
 			web_search: true,
 			image_generation: true,
-			code_interpreter: true,
 			notes: true
 		}
 	};
@@ -761,22 +760,6 @@
 				<Switch bind:state={permissions.features.image_generation} />
 			</div>
 			{#if defaultPermissions?.features?.image_generation && !permissions.features.image_generation}
-				<div>
-					<div class="text-xs text-gray-500">
-						{'This is a default user permission and will remain enabled.'}
-					</div>
-				</div>
-			{/if}
-		</div>
-
-		<div class="flex flex-col w-full">
-			<div class="flex w-full justify-between my-1">
-				<div class=" self-center text-xs font-medium">
-					{'Code Interpreter'}
-				</div>
-				<Switch bind:state={permissions.features.code_interpreter} />
-			</div>
-			{#if defaultPermissions?.features?.code_interpreter && !permissions.features.code_interpreter}
 				<div>
 					<div class="text-xs text-gray-500">
 						{'This is a default user permission and will remain enabled.'}
