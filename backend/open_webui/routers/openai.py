@@ -754,8 +754,6 @@ async def generate_chat_completion(
                 log.exception(e)
                 yield f"data: {json.dumps({'error': {'message': str(e)}})}\n\n"
             finally:
-                if stream_resp is not None:
-                    await stream_resp.aclose()
                 await client.close()
 
         return StreamingResponse(stream_completion(), media_type="text/event-stream")
