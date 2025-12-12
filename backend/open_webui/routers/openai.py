@@ -94,16 +94,6 @@ def openai_reasoning_model_handler(payload):
         # Convert "max_tokens" to "max_completion_tokens" for all reasoning models
         payload["max_completion_tokens"] = payload["max_tokens"]
         del payload["max_tokens"]
-
-    # Handle system role conversion based on model type
-    if payload["messages"][0]["role"] == "system":
-        model_lower = payload["model"].lower()
-        # Legacy models use "user" role instead of "system"
-        if model_lower.startswith("o1-mini") or model_lower.startswith("o1-preview"):
-            payload["messages"][0]["role"] = "user"
-        else:
-            payload["messages"][0]["role"] = "developer"
-
     return payload
 
 
@@ -120,7 +110,7 @@ async def get_headers_and_cookies(
         "Content-Type": "application/json",
         **(
             {
-                "HTTP-Referer": "https://openwebui.com/",
+                "HTTP-Referer": "https://chat.natebrake.com/",
                 "X-Title": "Open WebUI",
             }
             if "openrouter.ai" in url
@@ -814,15 +804,6 @@ async def generate_chat_completion(
     url = request.app.state.config.OPENAI_API_BASE_URLS[idx]
     key = request.app.state.config.OPENAI_API_KEYS[idx]
 
-    # Check if model is a reasoning model that needs special handling
-    if is_openai_reasoning_model(payload["model"]):
-        payload = openai_reasoning_model_handler(payload)
-    elif "api.openai.com" not in url:
-        # Remove "max_completion_tokens" from the payload for backward compatibility
-        if "max_completion_tokens" in payload:
-            payload["max_tokens"] = payload["max_completion_tokens"]
-            del payload["max_completion_tokens"]
-
     if "max_tokens" in payload and "max_completion_tokens" in payload:
         del payload["max_tokens"]
 
@@ -866,11 +847,15 @@ async def generate_chat_completion(
             ssl=AIOHTTP_CLIENT_SESSION_SSL,
         )
 
+        # Add logging for raw response
+        log.debug(f"Raw LLM response status: {r.status}")
+        log.debug(f"Raw LLM response headers: {dict(r.headers)}")
+
         # Check if response is SSE
         if "text/event-stream" in r.headers.get("Content-Type", ""):
             streaming = True
             return StreamingResponse(
-                stream_chunks_handler(r.content),
+                stream_chunks_handler(r.content, log=log),
                 status_code=r.status,
                 headers=dict(r.headers),
                 background=BackgroundTask(cleanup_response, response=r, session=session),

@@ -629,14 +629,18 @@ def extract_urls(text: str) -> list[str]:
     return url_pattern.findall(text)
 
 
-def stream_chunks_handler(stream: aiohttp.StreamReader):
+def stream_chunks_handler(stream: aiohttp.StreamReader, log=None):
     """Handle stream response chunks, supporting large data chunks that exceed the original 16kb limit.
     When a single line exceeds max_buffer_size, returns an empty JSON string {} and skips subsequent data
     until encountering normally sized data.
 
     :param stream: The stream reader to handle.
+    :param log: Optional logger instance for detailed logging.
     :return: An async generator that yields the stream data.
     """
+    if log is None:
+        log = logging.getLogger(__name__)
+
     max_buffer_size = CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE
     if max_buffer_size is None or max_buffer_size <= 0:
         return stream
@@ -644,10 +648,15 @@ def stream_chunks_handler(stream: aiohttp.StreamReader):
     async def yield_safe_stream_chunks():
         buffer = b""
         skip_mode = False
+        tool_call_buffer = []
+        in_tool_call = False
 
         async for data, _ in stream.iter_chunks():
             if not data:
                 continue
+
+            # Log raw chunk data
+            log.debug(f"Raw stream chunk received: {len(data)} bytes")
 
             # In skip_mode, if buffer already exceeds the limit, clear it (it's part of an oversized line)
             if skip_mode and len(buffer) > max_buffer_size:
@@ -659,19 +668,39 @@ def stream_chunks_handler(stream: aiohttp.StreamReader):
             for i in range(len(lines) - 1):
                 line = lines[i]
 
+                # Log each line for debugging
+                log.debug(f"Processing line: {line[:100]}..." if len(line) > 100 else f"Processing line: {line}")
+
+                # Check for tool call patterns
+                line_str = line.decode("utf-8", errors="replace")
+                if "<think>" in line_str or "<details" in line_str:
+                    in_tool_call = True
+                    log.warning(f"DETECTED TOOL CALL PATTERN START: {line_str[:200]}")
+                    tool_call_buffer.append(line_str)
+                elif in_tool_call and ("</think>" in line_str or "</details>" in line_str):
+                    tool_call_buffer.append(line_str)
+                    full_tool_call = "".join(tool_call_buffer)
+                    log.warning(f"COMPLETE TOOL CALL DETECTED:\n{full_tool_call}")
+                    tool_call_buffer = []
+                    in_tool_call = False
+                elif in_tool_call:
+                    tool_call_buffer.append(line_str)
+
                 if skip_mode:
                     # Skip mode: check if current line is small enough to exit skip mode
                     if len(line) <= max_buffer_size:
                         skip_mode = False
+                        log.debug(f"Exiting skip mode, yielding line: {line[:100]}")
                         yield line
                     else:
+                        log.debug(f"Skip mode active, yielding empty JSON for large line: {len(line)} bytes")
                         yield b"data: {}"
                 else:
                     # Normal mode: check if line exceeds limit
                     if len(line) > max_buffer_size:
                         skip_mode = True
-                        yield b"data: {}"
                         log.info(f"Skip mode triggered, line size: {len(line)}")
+                        yield b"data: {}"
                     else:
                         yield line
 
@@ -687,6 +716,7 @@ def stream_chunks_handler(stream: aiohttp.StreamReader):
 
         # Process remaining buffer data
         if buffer and not skip_mode:
+            log.debug(f"Yielding final buffer: {buffer[:100]}")
             yield buffer
 
     return yield_safe_stream_chunks()
