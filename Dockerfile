@@ -1,11 +1,7 @@
 # syntax=docker/dockerfile:1
-# Initialize device type args
-# use build args in the docker build command with --build-arg="BUILDARG=true"
-ARG USE_CUDA=false
+# This image is CPU-only by design.
 ARG USE_SLIM=false
 ARG USE_PERMISSION_HARDENING=false
-# Tested with cu117 for CUDA 11 and cu121 for CUDA 12 (default)
-ARG USE_CUDA_VER=cu128
 # any sentence transformer model; models to use can be found at https://huggingface.co/models?library=sentence-transformers
 # Leaderboard: https://huggingface.co/spaces/mteb/leaderboard
 # for better performance and multilangauge support use "intfloat/multilingual-e5-large" (~2.5GB) or "intfloat/multilingual-e5-base" (~1.5GB)
@@ -45,8 +41,6 @@ RUN npm run build
 FROM python:3.11-slim-bookworm AS base
 
 # Use args
-ARG USE_CUDA
-ARG USE_CUDA_VER
 ARG USE_SLIM
 ARG USE_PERMISSION_HARDENING
 ARG USE_EMBEDDING_MODEL
@@ -58,9 +52,7 @@ ARG GID
 ENV ENV=prod \
     PORT=8080 \
     # pass build args to the build
-    USE_CUDA_DOCKER=${USE_CUDA} \
     USE_SLIM_DOCKER=${USE_SLIM} \
-    USE_CUDA_DOCKER_VER=${USE_CUDA_VER} \
     USE_EMBEDDING_MODEL_DOCKER=${USE_EMBEDDING_MODEL} \
     USE_RERANKING_MODEL_DOCKER=${USE_RERANKING_MODEL}
 
@@ -129,13 +121,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=cache,target=/root/.cache/uv \
-    if [ "$USE_CUDA" = "true" ]; then \
-    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/$USE_CUDA_DOCKER_VER && \
-    uv pip install --system -r requirements.txt; \
-    else \
-    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu && \
-    uv pip install --system -r requirements.txt; \
-    fi
+    uv pip install --system -r requirements.txt
 
 RUN mkdir -p /app/backend/data && chown -R $UID:$GID /app/backend/data/
 

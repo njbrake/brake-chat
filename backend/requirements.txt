@@ -48,9 +48,6 @@ langchain-community==0.3.29
 fake-useragent==2.2.0
 chromadb==1.1.0
 
-transformers
-sentence-transformers==5.1.1
-accelerate
 pyarrow==20.0.0 # fix: pin pyarrow version to 20 for rpi compatibility #15897
 einops==0.8.1
 
@@ -112,8 +109,6 @@ boto3==1.40.5
 playwright==1.49.1 # Caution: version must match docker-compose.playwright.yaml
 
 av==14.0.1 # Caution: Set due to FATAL FIPS SELFTEST FAILURE, see discussion https://github.com/open-webui/open-webui/discussions/15720
-
-colbert-ai==0.2.21
 
 
 ## Tests

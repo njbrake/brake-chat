@@ -26,7 +26,6 @@ from open_webui.config import (
 from open_webui.constants import ERROR_MESSAGES
 from open_webui.env import (
     DEVICE_TYPE,
-    DOCKER,
     ENV,
     SENTENCE_TRANSFORMERS_BACKEND,
     SENTENCE_TRANSFORMERS_CROSS_ENCODER_BACKEND,
@@ -75,7 +74,11 @@ def get_ef(
 ):
     ef = None
     if embedding_model and engine == "":
-        from sentence_transformers import SentenceTransformer
+        try:
+            from sentence_transformers import SentenceTransformer
+        except ModuleNotFoundError:
+            log.info("SentenceTransformer not installed; internal embedding engine is unavailable.")
+            return None
 
         try:
             ef = SentenceTransformer(
@@ -101,44 +104,39 @@ def get_rf(
     rf = None
     if reranking_model:
         if any(model in reranking_model for model in ["jinaai/jina-colbert-v2"]):
+            raise Exception(ERROR_MESSAGES.DEFAULT("ColBERT reranking is not available (torch removed)."))
+
+        if engine == "external":
             try:
-                from open_webui.retrieval.models.colbert import ColBERT
+                from open_webui.retrieval.models.external import ExternalReranker
 
-                rf = ColBERT(
-                    get_model_path(reranking_model, auto_update),
-                    env="docker" if DOCKER else None,
+                rf = ExternalReranker(
+                    url=external_reranker_url,
+                    api_key=external_reranker_api_key,
+                    model=reranking_model,
                 )
-
             except Exception as e:
-                log.error(f"ColBERT: {e}")
+                log.error(f"ExternalReranking: {e}")
                 raise Exception(ERROR_MESSAGES.DEFAULT(e))
         else:
-            if engine == "external":
-                try:
-                    from open_webui.retrieval.models.external import ExternalReranker
-
-                    rf = ExternalReranker(
-                        url=external_reranker_url,
-                        api_key=external_reranker_api_key,
-                        model=reranking_model,
-                    )
-                except Exception as e:
-                    log.error(f"ExternalReranking: {e}")
-                    raise Exception(ERROR_MESSAGES.DEFAULT(e))
-            else:
+            try:
                 import sentence_transformers
+            except ModuleNotFoundError:
+                raise Exception(
+                    ERROR_MESSAGES.DEFAULT("Reranking model requires sentence-transformers (torch removed).")
+                )
 
-                try:
-                    rf = sentence_transformers.CrossEncoder(
-                        get_model_path(reranking_model, auto_update),
-                        device=DEVICE_TYPE,
-                        trust_remote_code=RAG_RERANKING_MODEL_TRUST_REMOTE_CODE,
-                        backend=SENTENCE_TRANSFORMERS_CROSS_ENCODER_BACKEND,
-                        model_kwargs=SENTENCE_TRANSFORMERS_CROSS_ENCODER_MODEL_KWARGS,
-                    )
-                except Exception as e:
-                    log.error(f"CrossEncoder: {e}")
-                    raise Exception(ERROR_MESSAGES.DEFAULT("CrossEncoder error"))
+            try:
+                rf = sentence_transformers.CrossEncoder(
+                    get_model_path(reranking_model, auto_update),
+                    device=DEVICE_TYPE,
+                    trust_remote_code=RAG_RERANKING_MODEL_TRUST_REMOTE_CODE,
+                    backend=SENTENCE_TRANSFORMERS_CROSS_ENCODER_BACKEND,
+                    model_kwargs=SENTENCE_TRANSFORMERS_CROSS_ENCODER_MODEL_KWARGS,
+                )
+            except Exception as e:
+                log.error(f"CrossEncoder: {e}")
+                raise Exception(ERROR_MESSAGES.DEFAULT("CrossEncoder error"))
 
                 # Safely adjust pad_token_id if missing as some models do not have this in config
                 try:
@@ -240,11 +238,6 @@ def unload_embedding_model(request: Request):
         import gc
 
         gc.collect()
-        if DEVICE_TYPE == "cuda":
-            import torch
-
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
 
 
 @router.post("/embedding/update")
@@ -675,11 +668,6 @@ async def update_rag_config(request: Request, form_data: ConfigForm, user=Depend
         import gc
 
         gc.collect()
-        if DEVICE_TYPE == "cuda":
-            import torch
-
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
     request.app.state.config.RAG_RERANKING_ENGINE = (
         form_data.RAG_RERANKING_ENGINE
         if form_data.RAG_RERANKING_ENGINE is not None
