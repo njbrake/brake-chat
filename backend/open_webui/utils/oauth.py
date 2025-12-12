@@ -9,7 +9,7 @@ import sys
 import urllib
 import uuid
 from datetime import datetime, timedelta
-from typing import Literal
+from typing import Any, Literal
 
 import aiohttp
 from authlib.integrations.starlette_client import OAuth
@@ -63,11 +63,12 @@ from open_webui.env import (
 from open_webui.models.auths import Auths
 from open_webui.models.groups import GroupForm, GroupModel, Groups, GroupUpdateForm
 from open_webui.models.oauth_sessions import OAuthSessions
-from open_webui.models.users import Users
+from open_webui.models.users import UserModel, Users
 from open_webui.utils.auth import create_token, get_password_hash
 from open_webui.utils.misc import parse_duration
 from open_webui.utils.webhook import post_webhook
-from starlette.responses import RedirectResponse
+from starlette.requests import Request
+from starlette.responses import RedirectResponse, Response
 
 
 class OAuthClientMetadata(MCPOAuthClientMetadata):
@@ -943,7 +944,9 @@ class OAuthManager:
 
         return role
 
-    def update_user_groups(self, user, user_data, default_permissions):
+    def update_user_groups(
+        self, user: UserModel, user_data: dict[str, Any], default_permissions: dict[str, Any]
+    ) -> None:
         log.debug("Running OAUTH Group management")
         oauth_claim = auth_manager_config.OAUTH_GROUPS_CLAIM
 
@@ -1121,7 +1124,7 @@ class OAuthManager:
             raise HTTPException(404)
         return await client.authorize_redirect(request, redirect_uri)
 
-    async def handle_callback(self, request, provider, response):
+    async def handle_callback(self, request: Request, provider: str, response: Response) -> RedirectResponse:
         if provider not in OAUTH_PROVIDERS:
             raise HTTPException(404)
 
@@ -1183,8 +1186,8 @@ class OAuthManager:
                     try:
                         access_token = token.get("access_token")
                         headers = {"Authorization": f"Bearer {access_token}"}
-                        async with aiohttp.ClientSession(trust_env=True) as session:
-                            async with session.get(
+                        async with aiohttp.ClientSession(trust_env=True) as http_session:
+                            async with http_session.get(
                                 "https://api.github.com/user/emails",
                                 headers=headers,
                                 ssl=AIOHTTP_CLIENT_SESSION_SSL,
@@ -1349,9 +1352,9 @@ class OAuthManager:
 
             # Clean up any existing sessions for this user/provider first
             sessions = OAuthSessions.get_sessions_by_user_id(user.id)
-            for session in sessions:
-                if session.provider == provider:
-                    OAuthSessions.delete_session_by_id(session.id)
+            for existing_session in sessions:
+                if existing_session.provider == provider:
+                    OAuthSessions.delete_session_by_id(existing_session.id)
 
             session = OAuthSessions.create_session(
                 user_id=user.id,
@@ -1359,13 +1362,14 @@ class OAuthManager:
                 token=token,
             )
 
-            response.set_cookie(
-                key="oauth_session_id",
-                value=session.id,
-                httponly=True,
-                samesite=WEBUI_AUTH_COOKIE_SAME_SITE,
-                secure=WEBUI_AUTH_COOKIE_SECURE,
-            )
+            if session:
+                response.set_cookie(
+                    key="oauth_session_id",
+                    value=session.id,
+                    httponly=True,
+                    samesite=WEBUI_AUTH_COOKIE_SAME_SITE,
+                    secure=WEBUI_AUTH_COOKIE_SECURE,
+                )
 
             log.info(f"Stored OAuth session server-side for user {user.id}, provider {provider}")
         except Exception as e:

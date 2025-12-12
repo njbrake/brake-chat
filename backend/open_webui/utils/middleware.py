@@ -89,7 +89,6 @@ from open_webui.utils.task import (
     rag_template,
     tools_function_calling_generation_template,
 )
-from open_webui.utils.tools import get_tools, get_updated_tool_function
 from open_webui.utils.webhook import post_webhook
 from starlette.responses import JSONResponse, StreamingResponse
 
@@ -1058,13 +1057,6 @@ async def process_chat_payload(request, form_data, user, metadata, model):
     else:
         models = request.app.state.MODELS
 
-    task_model_id = get_task_model_id(
-        form_data["model"],
-        request.app.state.config.TASK_MODEL,
-        request.app.state.config.TASK_MODEL_EXTERNAL,
-        models,
-    )
-
     events = []
     sources = []
 
@@ -1283,6 +1275,7 @@ async def process_chat_payload(request, form_data, user, metadata, model):
                     await mcp_clients[server_id].connect(
                         url=mcp_server_connection.get("url", ""),
                         headers=headers if headers else None,
+                        protocol=mcp_server_connection.get("protocol", "streamable_http"),
                     )
 
                     function_name_filter_value = mcp_server_connection.get("config", {}).get(
@@ -1338,20 +1331,8 @@ async def process_chat_payload(request, form_data, user, metadata, model):
                         )
                     continue
 
-        tools_dict = await get_tools(
-            request,
-            tool_ids,
-            user,
-            {
-                **extra_params,
-                "__model__": models[task_model_id],
-                "__messages__": form_data["messages"],
-                "__files__": metadata.get("files", []),
-            },
-        )
-
-        if mcp_tools_dict:
-            tools_dict = {**tools_dict, **mcp_tools_dict}
+        # Initialize tools dict with MCP tools only (Python tools removed)
+        tools_dict = mcp_tools_dict if mcp_tools_dict else {}
 
     if direct_tool_servers:
         for tool_server in direct_tool_servers:
@@ -2017,9 +1998,8 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                 def extract_attributes(tag_content):
                     """Extract attributes from a tag if they exist."""
                     attributes = {}
-                    if not tag_content:  # Ensure tag_content is not None
+                    if not tag_content:
                         return attributes
-                    # Match attributes in the format: key="value" (ignores single quotes for simplicity)
                     matches = re.findall(r'(\w+)\s*=\s*"([^"]+)"', tag_content)
                     for key, value in matches:
                         attributes[key] = value
@@ -2029,25 +2009,26 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                     for start_tag, end_tag in tags:
                         start_tag_pattern = rf"{re.escape(start_tag)}"
                         if start_tag.startswith("<") and start_tag.endswith(">"):
-                            # Match start tag e.g., <tag> or <tag attr="value">
-                            # remove both '<' and '>' from start_tag
-                            # Match start tag with attributes
                             start_tag_pattern = rf"<{re.escape(start_tag[1:-1])}(\s.*?)?>"
 
                         match = re.search(start_tag_pattern, content)
                         if match:
+                            # Validate we have a complete start tag
+                            matched_text = match.group(0)
+                            if matched_text.count("<") != matched_text.count(">"):
+                                # Incomplete tag - skip processing
+                                continue
+
                             try:
-                                attr_content = match.group(1) if match.group(1) else ""  # Ensure it's not None
+                                attr_content = match.group(1) if match.group(1) else ""
                             except:
                                 attr_content = ""
 
-                            attributes = extract_attributes(attr_content)  # Extract attributes safely
+                            attributes = extract_attributes(attr_content)
 
-                            # Capture everything before and after the matched tag
-                            before_tag = content[: match.start()]  # Content before opening tag
-                            after_tag = content[match.end() :]  # Content after opening tag
+                            before_tag = content[: match.start()]
+                            after_tag = content[match.end() :]
 
-                            # Remove the start tag and after from the currently handling text block
                             content_blocks[-1]["content"] = content_blocks[-1]["content"].replace(
                                 match.group(0) + after_tag, ""
                             )
@@ -2058,7 +2039,6 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                             if not content_blocks[-1]["content"]:
                                 content_blocks.pop()
 
-                            # Append the new block
                             content_blocks.append(
                                 {
                                     "type": content_type,
@@ -2070,7 +2050,7 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                                 }
                             )
 
-                            if after_tag:
+                            if after_tag and after_tag.strip():  # Only recurse if there's actual content
                                 content_blocks[-1]["content"] = after_tag
                                 tag_content_handler(content_type, tags, after_tag, content_blocks)
 
@@ -2634,15 +2614,8 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                                     )
 
                                 else:
-                                    tool_function = get_updated_tool_function(
-                                        function=tool["callable"],
-                                        extra_params={
-                                            "__messages__": form_data.get("messages", []),
-                                            "__files__": metadata.get("files", []),
-                                        },
-                                    )
-
-                                    tool_result = await tool_function(**tool_function_params)
+                                    # Call MCP tool directly (Python tools have been removed)
+                                    tool_result = await tool["callable"](**tool_function_params)
 
                             except Exception as e:
                                 tool_result = str(e)

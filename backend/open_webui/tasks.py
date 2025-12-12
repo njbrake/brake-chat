@@ -21,7 +21,7 @@ REDIS_ITEM_TASKS_KEY = f"{REDIS_KEY_PREFIX}:tasks:item"
 REDIS_PUBSUB_CHANNEL = f"{REDIS_KEY_PREFIX}:tasks:commands"
 
 
-async def redis_task_command_listener(app):
+async def redis_task_command_listener(app) -> None:
     redis: Redis = app.state.redis
     pubsub = redis.pubsub()
     await pubsub.subscribe(REDIS_PUBSUB_CHANNEL)

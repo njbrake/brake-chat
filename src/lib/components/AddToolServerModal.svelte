@@ -55,6 +55,8 @@
 	let verifiedSpecs = null;
 	let showVerifiedTools = false;
 
+	let protocol = 'streamable_http';
+
 	const registerOAuthClientHandler = async () => {
 		if (url === '') {
 			toast.error('Please enter a valid URL');
@@ -254,7 +256,8 @@
 				name: name,
 				description: description,
 				...(oauthClientInfo ? { oauth_client_info: oauthClientInfo } : {})
-			}
+			},
+			protocol: protocol
 		};
 
 		await onSubmit(connection);
@@ -299,6 +302,7 @@
 			enable = connection.config?.enable ?? true;
 			functionNameFilterList = connection.config?.function_name_filter_list ?? [];
 			accessControl = connection.config?.access_control ?? null;
+			protocol = connection?.protocol ?? 'streamable_http';
 		}
 	};
 
@@ -523,6 +527,27 @@
 												{'Uses OAuth 2.1 Dynamic Client Registration'}
 											</div>
 										{/if}
+									</div>
+								</div>
+							</div>
+
+							<div class="flex gap-2 mt-2">
+								<div class="flex flex-col w-full">
+									<label
+										for="select-protocol"
+										class={`mb-0.5 text-xs ${($settings?.highContrastMode ?? false) ? 'text-gray-800 dark:text-gray-100' : 'text-gray-500'}`}
+										>{'Protocol'}</label
+									>
+
+									<div class="flex-1">
+										<select
+											id="select-protocol"
+											class={`w-full text-sm bg-transparent ${($settings?.highContrastMode ?? false) ? 'placeholder:text-gray-700 dark:placeholder:text-gray-100' : 'outline-hidden placeholder:text-gray-300 dark:placeholder:text-gray-700'}`}
+											bind:value={protocol}
+										>
+											<option value="streamable_http">{'Streamable HTTP'}</option>
+											<option value="http_sse">{'HTTP+SSE'}</option>
+										</select>
 									</div>
 								</div>
 							</div>
