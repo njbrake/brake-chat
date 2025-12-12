@@ -11,14 +11,10 @@
 		image_generation: {
 			label: 'Image Generation',
 			description: 'Model can generate images based on text prompts'
-		},
-		code_interpreter: {
-			label: 'Code Interpreter',
-			description: 'Model can execute code and perform calculations'
 		}
 	};
 
-	export let availableFeatures = ['web_search', 'image_generation', 'code_interpreter'];
+	export let availableFeatures = ['web_search', 'image_generation'];
 	export let featureIds = [];
 </script>
 

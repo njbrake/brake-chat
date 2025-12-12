@@ -50,14 +50,6 @@ export const getOAuthClientAuthorizationUrl = (clientId: string, type: null | st
 	return `${WEBUI_BASE_URL}/oauth/clients/${oauthClientId}/authorize`;
 };
 
-export const getCodeExecutionConfig = async (token: string) => {
-	return api.get('/configs/code_execution', token);
-};
-
-export const setCodeExecutionConfig = async (token: string, config: object) => {
-	return api.post('/configs/code_execution', config, token);
-};
-
 export const getModelsConfig = async (token: string) => {
 	return api.get('/configs/models', token);
 };

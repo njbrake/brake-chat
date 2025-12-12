@@ -225,21 +225,7 @@
 				tags.set(await getAllChatTags(localStorage.token));
 			}
 		} else if (data?.session_id === $socket.id) {
-			if (type === 'execute:python') {
-				console.log('execute:python - Pyodide support has been removed');
-				if (cb) {
-					cb(
-						JSON.parse(
-							JSON.stringify({
-								stdout: '',
-								stderr:
-									'Pyodide support has been removed. Please configure Jupyter execution engine instead.',
-								result: null
-							})
-						)
-					);
-				}
-			} else if (type === 'execute:tool') {
+			if (type === 'execute:tool') {
 				console.log('execute:tool', data);
 				executeTool(data, cb);
 			} else if (type === 'request:chat:completion') {
