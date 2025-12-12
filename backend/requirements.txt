@@ -39,8 +39,6 @@ mcp==1.21.2
 
 openai
 anthropic
-google-genai==1.52.0
-google-generativeai==0.8.5
 
 langchain==0.3.27
 langchain-community==0.3.29

@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.11, <3.13.0"
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'darwin'",
@@ -2504,8 +2504,6 @@ dependencies = [
     { name = "google-auth-httplib2" },
     { name = "google-auth-oauthlib" },
     { name = "google-cloud-storage" },
-    { name = "google-genai" },
-    { name = "google-generativeai" },
     { name = "googleapis-common-protos" },
     { name = "httpx", extra = ["brotli", "cli", "http2", "socks", "zstd"] },
     { name = "itsdangerous" },
@@ -2579,6 +2577,10 @@ all = [
     { name = "qdrant-client" },
     { name = "weaviate-client" },
 ]
+google = [
+    { name = "google-genai" },
+    { name = "google-generativeai" },
+]
 postgres = [
     { name = "pgvector" },
     { name = "psycopg2-binary" },
@@ -2632,8 +2634,8 @@ requires-dist = [
     { name = "google-auth-httplib2" },
     { name = "google-auth-oauthlib" },
     { name = "google-cloud-storage", specifier = "==2.19.0" },
-    { name = "google-genai", specifier = "==1.52.0" },
-    { name = "google-generativeai", specifier = "==0.8.5" },
+    { name = "google-genai", marker = "extra == 'google'", specifier = "==1.52.0" },
+    { name = "google-generativeai", marker = "extra == 'google'", specifier = "==0.8.5" },
     { name = "googleapis-common-protos", specifier = "==1.70.0" },
     { name = "httpx", extras = ["brotli", "cli", "http2", "socks", "zstd"], specifier = "==0.28.1" },
     { name = "itsdangerous", specifier = "==2.2.0" },
@@ -2700,7 +2702,7 @@ requires-dist = [
     { name = "xlrd", specifier = "==2.0.1" },
     { name = "youtube-transcript-api", specifier = "==1.2.2" },
 ]
-provides-extras = ["all", "postgres"]
+provides-extras = ["all", "google", "postgres"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest-asyncio", specifier = ">=1.0.0" }]
