@@ -1,11 +1,10 @@
 import asyncio
-import json
 import logging
 from contextlib import AsyncExitStack
 
 import anyio
-import httpx
 from mcp import ClientSession
+from mcp.client.sse import sse_client
 from mcp.client.streamable_http import streamablehttp_client
 from open_webui.env import SRC_LOG_LEVELS
 
@@ -40,13 +39,11 @@ class MCPClient:
                     self._session_context = ClientSession(read_stream, write_stream)
                 elif protocol == "http_sse":
                     log.debug("Using HTTP+SSE protocol")
-                    # HTTP+SSE protocol implementation
-                    self._sse_client = httpx.AsyncClient(headers=headers)
-                    self._sse_context = exit_stack.enter_async_context(self._sse_client)
-                    # For HTTP+SSE, we need to implement the transport layer
-                    # This is a simplified implementation - a full implementation would require
-                    # proper SSE event handling and bidirectional communication
-                    self._session_context = await self._create_sse_session(url)
+                    # Use the official MCP SSE client implementation
+                    self._sse_context = sse_client(url, headers=headers)
+                    transport = await exit_stack.enter_async_context(self._sse_context)
+                    read_stream, write_stream = transport
+                    self._session_context = ClientSession(read_stream, write_stream)
                 else:
                     raise ValueError(f"Unsupported MCP protocol: {protocol}")
 
@@ -61,101 +58,6 @@ class MCPClient:
                 log.debug("Exception details:", exc_info=True)
                 await asyncio.shield(self.disconnect())
                 raise e
-
-    async def _create_sse_session(self, url: str):
-        """Create an MCP session using HTTP+SSE protocol.
-        This implementation uses HTTP POST for requests and SSE for responses.
-        """
-        log.debug("Creating SSE session")
-        # Parse the base URL and create SSE endpoint
-        url = url.removesuffix("/")
-        sse_url = f"{url}/events"
-        log.debug(f"SSE endpoint: {sse_url}")
-
-        # Create message queues for bidirectional communication
-        self._message_queue = asyncio.Queue()
-        self._sse_task = None
-
-        async def sse_read_stream():
-            """Read stream that consumes messages from the SSE event queue"""
-            log.debug("SSE read stream started")
-            while True:
-                try:
-                    message = await self._message_queue.get()
-                    if message is None:  # Sentinel value for stream end
-                        log.debug("SSE read stream received end signal")
-                        break
-                    log.debug(f"SSE read stream yielding message: {message}")
-                    yield message
-                except asyncio.CancelledError:
-                    log.debug("SSE read stream cancelled")
-                    break
-                except Exception as e:
-                    log.error(f"Error in SSE read stream: {e}")
-                    log.debug("SSE read stream error details:", exc_info=True)
-                    break
-
-        async def sse_write_stream():
-            """Write stream that sends messages via HTTP POST"""
-            log.debug("SSE write stream created")
-
-            async def write_message(message):
-                try:
-                    log.debug(f"Sending MCP message via HTTP POST: {message}")
-                    # Convert message to JSON and send via HTTP POST
-                    message_data = json.dumps(message)
-                    response = await self._sse_client.post(
-                        f"{url}/call", content=message_data, headers={"Content-Type": "application/json"}
-                    )
-                    response.raise_for_status()
-                    result = await response.json()
-                    log.debug(f"Received response: {result}")
-                    return result
-                except Exception as e:
-                    log.error(f"Error sending MCP message: {e}")
-                    log.debug("MCP message sending error details:", exc_info=True)
-                    raise
-
-            return write_message
-
-        # Start SSE event listener in background
-        log.debug("Starting SSE event listener task")
-        self._sse_task = asyncio.create_task(self._listen_to_sse_events(sse_url))
-
-        # Create a minimal transport interface
-        class SSETransport:
-            def __init__(self):
-                self.read_stream = sse_read_stream()
-                self.write_stream = sse_write_stream()
-
-        transport = SSETransport()
-        return ClientSession(transport.read_stream, transport.write_stream)
-
-    async def _listen_to_sse_events(self, sse_url: str):
-        """Listen to Server-Sent Events from the MCP server."""
-        log.debug(f"Starting SSE event listener for: {sse_url}")
-        try:
-            async with self._sse_client.stream("GET", sse_url) as response:
-                log.debug("SSE connection established")
-                async for line in response.aiter_lines():
-                    log.debug(f"Received SSE line: {line}")
-                    if line and line.startswith("data:"):
-                        # Parse SSE data
-                        data = line[5:].strip()
-                        if data:
-                            try:
-                                message = json.loads(data)
-                                log.debug(f"Parsed SSE message: {message}")
-                                await self._message_queue.put(message)
-                            except json.JSONDecodeError:
-                                log.error(f"Failed to parse SSE message: {data}")
-        except Exception as e:
-            log.error(f"SSE connection error: {e}")
-            log.debug("SSE connection error details:", exc_info=True)
-        finally:
-            log.debug("SSE event listener shutting down")
-            # Signal end of stream
-            await self._message_queue.put(None)
 
     async def list_tool_specs(self) -> dict | None:
         log.debug("Listing tool specs")
@@ -237,15 +139,6 @@ class MCPClient:
 
     async def disconnect(self):
         # Clean up and close the session
-        if hasattr(self, "_sse_task") and self._sse_task:
-            self._sse_task.cancel()
-            try:
-                await self._sse_task
-            except asyncio.CancelledError:
-                pass
-        if hasattr(self, "_message_queue"):
-            # Put sentinel value to stop the read stream
-            await self._message_queue.put(None)
         await self.exit_stack.aclose()
 
     async def __aenter__(self):
