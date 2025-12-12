@@ -4,9 +4,9 @@ import json
 import logging
 
 import aiohttp
+import httpx
 import requests
 from aiocache import cached
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import (
     FileResponse,
@@ -34,13 +34,13 @@ from open_webui.utils.auth import get_admin_user, get_verified_user
 from open_webui.utils.headers import include_user_info_headers
 from open_webui.utils.misc import (
     convert_logit_bias_input_to_json,
-    stream_chunks_handler,
 )
 from open_webui.utils.payload import (
     apply_model_params_to_body_openai,
     apply_system_prompt_to_body,
     remove_open_webui_params,
 )
+from openai import AsyncOpenAI, OpenAIError
 from pydantic import BaseModel
 from starlette.background import BackgroundTask
 
@@ -160,9 +160,6 @@ async def get_headers_and_cookies(
         if oauth_token:
             token = f"{oauth_token.get('access_token', '')}"
 
-    elif auth_type in ("azure_ad", "microsoft_entra_id"):
-        token = get_microsoft_entra_id_access_token()
-
     if token:
         headers["Authorization"] = f"Bearer {token}"
 
@@ -170,20 +167,6 @@ async def get_headers_and_cookies(
         headers = {**headers, **config.get("headers")}
 
     return headers, cookies
-
-
-def get_microsoft_entra_id_access_token():
-    """Get Microsoft Entra ID access token using DefaultAzureCredential for Azure OpenAI.
-    Returns the token string or None if authentication fails.
-    """
-    try:
-        token_provider = get_bearer_token_provider(
-            DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
-        )
-        return token_provider()
-    except Exception as e:
-        log.error(f"Error getting Microsoft Entra ID access token: {e}")
-        return None
 
 
 ##########################################
@@ -526,48 +509,42 @@ async def get_models(request: Request, url_idx: int | None = None, user=Depends(
             try:
                 headers, cookies = await get_headers_and_cookies(request, url, key, api_config, user=user)
 
-                if api_config.get("azure", False):
-                    models = {
-                        "data": api_config.get("model_ids", []) or [],
-                        "object": "list",
-                    }
-                else:
-                    async with session.get(
-                        f"{url}/models",
-                        headers=headers,
-                        cookies=cookies,
-                        ssl=AIOHTTP_CLIENT_SESSION_SSL,
-                    ) as r:
-                        if r.status != 200:
-                            # Extract response error details if available
-                            error_detail = f"HTTP Error: {r.status}"
-                            res = await r.json()
-                            if "error" in res:
-                                error_detail = f"External Error: {res['error']}"
-                            raise Exception(error_detail)
+                async with session.get(
+                    f"{url}/models",
+                    headers=headers,
+                    cookies=cookies,
+                    ssl=AIOHTTP_CLIENT_SESSION_SSL,
+                ) as r:
+                    if r.status != 200:
+                        # Extract response error details if available
+                        error_detail = f"HTTP Error: {r.status}"
+                        res = await r.json()
+                        if "error" in res:
+                            error_detail = f"External Error: {res['error']}"
+                        raise Exception(error_detail)
 
-                        response_data = await r.json()
+                    response_data = await r.json()
 
-                        # Check if we're calling OpenAI API based on the URL
-                        if "api.openai.com" in url:
-                            # Filter models according to the specified conditions
-                            response_data["data"] = [
-                                model
-                                for model in response_data.get("data", [])
-                                if not any(
-                                    name in model["id"]
-                                    for name in [
-                                        "babbage",
-                                        "dall-e",
-                                        "davinci",
-                                        "embedding",
-                                        "tts",
-                                        "whisper",
-                                    ]
-                                )
-                            ]
+                    # Check if we're calling OpenAI API based on the URL
+                    if "api.openai.com" in url:
+                        # Filter models according to the specified conditions
+                        response_data["data"] = [
+                            model
+                            for model in response_data.get("data", [])
+                            if not any(
+                                name in model["id"]
+                                for name in [
+                                    "babbage",
+                                    "dall-e",
+                                    "davinci",
+                                    "embedding",
+                                    "tts",
+                                    "whisper",
+                                ]
+                            )
+                        ]
 
-                        models = response_data
+                    models = response_data
             except aiohttp.ClientError as e:
                 # ClientError covers all aiohttp requests issues
                 log.exception(f"Client error: {e!s}")
@@ -608,48 +585,23 @@ async def verify_connection(
         try:
             headers, cookies = await get_headers_and_cookies(request, url, key, api_config, user=user)
 
-            if api_config.get("azure", False):
-                # Only set api-key header if not using Azure Entra ID authentication
-                auth_type = api_config.get("auth_type", "bearer")
-                if auth_type not in ("azure_ad", "microsoft_entra_id"):
-                    headers["api-key"] = key
+            async with session.get(
+                f"{url}/models",
+                headers=headers,
+                cookies=cookies,
+                ssl=AIOHTTP_CLIENT_SESSION_SSL,
+            ) as r:
+                try:
+                    response_data = await r.json()
+                except Exception:
+                    response_data = await r.text()
 
-                api_version = api_config.get("api_version", "") or "2023-03-15-preview"
-                async with session.get(
-                    url=f"{url}/openai/models?api-version={api_version}",
-                    headers=headers,
-                    cookies=cookies,
-                    ssl=AIOHTTP_CLIENT_SESSION_SSL,
-                ) as r:
-                    try:
-                        response_data = await r.json()
-                    except Exception:
-                        response_data = await r.text()
+                if r.status != 200:
+                    if isinstance(response_data, (dict, list)):
+                        return JSONResponse(status_code=r.status, content=response_data)
+                    return PlainTextResponse(status_code=r.status, content=response_data)
 
-                    if r.status != 200:
-                        if isinstance(response_data, (dict, list)):
-                            return JSONResponse(status_code=r.status, content=response_data)
-                        return PlainTextResponse(status_code=r.status, content=response_data)
-
-                    return response_data
-            else:
-                async with session.get(
-                    f"{url}/models",
-                    headers=headers,
-                    cookies=cookies,
-                    ssl=AIOHTTP_CLIENT_SESSION_SSL,
-                ) as r:
-                    try:
-                        response_data = await r.json()
-                    except Exception:
-                        response_data = await r.text()
-
-                    if r.status != 200:
-                        if isinstance(response_data, (dict, list)):
-                            return JSONResponse(status_code=r.status, content=response_data)
-                        return PlainTextResponse(status_code=r.status, content=response_data)
-
-                    return response_data
+                return response_data
 
         except aiohttp.ClientError as e:
             # ClientError covers all aiohttp requests issues
@@ -660,75 +612,8 @@ async def verify_connection(
             raise HTTPException(status_code=500, detail="Open WebUI: Server Connection Error")
 
 
-def get_azure_allowed_params(api_version: str) -> set[str]:
-    allowed_params = {
-        "messages",
-        "temperature",
-        "role",
-        "content",
-        "contentPart",
-        "contentPartImage",
-        "enhancements",
-        "dataSources",
-        "n",
-        "stream",
-        "stop",
-        "max_tokens",
-        "presence_penalty",
-        "frequency_penalty",
-        "logit_bias",
-        "user",
-        "function_call",
-        "functions",
-        "tools",
-        "tool_choice",
-        "top_p",
-        "log_probs",
-        "top_logprobs",
-        "response_format",
-        "seed",
-        "max_completion_tokens",
-        "reasoning_effort",
-    }
-
-    try:
-        if api_version >= "2024-09-01-preview":
-            allowed_params.add("stream_options")
-    except ValueError:
-        log.debug(f"Invalid API version {api_version} for Azure OpenAI. Defaulting to allowed parameters.")
-
-    return allowed_params
-
-
 def is_openai_reasoning_model(model: str) -> bool:
     return model.lower().startswith(("o1", "o3", "o4", "gpt-5"))
-
-
-def convert_to_azure_payload(url, payload: dict, api_version: str):
-    model = payload.get("model", "")
-
-    # Filter allowed parameters based on Azure OpenAI API
-    allowed_params = get_azure_allowed_params(api_version)
-
-    # Special handling for o-series models
-    if is_openai_reasoning_model(model):
-        # Convert max_tokens to max_completion_tokens for o-series models
-        if "max_tokens" in payload:
-            payload["max_completion_tokens"] = payload["max_tokens"]
-            del payload["max_tokens"]
-
-        # Remove temperature if not 1 for o-series models
-        if "temperature" in payload and payload["temperature"] != 1:
-            log.debug(
-                f"Removing temperature parameter for o-series model {model} as only default value (1) is supported"
-            )
-            del payload["temperature"]
-
-    # Filter out unsupported parameters
-    payload = {k: v for k, v in payload.items() if k in allowed_params}
-
-    url = f"{url}/openai/deployments/{model}"
-    return url, payload
 
 
 @router.post("/chat/completions")
@@ -832,71 +717,65 @@ async def generate_chat_completion(
 
     headers, cookies = await get_headers_and_cookies(request, url, key, api_config, metadata, user=user)
 
-    if api_config.get("azure", False):
-        api_version = api_config.get("api_version", "2023-03-15-preview")
-        request_url, payload = convert_to_azure_payload(url, payload, api_version)
-
-        # Only set api-key header if not using Azure Entra ID authentication
-        auth_type = api_config.get("auth_type", "bearer")
-        if auth_type not in ("azure_ad", "microsoft_entra_id"):
-            headers["api-key"] = key
-
-        headers["api-version"] = api_version
-        request_url = f"{request_url}/chat/completions?api-version={api_version}"
-    else:
-        request_url = f"{url}/chat/completions"
-
     payload = remove_open_webui_params(payload)
-    payload = json.dumps(payload)
+    stream = bool(payload.pop("stream", False))
 
-    r = None
-    session = None
-    streaming = False
-    response = None
+    timeout = AIOHTTP_CLIENT_TIMEOUT
+
+    http_client = httpx.AsyncClient(
+        timeout=timeout,
+        follow_redirects=True,
+        headers=headers,
+        cookies=cookies if cookies else None,
+        trust_env=True,
+    )
+    client = AsyncOpenAI(
+        api_key=key,
+        base_url=url,
+        default_headers=headers,
+        http_client=http_client,
+    )
+
+    if stream:
+
+        async def stream_completion():
+            stream_resp = None
+            try:
+                stream_resp = await client.chat.completions.create(stream=True, **payload)
+                async for chunk in stream_resp:
+                    if log.isEnabledFor(logging.DEBUG):
+                        log.debug("Streaming chunk: %s", chunk.model_dump(exclude_none=True))
+                    yield f"data: {json.dumps(chunk.model_dump(exclude_none=True))}\n\n"
+                yield "data: [DONE]\n\n"
+            except OpenAIError as e:
+                log.exception(e)
+                yield f"data: {json.dumps({'error': {'message': str(e)}})}\n\n"
+            except Exception as e:
+                log.exception(e)
+                yield f"data: {json.dumps({'error': {'message': str(e)}})}\n\n"
+            finally:
+                await client.close()
+
+        return StreamingResponse(stream_completion(), media_type="text/event-stream")
 
     try:
-        session = aiohttp.ClientSession(trust_env=True, timeout=aiohttp.ClientTimeout(total=AIOHTTP_CLIENT_TIMEOUT))
-
-        r = await session.request(
-            method="POST",
-            url=request_url,
-            data=payload,
-            headers=headers,
-            cookies=cookies,
-            ssl=AIOHTTP_CLIENT_SESSION_SSL,
+        response = await client.chat.completions.create(**payload)
+        return response.model_dump(exclude_none=True)
+    except OpenAIError as e:
+        log.exception(e)
+        status_code = getattr(e, "status_code", 500) or 500
+        raise HTTPException(
+            status_code=status_code,
+            detail=f"External: {e!s}",
         )
-
-        # Check if response is SSE
-        if "text/event-stream" in r.headers.get("Content-Type", ""):
-            streaming = True
-            return StreamingResponse(
-                stream_chunks_handler(r.content),
-                status_code=r.status,
-                headers=dict(r.headers),
-                background=BackgroundTask(cleanup_response, response=r, session=session),
-            )
-        try:
-            response = await r.json()
-        except Exception as e:
-            log.error(e)
-            response = await r.text()
-
-        if r.status >= 400:
-            if isinstance(response, (dict, list)):
-                return JSONResponse(status_code=r.status, content=response)
-            return PlainTextResponse(status_code=r.status, content=response)
-
-        return response
     except Exception as e:
         log.exception(e)
-
         raise HTTPException(
-            status_code=r.status if r else 500,
+            status_code=500,
             detail="Open WebUI: Server Connection Error",
         )
     finally:
-        if not streaming:
-            await cleanup_response(r, session)
+        await client.close()
 
 
 async def embeddings(request: Request, form_data: dict, user):
@@ -996,28 +875,11 @@ async def proxy(path: str, request: Request, user=Depends(get_verified_user)):
     try:
         headers, cookies = await get_headers_and_cookies(request, url, key, api_config, user=user)
 
-        if api_config.get("azure", False):
-            api_version = api_config.get("api_version", "2023-03-15-preview")
-
-            # Only set api-key header if not using Azure Entra ID authentication
-            auth_type = api_config.get("auth_type", "bearer")
-            if auth_type not in ("azure_ad", "microsoft_entra_id"):
-                headers["api-key"] = key
-
-            headers["api-version"] = api_version
-
+        request_url = f"{url}/{path}"
+        if body:
             payload = json.loads(body)
             payload = remove_open_webui_params(payload)
-            url, payload = convert_to_azure_payload(url, payload, api_version)
             body = json.dumps(payload).encode()
-
-            request_url = f"{url}/{path}?api-version={api_version}"
-        else:
-            request_url = f"{url}/{path}"
-            if body:
-                payload = json.loads(body)
-                payload = remove_open_webui_params(payload)
-                body = json.dumps(payload).encode()
 
         session = aiohttp.ClientSession(trust_env=True)
         r = await session.request(
