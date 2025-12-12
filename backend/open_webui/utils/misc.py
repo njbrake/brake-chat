@@ -543,7 +543,7 @@ def extract_urls(text: str) -> list[str]:
     return url_pattern.findall(text)
 
 
-def stream_chunks_handler(stream: aiohttp.StreamReader, log=None):
+def stream_chunks_handler(stream: aiohttp.StreamReader, log: logging.Logger):
     """Handle stream response chunks, supporting large data chunks that exceed the original 16kb limit.
     When a single line exceeds max_buffer_size, returns an empty JSON string {} and skips subsequent data
     until encountering normally sized data.
@@ -552,8 +552,7 @@ def stream_chunks_handler(stream: aiohttp.StreamReader, log=None):
     :param log: Optional logger instance for detailed logging.
     :return: An async generator that yields the stream data.
     """
-    if log is None:
-        log = logging.getLogger(__name__)
+    log.info("Stream chunks handler started")
 
     max_buffer_size = CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE
     if max_buffer_size is None or max_buffer_size <= 0:
