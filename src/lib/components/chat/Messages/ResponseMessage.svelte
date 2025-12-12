@@ -13,14 +13,13 @@
 	import { generateTags } from '$lib/apis';
 
 	import {
-		audioQueue,
-		config,
-		models,
-		settings,
-		temporaryChatEnabled,
-		TTSWorker,
-		user
-	} from '$lib/stores';
+                audioQueue,
+                config,
+                models,
+                settings,
+                temporaryChatEnabled,
+                user
+        } from '$lib/stores';
 	import { synthesizeOpenAISpeech } from '$lib/apis/audio';
 	import { imageGenerations } from '$lib/apis/images';
 	import {
@@ -50,8 +49,7 @@
 	import Citations from './Citations.svelte';
 	import CodeExecutions from './CodeExecutions.svelte';
 	import ContentRenderer from './ContentRenderer.svelte';
-	import { KokoroWorker } from '$lib/workers/KokoroWorker';
-	import FileItem from '$lib/components/common/FileItem.svelte';
+import FileItem from '$lib/components/common/FileItem.svelte';
 	import FollowUps from './ResponseMessage/FollowUps.svelte';
 	import { fade } from 'svelte/transition';
 	import { flyAndScale } from '$lib/utils/transitions';
@@ -262,64 +260,32 @@
 				return;
 			}
 
-			console.debug('Prepared message content for TTS', messageContentParts);
-			if ($settings.audio?.tts?.engine === 'browser-kokoro') {
-				if (!$TTSWorker) {
-					await TTSWorker.set(
-						new KokoroWorker({
-							dtype: $settings.audio?.tts?.engineConfig?.dtype ?? 'fp32'
-						})
-					);
+                        console.debug('Prepared message content for TTS', messageContentParts);
+                        for (const [, sentence] of messageContentParts.entries()) {
+                                const res = await synthesizeOpenAISpeech(
+                                        localStorage.token,
+                                        $settings?.audio?.tts?.defaultVoice === $config.audio.tts.voice
+                                                ? ($settings?.audio?.tts?.voice ?? $config?.audio?.tts?.voice)
+                                                : $config?.audio?.tts?.voice,
+                                        sentence
+                                ).catch((error) => {
+                                        console.error(error);
+                                        toast.error(`${error}`);
 
-					await $TTSWorker.init();
-				}
+                                        speaking = false;
+                                        loadingSpeech = false;
+                                });
 
-				for (const [idx, sentence] of messageContentParts.entries()) {
-					const url = await $TTSWorker
-						.generate({
-							text: sentence,
-							voice: $settings?.audio?.tts?.voice ?? $config?.audio?.tts?.voice
-						})
-						.catch((error) => {
-							console.error(error);
-							toast.error(`${error}`);
+                                if (res && speaking) {
+                                        const blob = await res.blob();
+                                        const url = URL.createObjectURL(blob);
 
-							speaking = false;
-							loadingSpeech = false;
-						});
-
-					if (url && speaking) {
-						$audioQueue.enqueue(url);
-						loadingSpeech = false;
-					}
-				}
-			} else {
-				for (const [idx, sentence] of messageContentParts.entries()) {
-					const res = await synthesizeOpenAISpeech(
-						localStorage.token,
-						$settings?.audio?.tts?.defaultVoice === $config.audio.tts.voice
-							? ($settings?.audio?.tts?.voice ?? $config?.audio?.tts?.voice)
-							: $config?.audio?.tts?.voice,
-						sentence
-					).catch((error) => {
-						console.error(error);
-						toast.error(`${error}`);
-
-						speaking = false;
-						loadingSpeech = false;
-					});
-
-					if (res && speaking) {
-						const blob = await res.blob();
-						const url = URL.createObjectURL(blob);
-
-						$audioQueue.enqueue(url);
-						loadingSpeech = false;
-					}
-				}
-			}
-		}
-	};
+                                        $audioQueue.enqueue(url);
+                                        loadingSpeech = false;
+                                }
+                        }
+                }
+        };
 
 	let preprocessedDetailsCache = [];
 

@@ -6,6 +6,7 @@ import logging
 import mimetypes
 import os
 import uuid
+import importlib.util
 from concurrent.futures import ThreadPoolExecutor
 from fnmatch import fnmatch
 from functools import lru_cache
@@ -38,6 +39,8 @@ from open_webui.env import (
     ENABLE_FORWARD_USER_INFO_HEADERS,
     SRC_LOG_LEVELS,
 )
+
+FASTER_WHISPER_AVAILABLE = importlib.util.find_spec("faster_whisper") is not None
 from open_webui.utils.auth import get_admin_user, get_verified_user
 from open_webui.utils.headers import include_user_info_headers
 from pydantic import BaseModel
@@ -111,6 +114,14 @@ def convert_audio_to_mp3(file_path):
 def set_faster_whisper_model(model: str, auto_update: bool = False):
     whisper_model = None
     if model:
+        if not FASTER_WHISPER_AVAILABLE:
+            raise HTTPException(
+                status_code=500,
+                detail=(
+                    "faster-whisper is not installed. Install it to enable the local "
+                    "Whisper transcription engine."
+                ),
+            )
         from faster_whisper import WhisperModel
 
         faster_whisper_kwargs = {

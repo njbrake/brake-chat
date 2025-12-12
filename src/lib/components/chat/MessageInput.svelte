@@ -17,14 +17,13 @@
 		settings,
 		models,
 		config,
-		showCallOverlay,
-		tools,
-		toolServers,
-		user as _user,
-		showControls,
-		TTSWorker,
-		temporaryChatEnabled
-	} from '$lib/stores';
+                showCallOverlay,
+                tools,
+                toolServers,
+                user as _user,
+                showControls,
+                temporaryChatEnabled
+        } from '$lib/stores';
 
 	import {
 		convertHeicToJpeg,
@@ -73,9 +72,7 @@
 	import Component from '../icons/Component.svelte';
 	import PlusAlt from '../icons/PlusAlt.svelte';
 
-	import { KokoroWorker } from '$lib/workers/KokoroWorker';
-
-	import { getSuggestionRenderer } from '../common/MarkdownInput/suggestions';
+import { getSuggestionRenderer } from '../common/MarkdownInput/suggestions';
 	import CommandSuggestionList from './MessageInput/CommandSuggestionList.svelte';
 	import Knobs from '../icons/Knobs.svelte';
 	import ValvesModal from '../workspace/common/ValvesModal.svelte';
@@ -1618,21 +1615,8 @@
 
 															stream = null;
 
-															if ($settings.audio?.tts?.engine === 'browser-kokoro') {
-																// If the user has not initialized the TTS worker, initialize it
-																if (!$TTSWorker) {
-																	await TTSWorker.set(
-																		new KokoroWorker({
-																			dtype: $settings.audio?.tts?.engineConfig?.dtype ?? 'fp32'
-																		})
-																	);
-
-																	await $TTSWorker.init();
-																}
-															}
-
-															showCallOverlay.set(true);
-															showControls.set(true);
+                                                                                                                        showCallOverlay.set(true);
+                                                                                                                        showControls.set(true);
 														} catch (err) {
 															// If the user denies the permission or an error occurs, show an error message
 															toast.error('Permission denied when accessing media devices');

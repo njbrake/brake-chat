@@ -44,7 +44,6 @@ langchain==0.3.27
 langchain-community==0.3.29
 
 fake-useragent==2.2.0
-chromadb==1.1.0
 
 pyarrow==20.0.0 # fix: pin pyarrow version to 20 for rpi compatibility #15897
 einops==0.8.1
@@ -72,11 +71,7 @@ soundfile==0.13.1
 
 pillow==11.3.0
 opencv-python-headless==4.11.0.86
-rapidocr-onnxruntime==1.4.4
 rank-bm25==0.2.2
-
-onnxruntime==1.20.1
-faster-whisper==1.1.1
 
 youtube-transcript-api==1.2.2
 pytube==15.0.0

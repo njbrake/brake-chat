@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { config, models, settings, showCallOverlay, TTSWorker } from '$lib/stores';
+        import { config, models, settings, showCallOverlay } from '$lib/stores';
 	import { onMount, tick, getContext, onDestroy, createEventDispatcher } from 'svelte';
 
 	const dispatch = createEventDispatcher();
@@ -10,10 +10,9 @@
 
 	import { toast } from 'svelte-sonner';
 
-	import Tooltip from '$lib/components/common/Tooltip.svelte';
-	import VideoInputMenu from './CallOverlay/VideoInputMenu.svelte';
-	import { KokoroWorker } from '$lib/workers/KokoroWorker';
-	import { WEBUI_API_BASE_URL } from '$lib/constants';
+        import Tooltip from '$lib/components/common/Tooltip.svelte';
+        import VideoInputMenu from './CallOverlay/VideoInputMenu.svelte';
+        import { WEBUI_API_BASE_URL } from '$lib/constants';
 	export let eventTarget: EventTarget;
 	export let submitPrompt: Function;
 	export let stopResponse: Function;
@@ -454,54 +453,40 @@
 	const emojiCache = new Map();
 
 	const fetchAudio = async (content) => {
-		if (!audioCache.has(content)) {
-			try {
-				// Set the emoji for the content if needed
-				if ($settings?.showEmojiInCall ?? false) {
-					const emoji = await generateEmoji(localStorage.token, modelId, content, chatId);
-					if (emoji) {
-						emojiCache.set(content, emoji);
-					}
-				}
+                if (!audioCache.has(content)) {
+                        try {
+                                // Set the emoji for the content if needed
+                                if ($settings?.showEmojiInCall ?? false) {
+                                        const emoji = await generateEmoji(localStorage.token, modelId, content, chatId);
+                                        if (emoji) {
+                                                emojiCache.set(content, emoji);
+                                        }
+                                }
 
-				if ($settings.audio?.tts?.engine === 'browser-kokoro') {
-					const url = await $TTSWorker
-						.generate({
-							text: content,
-							voice: $settings?.audio?.tts?.voice ?? $config?.audio?.tts?.voice
-						})
-						.catch((error) => {
-							console.error(error);
-							toast.error(`${error}`);
-						});
+                                if ($config.audio.tts.engine !== '') {
+                                        const res = await synthesizeOpenAISpeech(
+                                                localStorage.token,
+                                                $settings?.audio?.tts?.defaultVoice === $config.audio.tts.voice
+                                                        ? ($settings?.audio?.tts?.voice ?? $config?.audio?.tts?.voice)
+                                                        : $config?.audio?.tts?.voice,
+                                                content
+                                        ).catch((error) => {
+                                                console.error(error);
+                                                return null;
+                                        });
 
-					if (url) {
-						audioCache.set(content, new Audio(url));
-					}
-				} else if ($config.audio.tts.engine !== '') {
-					const res = await synthesizeOpenAISpeech(
-						localStorage.token,
-						$settings?.audio?.tts?.defaultVoice === $config.audio.tts.voice
-							? ($settings?.audio?.tts?.voice ?? $config?.audio?.tts?.voice)
-							: $config?.audio?.tts?.voice,
-						content
-					).catch((error) => {
-						console.error(error);
-						return null;
-					});
-
-					if (res) {
-						const blob = await res.blob();
-						const blobUrl = URL.createObjectURL(blob);
-						audioCache.set(content, new Audio(blobUrl));
-					}
-				} else {
-					audioCache.set(content, true);
-				}
-			} catch (error) {
-				console.error('Error synthesizing speech:', error);
-			}
-		}
+                                        if (res) {
+                                                const blob = await res.blob();
+                                                const blobUrl = URL.createObjectURL(blob);
+                                                audioCache.set(content, new Audio(blobUrl));
+                                        }
+                                } else {
+                                        audioCache.set(content, true);
+                                }
+                        } catch (error) {
+                                console.error('Error synthesizing speech:', error);
+                        }
+                }
 
 		return audioCache.get(content);
 	};
