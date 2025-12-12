@@ -108,7 +108,6 @@ dependencies = [
     "azure-storage-blob==12.24.1",
 
     "ldap3==2.9.1",
-    "ruff>=0.8.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.11, < 3.13.0a1"
@@ -196,6 +195,7 @@ ignore-words-list = 'ans'
 [dependency-groups]
 dev = [
     "pytest-asyncio>=1.0.0",
+    "ruff==0.14.9",
 ]
 
 lint = [
