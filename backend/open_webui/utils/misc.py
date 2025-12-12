@@ -556,6 +556,7 @@ def stream_chunks_handler(stream: aiohttp.StreamReader, log: logging.Logger):
 
     max_buffer_size = CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE
     if max_buffer_size is None or max_buffer_size <= 0:
+        log.debug("Max buffer size is not set, returning stream as is")
         return stream
 
     async def yield_safe_stream_chunks():
