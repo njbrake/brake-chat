@@ -19,7 +19,6 @@ from open_webui.env import (
     CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES,
     CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE,
     ENABLE_CHAT_RESPONSE_BASE64_IMAGE_URL_CONVERSION,
-    ENABLE_QUERIES_CACHE,
     ENABLE_REALTIME_CHAT_SAVE,
     GLOBAL_LOG_LEVEL,
     SRC_LOG_LEVELS,
@@ -38,10 +37,6 @@ from open_webui.routers.images import (
 from open_webui.routers.memories import QueryMemoryForm, query_memory
 from open_webui.routers.pipelines import (
     process_pipeline_inlet_filter,
-)
-from open_webui.routers.retrieval import (
-    SearchForm,
-    process_web_search,
 )
 from open_webui.routers.tasks import (
     generate_chat_tags,
@@ -481,165 +476,6 @@ async def chat_memory_handler(request: Request, form_data: dict, extra_params: d
     if user_context.strip() != "":
         form_data["messages"] = add_or_update_system_message(
             f"User Context:\n{user_context}\n", form_data["messages"], append=True
-        )
-
-    return form_data
-
-
-async def chat_web_search_handler(request: Request, form_data: dict, extra_params: dict, user):
-    event_emitter = extra_params["__event_emitter__"]
-    await event_emitter(
-        {
-            "type": "status",
-            "data": {
-                "action": "web_search",
-                "description": "Searching the web",
-                "done": False,
-            },
-        }
-    )
-
-    messages = form_data["messages"]
-    user_message = get_last_user_message(messages)
-
-    queries = []
-    try:
-        res = await generate_queries(
-            request,
-            {
-                "model": form_data["model"],
-                "messages": messages,
-                "prompt": user_message,
-                "type": "web_search",
-            },
-            user,
-        )
-
-        response = res["choices"][0]["message"]["content"]
-
-        try:
-            bracket_start = response.find("{")
-            bracket_end = response.rfind("}") + 1
-
-            if bracket_start == -1 or bracket_end == -1:
-                raise Exception("No JSON object found in the response")
-
-            response = response[bracket_start:bracket_end]
-            queries = json.loads(response)
-            queries = queries.get("queries", [])
-        except Exception:
-            queries = [response]
-
-        if ENABLE_QUERIES_CACHE:
-            request.state.cached_queries = queries
-
-    except Exception as e:
-        log.exception(e)
-        queries = [user_message]
-
-    # Check if generated queries are empty
-    if len(queries) == 1 and queries[0].strip() == "":
-        queries = [user_message]
-
-    # Check if queries are not found
-    if len(queries) == 0:
-        await event_emitter(
-            {
-                "type": "status",
-                "data": {
-                    "action": "web_search",
-                    "description": "No search query generated",
-                    "done": True,
-                },
-            }
-        )
-        return form_data
-
-    await event_emitter(
-        {
-            "type": "status",
-            "data": {
-                "action": "web_search_queries_generated",
-                "queries": queries,
-                "done": False,
-            },
-        }
-    )
-
-    try:
-        results = await process_web_search(
-            request,
-            SearchForm(queries=queries),
-            user=user,
-        )
-
-        if results:
-            files = form_data.get("files", [])
-
-            if results.get("collection_names"):
-                for col_idx, collection_name in enumerate(results.get("collection_names")):
-                    files.append(
-                        {
-                            "collection_name": collection_name,
-                            "name": ", ".join(queries),
-                            "type": "web_search",
-                            "urls": results["filenames"],
-                            "queries": queries,
-                        }
-                    )
-            elif results.get("docs"):
-                # Invoked when bypass embedding and retrieval is set to True
-                docs = results["docs"]
-                files.append(
-                    {
-                        "docs": docs,
-                        "name": ", ".join(queries),
-                        "type": "web_search",
-                        "urls": results["filenames"],
-                        "queries": queries,
-                    }
-                )
-
-            form_data["files"] = files
-
-            await event_emitter(
-                {
-                    "type": "status",
-                    "data": {
-                        "action": "web_search",
-                        "description": "Searched {{count}} sites",
-                        "urls": results["filenames"],
-                        "items": results.get("items", []),
-                        "done": True,
-                    },
-                }
-            )
-        else:
-            await event_emitter(
-                {
-                    "type": "status",
-                    "data": {
-                        "action": "web_search",
-                        "description": "No search results found",
-                        "done": True,
-                        "error": True,
-                    },
-                }
-            )
-
-    except Exception as e:
-        log.exception(e)
-        await event_emitter(
-            {
-                "type": "status",
-                "data": {
-                    "action": "web_search",
-                    "description": "An error occurred while searching the web",
-                    "queries": queries,
-                    "done": True,
-                    "error": True,
-                },
-            }
         )
 
     return form_data
@@ -1162,9 +998,6 @@ async def process_chat_payload(request, form_data, user, metadata, model):
 
         if features.get("memory"):
             form_data = await chat_memory_handler(request, form_data, extra_params, user)
-
-        if features.get("web_search"):
-            form_data = await chat_web_search_handler(request, form_data, extra_params, user)
 
         if features.get("image_generation"):
             form_data = await chat_image_generation_handler(request, form_data, extra_params, user)

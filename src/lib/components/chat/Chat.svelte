@@ -64,11 +64,10 @@
 		updateChatById
 	} from '$lib/apis/chats';
 	import { generateOpenAIChatCompletion } from '$lib/apis/openai';
-	import { processWeb, processWebSearch, processYoutubeVideo } from '$lib/apis/retrieval';
+	import { processWeb, processYoutubeVideo } from '$lib/apis/retrieval';
 	import { getAndUpdateUserLocation, getUserSettings } from '$lib/apis/users';
 	import {
 		chatCompleted,
-		generateQueries,
 		chatAction,
 		generateMoACompletion,
 		stopTask,
@@ -131,7 +130,6 @@
 	let selectedToolIds = [];
 	let selectedFilterIds = [];
 	let imageGenerationEnabled = false;
-	let webSearchEnabled = false;
 
 	let showCommands = false;
 
@@ -167,7 +165,6 @@
 		files = [];
 		selectedToolIds = [];
 		selectedFilterIds = [];
-		webSearchEnabled = false;
 		imageGenerationEnabled = false;
 
 		const storageChatInput = sessionStorage.getItem(
@@ -190,7 +187,6 @@
 						files = input.files;
 						selectedToolIds = input.selectedToolIds;
 						selectedFilterIds = input.selectedFilterIds;
-						webSearchEnabled = input.webSearchEnabled;
 						imageGenerationEnabled = input.imageGenerationEnabled;
 					}
 				} catch (e) {}
@@ -249,7 +245,6 @@
 	const resetInput = () => {
 		selectedToolIds = [];
 		selectedFilterIds = [];
-		webSearchEnabled = false;
 		imageGenerationEnabled = false;
 
 		if (selectedModelIds.filter((id) => id).length > 0) {
@@ -290,10 +285,6 @@
 			if (model?.info?.meta?.defaultFeatureIds) {
 				if (model.info?.meta?.capabilities?.['image_generation']) {
 					imageGenerationEnabled = model.info.meta.defaultFeatureIds.includes('image_generation');
-				}
-
-				if (model.info?.meta?.capabilities?.['web_search']) {
-					webSearchEnabled = model.info.meta.defaultFeatureIds.includes('web_search');
 				}
 			}
 		}
@@ -533,7 +524,6 @@
 			files = [];
 			selectedToolIds = [];
 			selectedFilterIds = [];
-			webSearchEnabled = false;
 			imageGenerationEnabled = false;
 
 			try {
@@ -544,7 +534,6 @@
 					files = input.files;
 					selectedToolIds = input.selectedToolIds;
 					selectedFilterIds = input.selectedFilterIds;
-					webSearchEnabled = input.webSearchEnabled;
 					imageGenerationEnabled = input.imageGenerationEnabled;
 				}
 			} catch (e) {}
@@ -960,10 +949,6 @@
 
 		if ($page.url.searchParams.get('load-url')) {
 			await uploadWeb($page.url.searchParams.get('load-url'));
-		}
-
-		if ($page.url.searchParams.get('web-search') === 'true') {
-			webSearchEnabled = true;
 		}
 
 		if ($page.url.searchParams.get('image-generation') === 'true') {
@@ -1723,24 +1708,8 @@
 					$config?.features?.enable_image_generation &&
 					($user?.role === 'admin' || $user?.permissions?.features?.image_generation)
 						? imageGenerationEnabled
-						: false,
-				web_search:
-					$config?.features?.enable_web_search &&
-					($user?.role === 'admin' || $user?.permissions?.features?.web_search)
-						? webSearchEnabled
 						: false
 			};
-
-		const currentModels = atSelectedModel?.id ? [atSelectedModel.id] : selectedModels;
-		if (
-			currentModels.filter(
-				(model) => $models.find((m) => m.id === model)?.info?.meta?.capabilities?.web_search ?? true
-			).length === currentModels.length
-		) {
-			if ($config?.features?.enable_web_search && ($settings?.webSearch ?? false) === 'always') {
-				features = { ...features, web_search: true };
-			}
-		}
 
 		if ($settings?.memory ?? false) {
 			features = { ...features, memory: true };
@@ -2444,7 +2413,6 @@
 									bind:selectedToolIds
 									bind:selectedFilterIds
 									bind:imageGenerationEnabled
-									bind:webSearchEnabled
 									bind:atSelectedModel
 									bind:showCommands
 									toolServers={$toolServers}
@@ -2495,7 +2463,6 @@
 									bind:selectedToolIds
 									bind:selectedFilterIds
 									bind:imageGenerationEnabled
-									bind:webSearchEnabled
 									bind:atSelectedModel
 									bind:showCommands
 									toolServers={$toolServers}

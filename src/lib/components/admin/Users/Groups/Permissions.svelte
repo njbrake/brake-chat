@@ -53,7 +53,6 @@
 		features: {
 			api_keys: false,
 			direct_tool_servers: false,
-			web_search: true,
 			image_generation: true,
 			notes: true
 		}
@@ -728,22 +727,6 @@
 				<Switch bind:state={permissions.features.direct_tool_servers} />
 			</div>
 			{#if defaultPermissions?.features?.direct_tool_servers && !permissions.features.direct_tool_servers}
-				<div>
-					<div class="text-xs text-gray-500">
-						{'This is a default user permission and will remain enabled.'}
-					</div>
-				</div>
-			{/if}
-		</div>
-
-		<div class="flex flex-col w-full">
-			<div class="flex w-full justify-between my-1">
-				<div class=" self-center text-xs font-medium">
-					{'Web Search'}
-				</div>
-				<Switch bind:state={permissions.features.web_search} />
-			</div>
-			{#if defaultPermissions?.features?.web_search && !permissions.features.web_search}
 				<div>
 					<div class="text-xs text-gray-500">
 						{'This is a default user permission and will remain enabled.'}

@@ -4,17 +4,13 @@
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import { marked } from 'marked';
 	const featureLabels = {
-		web_search: {
-			label: 'Web Search',
-			description: 'Model can search the web for information'
-		},
 		image_generation: {
 			label: 'Image Generation',
 			description: 'Model can generate images based on text prompts'
 		}
 	};
 
-	export let availableFeatures = ['web_search', 'image_generation'];
+	export let availableFeatures = ['image_generation'];
 	export let featureIds = [];
 </script>
 

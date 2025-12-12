@@ -61,7 +61,6 @@
 
 	import XMark from '../icons/XMark.svelte';
 	import Headphone from '../icons/Headphone.svelte';
-	import GlobeAlt from '../icons/GlobeAlt.svelte';
 	import Photo from '../icons/Photo.svelte';
 	import Wrench from '../icons/Wrench.svelte';
 	import CommandLine from '../icons/CommandLine.svelte';
@@ -103,7 +102,6 @@
 	export let selectedFilterIds = [];
 
 	export let imageGenerationEnabled = false;
-	export let webSearchEnabled = false;
 
 	let showInputVariablesModal = false;
 	let inputVariablesModalCallback = (variableValues) => {};
@@ -132,8 +130,7 @@
 			}),
 		selectedToolIds,
 		selectedFilterIds,
-		imageGenerationEnabled,
-		webSearchEnabled
+		imageGenerationEnabled
 	});
 
 	const inputVariableHandler = async (text: string): Promise<string> => {
@@ -421,11 +418,6 @@
 		(model) => $models.find((m) => m.id === model)?.info?.meta?.capabilities?.file_upload ?? true
 	);
 
-	let webSearchCapableModels = [];
-	$: webSearchCapableModels = (atSelectedModel?.id ? [atSelectedModel.id] : selectedModels).filter(
-		(model) => $models.find((m) => m.id === model)?.info?.meta?.capabilities?.web_search ?? true
-	);
-
 	let imageGenerationCapableModels = [];
 	$: imageGenerationCapableModels = (
 		atSelectedModel?.id ? [atSelectedModel.id] : selectedModels
@@ -441,13 +433,6 @@
 
 	let showToolsButton = false;
 	$: showToolsButton = ($tools ?? []).length > 0 || ($toolServers ?? []).length > 0;
-
-	let showWebSearchButton = false;
-	$: showWebSearchButton =
-		(atSelectedModel?.id ? [atSelectedModel.id] : selectedModels).length ===
-			webSearchCapableModels.length &&
-		$config?.features?.enable_web_search &&
-		($_user.role === 'admin' || $_user?.permissions?.features?.web_search);
 
 	let showImageGenerationButton = false;
 	$: showImageGenerationButton =
@@ -1277,8 +1262,6 @@
 															atSelectedModel = undefined;
 															selectedToolIds = [];
 															selectedFilterIds = [];
-
-															webSearchEnabled = false;
 															imageGenerationEnabled = false;
 														}
 													}}
@@ -1401,7 +1384,7 @@
 										</div>
 									</InputMenu>
 
-									{#if showWebSearchButton || showImageGenerationButton || showToolsButton || (toggleFilters && toggleFilters.length > 0)}
+									{#if showImageGenerationButton || showToolsButton || (toggleFilters && toggleFilters.length > 0)}
 										<div
 											class="flex self-center w-[1px] h-4 mx-1 bg-gray-200/50 dark:bg-gray-800/50"
 										/>
@@ -1409,11 +1392,9 @@
 										<IntegrationsMenu
 											selectedModels={atSelectedModel ? [atSelectedModel.id] : selectedModels}
 											{toggleFilters}
-											{showWebSearchButton}
 											{showImageGenerationButton}
 											bind:selectedToolIds
 											bind:selectedFilterIds
-											bind:webSearchEnabled
 											bind:imageGenerationEnabled
 											closeOnOutsideClick={integrationsMenuCloseOnOutsideClick}
 											onShowValves={(e) => {
@@ -1513,24 +1494,6 @@
 												</Tooltip>
 											{/if}
 										{/each}
-
-										{#if webSearchEnabled}
-											<Tooltip content={'Web Search'} placement="top">
-												<button
-													on:click|preventDefault={() => (webSearchEnabled = !webSearchEnabled)}
-													type="button"
-													class="group p-[7px] flex gap-1.5 items-center text-sm rounded-full transition-colors duration-300 focus:outline-hidden max-w-full overflow-hidden {webSearchEnabled ||
-													($settings?.webSearch ?? false) === 'always'
-														? ' text-sky-500 dark:text-sky-300 bg-sky-50 hover:bg-sky-100 dark:bg-sky-400/10 dark:hover:bg-sky-600/10 border border-sky-200/40 dark:border-sky-500/20'
-														: 'bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 '}"
-												>
-													<GlobeAlt className="size-4" strokeWidth="1.75" />
-													<div class="hidden group-hover:block">
-														<XMark className="size-4" strokeWidth="1.75" />
-													</div>
-												</button>
-											</Tooltip>
-										{/if}
 
 										{#if imageGenerationEnabled}
 											<Tooltip content={'Image'} placement="top">

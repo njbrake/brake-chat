@@ -12,10 +12,6 @@
 			label: 'File Upload',
 			description: 'Model accepts file inputs'
 		},
-		web_search: {
-			label: 'Web Search',
-			description: 'Model can search the web for information'
-		},
 		image_generation: {
 			label: 'Image Generation',
 			description: 'Model can generate images based on text prompts'
@@ -38,7 +34,6 @@
 	export let capabilities: {
 		vision?: boolean;
 		file_upload?: boolean;
-		web_search?: boolean;
 		image_generation?: boolean;
 		usage?: boolean;
 		citations?: boolean;

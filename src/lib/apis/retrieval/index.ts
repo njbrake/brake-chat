@@ -94,31 +94,12 @@ export const updateRerankingConfig = async (token: string, payload: RerankingMod
 	return api.post('/reranking/update', payload, token, RETRIEVAL_API_BASE_URL);
 };
 
-export interface SearchDocument {
-	status: boolean;
-	collection_name: string;
-	filenames: string[];
-}
-
 export const processYoutubeVideo = async (token: string, url: string) => {
 	return api.post('/process/youtube', { url }, token, RETRIEVAL_API_BASE_URL);
 };
 
 export const processWeb = async (token: string, collection_name: string, url: string) => {
 	return api.post('/process/web', { url, collection_name }, token, RETRIEVAL_API_BASE_URL);
-};
-
-export const processWebSearch = async (
-	token: string,
-	query: string,
-	collection_name?: string
-): Promise<SearchDocument | null> => {
-	return api.post(
-		'/process/web/search',
-		{ query, collection_name: collection_name ?? '' },
-		token,
-		RETRIEVAL_API_BASE_URL
-	);
 };
 
 export const queryDoc = async (

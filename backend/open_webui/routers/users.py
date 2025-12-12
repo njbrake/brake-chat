@@ -204,7 +204,6 @@ class ChatPermissions(BaseModel):
 class FeaturesPermissions(BaseModel):
     api_keys: bool = False
     direct_tool_servers: bool = False
-    web_search: bool = True
     image_generation: bool = True
     notes: bool = True
 

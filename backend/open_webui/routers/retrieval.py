@@ -17,7 +17,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter, TokenTextSpl
 from langchain_core.documents import Document
 from langchain_text_splitters import MarkdownHeaderTextSplitter
 from open_webui.config import (
-    DEFAULT_LOCALE,
     RAG_EMBEDDING_CONTENT_PREFIX,
     RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE,
     RAG_EMBEDDING_QUERY_PREFIX,
@@ -52,17 +51,6 @@ from open_webui.retrieval.utils import (
 )
 from open_webui.retrieval.vector.factory import VECTOR_DB_CLIENT
 from open_webui.retrieval.vector.utils import filter_metadata
-from open_webui.retrieval.web.bing import search_bing
-from open_webui.retrieval.web.brave import search_brave
-from open_webui.retrieval.web.duckduckgo import search_duckduckgo
-from open_webui.retrieval.web.external import search_external
-from open_webui.retrieval.web.google_pse import search_google_pse
-
-# Web search engines
-from open_webui.retrieval.web.main import SearchResult
-from open_webui.retrieval.web.searxng import search_searxng
-from open_webui.retrieval.web.tavily import search_tavily
-from open_webui.retrieval.web.utils import get_web_loader
 from open_webui.storage.provider import Storage
 from open_webui.utils.auth import get_admin_user, get_verified_user
 from open_webui.utils.misc import (
@@ -187,10 +175,6 @@ class CollectionNameForm(BaseModel):
 
 class ProcessUrlForm(CollectionNameForm):
     url: str
-
-
-class SearchForm(BaseModel):
-    queries: list[str]
 
 
 @router.get("/")
@@ -404,29 +388,15 @@ async def get_rag_config(request: Request, user=Depends(get_admin_user)):
         "ENABLE_ONEDRIVE_INTEGRATION": request.app.state.config.ENABLE_ONEDRIVE_INTEGRATION,
         # Web search settings
         "web": {
-            "ENABLE_WEB_SEARCH": request.app.state.config.ENABLE_WEB_SEARCH,
-            "WEB_SEARCH_ENGINE": request.app.state.config.WEB_SEARCH_ENGINE,
             "WEB_SEARCH_TRUST_ENV": request.app.state.config.WEB_SEARCH_TRUST_ENV,
-            "WEB_SEARCH_RESULT_COUNT": request.app.state.config.WEB_SEARCH_RESULT_COUNT,
-            "WEB_SEARCH_CONCURRENT_REQUESTS": request.app.state.config.WEB_SEARCH_CONCURRENT_REQUESTS,
             "WEB_LOADER_CONCURRENT_REQUESTS": request.app.state.config.WEB_LOADER_CONCURRENT_REQUESTS,
-            "WEB_SEARCH_DOMAIN_FILTER_LIST": request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST,
             "BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL": request.app.state.config.BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL,
-            "BYPASS_WEB_SEARCH_WEB_LOADER": request.app.state.config.BYPASS_WEB_SEARCH_WEB_LOADER,
-            "SEARXNG_QUERY_URL": request.app.state.config.SEARXNG_QUERY_URL,
-            "GOOGLE_PSE_API_KEY": request.app.state.config.GOOGLE_PSE_API_KEY,
-            "GOOGLE_PSE_ENGINE_ID": request.app.state.config.GOOGLE_PSE_ENGINE_ID,
-            "BRAVE_SEARCH_API_KEY": request.app.state.config.BRAVE_SEARCH_API_KEY,
             "TAVILY_API_KEY": request.app.state.config.TAVILY_API_KEY,
-            "BING_SEARCH_V7_ENDPOINT": request.app.state.config.BING_SEARCH_V7_ENDPOINT,
-            "BING_SEARCH_V7_SUBSCRIPTION_KEY": request.app.state.config.BING_SEARCH_V7_SUBSCRIPTION_KEY,
             "WEB_LOADER_ENGINE": request.app.state.config.WEB_LOADER_ENGINE,
             "ENABLE_WEB_LOADER_SSL_VERIFICATION": request.app.state.config.ENABLE_WEB_LOADER_SSL_VERIFICATION,
             "PLAYWRIGHT_WS_URL": request.app.state.config.PLAYWRIGHT_WS_URL,
             "PLAYWRIGHT_TIMEOUT": request.app.state.config.PLAYWRIGHT_TIMEOUT,
             "TAVILY_EXTRACT_DEPTH": request.app.state.config.TAVILY_EXTRACT_DEPTH,
-            "EXTERNAL_WEB_SEARCH_URL": request.app.state.config.EXTERNAL_WEB_SEARCH_URL,
-            "EXTERNAL_WEB_SEARCH_API_KEY": request.app.state.config.EXTERNAL_WEB_SEARCH_API_KEY,
             "EXTERNAL_WEB_LOADER_URL": request.app.state.config.EXTERNAL_WEB_LOADER_URL,
             "EXTERNAL_WEB_LOADER_API_KEY": request.app.state.config.EXTERNAL_WEB_LOADER_API_KEY,
             "YOUTUBE_LOADER_LANGUAGE": request.app.state.config.YOUTUBE_LOADER_LANGUAGE,
@@ -437,29 +407,15 @@ async def get_rag_config(request: Request, user=Depends(get_admin_user)):
 
 
 class WebConfig(BaseModel):
-    ENABLE_WEB_SEARCH: bool | None = None
-    WEB_SEARCH_ENGINE: str | None = None
     WEB_SEARCH_TRUST_ENV: bool | None = None
-    WEB_SEARCH_RESULT_COUNT: int | None = None
-    WEB_SEARCH_CONCURRENT_REQUESTS: int | None = None
     WEB_LOADER_CONCURRENT_REQUESTS: int | None = None
-    WEB_SEARCH_DOMAIN_FILTER_LIST: list[str] | None = []
     BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL: bool | None = None
-    BYPASS_WEB_SEARCH_WEB_LOADER: bool | None = None
-    SEARXNG_QUERY_URL: str | None = None
-    GOOGLE_PSE_API_KEY: str | None = None
-    GOOGLE_PSE_ENGINE_ID: str | None = None
-    BRAVE_SEARCH_API_KEY: str | None = None
     TAVILY_API_KEY: str | None = None
-    BING_SEARCH_V7_ENDPOINT: str | None = None
-    BING_SEARCH_V7_SUBSCRIPTION_KEY: str | None = None
     WEB_LOADER_ENGINE: str | None = None
     ENABLE_WEB_LOADER_SSL_VERIFICATION: bool | None = None
     PLAYWRIGHT_WS_URL: str | None = None
     PLAYWRIGHT_TIMEOUT: int | None = None
     TAVILY_EXTRACT_DEPTH: str | None = None
-    EXTERNAL_WEB_SEARCH_URL: str | None = None
-    EXTERNAL_WEB_SEARCH_API_KEY: str | None = None
     EXTERNAL_WEB_LOADER_URL: str | None = None
     EXTERNAL_WEB_LOADER_API_KEY: str | None = None
     YOUTUBE_LOADER_LANGUAGE: list[str] | None = None
@@ -816,32 +772,18 @@ async def update_rag_config(request: Request, form_data: ConfigForm, user=Depend
 
     if form_data.web is not None:
         # Web search settings
-        request.app.state.config.ENABLE_WEB_SEARCH = form_data.web.ENABLE_WEB_SEARCH
-        request.app.state.config.WEB_SEARCH_ENGINE = form_data.web.WEB_SEARCH_ENGINE
         request.app.state.config.WEB_SEARCH_TRUST_ENV = form_data.web.WEB_SEARCH_TRUST_ENV
-        request.app.state.config.WEB_SEARCH_RESULT_COUNT = form_data.web.WEB_SEARCH_RESULT_COUNT
-        request.app.state.config.WEB_SEARCH_CONCURRENT_REQUESTS = form_data.web.WEB_SEARCH_CONCURRENT_REQUESTS
         request.app.state.config.WEB_LOADER_CONCURRENT_REQUESTS = form_data.web.WEB_LOADER_CONCURRENT_REQUESTS
-        request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST = form_data.web.WEB_SEARCH_DOMAIN_FILTER_LIST
         request.app.state.config.BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL = (
             form_data.web.BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL
         )
-        request.app.state.config.BYPASS_WEB_SEARCH_WEB_LOADER = form_data.web.BYPASS_WEB_SEARCH_WEB_LOADER
-        request.app.state.config.SEARXNG_QUERY_URL = form_data.web.SEARXNG_QUERY_URL
-        request.app.state.config.GOOGLE_PSE_API_KEY = form_data.web.GOOGLE_PSE_API_KEY
-        request.app.state.config.GOOGLE_PSE_ENGINE_ID = form_data.web.GOOGLE_PSE_ENGINE_ID
-        request.app.state.config.BRAVE_SEARCH_API_KEY = form_data.web.BRAVE_SEARCH_API_KEY
         request.app.state.config.TAVILY_API_KEY = form_data.web.TAVILY_API_KEY
-        request.app.state.config.BING_SEARCH_V7_ENDPOINT = form_data.web.BING_SEARCH_V7_ENDPOINT
-        request.app.state.config.BING_SEARCH_V7_SUBSCRIPTION_KEY = form_data.web.BING_SEARCH_V7_SUBSCRIPTION_KEY
 
         # Web loader settings
         request.app.state.config.WEB_LOADER_ENGINE = form_data.web.WEB_LOADER_ENGINE
         request.app.state.config.ENABLE_WEB_LOADER_SSL_VERIFICATION = form_data.web.ENABLE_WEB_LOADER_SSL_VERIFICATION
         request.app.state.config.PLAYWRIGHT_WS_URL = form_data.web.PLAYWRIGHT_WS_URL
         request.app.state.config.PLAYWRIGHT_TIMEOUT = form_data.web.PLAYWRIGHT_TIMEOUT
-        request.app.state.config.EXTERNAL_WEB_SEARCH_URL = form_data.web.EXTERNAL_WEB_SEARCH_URL
-        request.app.state.config.EXTERNAL_WEB_SEARCH_API_KEY = form_data.web.EXTERNAL_WEB_SEARCH_API_KEY
         request.app.state.config.EXTERNAL_WEB_LOADER_URL = form_data.web.EXTERNAL_WEB_LOADER_URL
         request.app.state.config.EXTERNAL_WEB_LOADER_API_KEY = form_data.web.EXTERNAL_WEB_LOADER_API_KEY
         request.app.state.config.TAVILY_EXTRACT_DEPTH = form_data.web.TAVILY_EXTRACT_DEPTH
@@ -907,31 +849,17 @@ async def update_rag_config(request: Request, form_data: ConfigForm, user=Depend
         # Integration settings
         "ENABLE_GOOGLE_DRIVE_INTEGRATION": request.app.state.config.ENABLE_GOOGLE_DRIVE_INTEGRATION,
         "ENABLE_ONEDRIVE_INTEGRATION": request.app.state.config.ENABLE_ONEDRIVE_INTEGRATION,
-        # Web search settings
+        # Web settings
         "web": {
-            "ENABLE_WEB_SEARCH": request.app.state.config.ENABLE_WEB_SEARCH,
-            "WEB_SEARCH_ENGINE": request.app.state.config.WEB_SEARCH_ENGINE,
             "WEB_SEARCH_TRUST_ENV": request.app.state.config.WEB_SEARCH_TRUST_ENV,
-            "WEB_SEARCH_RESULT_COUNT": request.app.state.config.WEB_SEARCH_RESULT_COUNT,
-            "WEB_SEARCH_CONCURRENT_REQUESTS": request.app.state.config.WEB_SEARCH_CONCURRENT_REQUESTS,
             "WEB_LOADER_CONCURRENT_REQUESTS": request.app.state.config.WEB_LOADER_CONCURRENT_REQUESTS,
-            "WEB_SEARCH_DOMAIN_FILTER_LIST": request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST,
             "BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL": request.app.state.config.BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL,
-            "BYPASS_WEB_SEARCH_WEB_LOADER": request.app.state.config.BYPASS_WEB_SEARCH_WEB_LOADER,
-            "SEARXNG_QUERY_URL": request.app.state.config.SEARXNG_QUERY_URL,
-            "GOOGLE_PSE_API_KEY": request.app.state.config.GOOGLE_PSE_API_KEY,
-            "GOOGLE_PSE_ENGINE_ID": request.app.state.config.GOOGLE_PSE_ENGINE_ID,
-            "BRAVE_SEARCH_API_KEY": request.app.state.config.BRAVE_SEARCH_API_KEY,
             "TAVILY_API_KEY": request.app.state.config.TAVILY_API_KEY,
-            "BING_SEARCH_V7_ENDPOINT": request.app.state.config.BING_SEARCH_V7_ENDPOINT,
-            "BING_SEARCH_V7_SUBSCRIPTION_KEY": request.app.state.config.BING_SEARCH_V7_SUBSCRIPTION_KEY,
             "WEB_LOADER_ENGINE": request.app.state.config.WEB_LOADER_ENGINE,
             "ENABLE_WEB_LOADER_SSL_VERIFICATION": request.app.state.config.ENABLE_WEB_LOADER_SSL_VERIFICATION,
             "PLAYWRIGHT_WS_URL": request.app.state.config.PLAYWRIGHT_WS_URL,
             "PLAYWRIGHT_TIMEOUT": request.app.state.config.PLAYWRIGHT_TIMEOUT,
             "TAVILY_EXTRACT_DEPTH": request.app.state.config.TAVILY_EXTRACT_DEPTH,
-            "EXTERNAL_WEB_SEARCH_URL": request.app.state.config.EXTERNAL_WEB_SEARCH_URL,
-            "EXTERNAL_WEB_SEARCH_API_KEY": request.app.state.config.EXTERNAL_WEB_SEARCH_API_KEY,
             "EXTERNAL_WEB_LOADER_URL": request.app.state.config.EXTERNAL_WEB_LOADER_URL,
             "EXTERNAL_WEB_LOADER_API_KEY": request.app.state.config.EXTERNAL_WEB_LOADER_API_KEY,
             "YOUTUBE_LOADER_LANGUAGE": request.app.state.config.YOUTUBE_LOADER_LANGUAGE,
@@ -1425,209 +1353,6 @@ async def process_web(request: Request, form_data: ProcessUrlForm, user=Depends(
                     "source": form_data.url,
                 },
             },
-        }
-    except Exception as e:
-        log.exception(e)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ERROR_MESSAGES.DEFAULT(e),
-        )
-
-
-def search_web(request: Request, engine: str, query: str, user=None) -> list[SearchResult]:
-    """Search the web using a search engine and return the results as a list of SearchResult objects.
-    Supported search engines:
-    - searxng: SEARXNG_QUERY_URL
-    - google_pse: GOOGLE_PSE_API_KEY + GOOGLE_PSE_ENGINE_ID
-    - brave: BRAVE_SEARCH_API_KEY
-    - duckduckgo: No API key required
-    - tavily: TAVILY_API_KEY
-    - bing: BING_SEARCH_V7_ENDPOINT + BING_SEARCH_V7_SUBSCRIPTION_KEY
-    - external: EXTERNAL_WEB_SEARCH_URL + EXTERNAL_WEB_SEARCH_API_KEY
-    Args:
-        query (str): The query to search for
-    """
-    if engine == "searxng":
-        if request.app.state.config.SEARXNG_QUERY_URL:
-            return search_searxng(
-                request.app.state.config.SEARXNG_QUERY_URL,
-                query,
-                request.app.state.config.WEB_SEARCH_RESULT_COUNT,
-                request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST,
-            )
-        raise Exception("No SEARXNG_QUERY_URL found in environment variables")
-    if engine == "google_pse":
-        if request.app.state.config.GOOGLE_PSE_API_KEY and request.app.state.config.GOOGLE_PSE_ENGINE_ID:
-            return search_google_pse(
-                request.app.state.config.GOOGLE_PSE_API_KEY,
-                request.app.state.config.GOOGLE_PSE_ENGINE_ID,
-                query,
-                request.app.state.config.WEB_SEARCH_RESULT_COUNT,
-                request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST,
-                referer=request.app.state.config.WEBUI_URL,
-            )
-        raise Exception("No GOOGLE_PSE_API_KEY or GOOGLE_PSE_ENGINE_ID found in environment variables")
-    if engine == "brave":
-        if request.app.state.config.BRAVE_SEARCH_API_KEY:
-            return search_brave(
-                request.app.state.config.BRAVE_SEARCH_API_KEY,
-                query,
-                request.app.state.config.WEB_SEARCH_RESULT_COUNT,
-                request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST,
-            )
-        raise Exception("No BRAVE_SEARCH_API_KEY found in environment variables")
-    if engine == "duckduckgo":
-        return search_duckduckgo(
-            query,
-            request.app.state.config.WEB_SEARCH_RESULT_COUNT,
-            request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST,
-            concurrent_requests=request.app.state.config.WEB_SEARCH_CONCURRENT_REQUESTS,
-        )
-    if engine == "tavily":
-        if request.app.state.config.TAVILY_API_KEY:
-            return search_tavily(
-                request.app.state.config.TAVILY_API_KEY,
-                query,
-                request.app.state.config.WEB_SEARCH_RESULT_COUNT,
-                request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST,
-            )
-        raise Exception("No TAVILY_API_KEY found in environment variables")
-    if engine == "bing":
-        return search_bing(
-            request.app.state.config.BING_SEARCH_V7_SUBSCRIPTION_KEY,
-            request.app.state.config.BING_SEARCH_V7_ENDPOINT,
-            str(DEFAULT_LOCALE),
-            query,
-            request.app.state.config.WEB_SEARCH_RESULT_COUNT,
-            request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST,
-        )
-    if engine == "external":
-        return search_external(
-            request,
-            request.app.state.config.EXTERNAL_WEB_SEARCH_URL,
-            request.app.state.config.EXTERNAL_WEB_SEARCH_API_KEY,
-            query,
-            request.app.state.config.WEB_SEARCH_RESULT_COUNT,
-            request.app.state.config.WEB_SEARCH_DOMAIN_FILTER_LIST,
-            user=user,
-        )
-    raise Exception("No search engine API key found in environment variables")
-
-
-@router.post("/process/web/search")
-async def process_web_search(request: Request, form_data: SearchForm, user=Depends(get_verified_user)):
-    urls = []
-    result_items = []
-
-    try:
-        logging.debug(f"trying to web search with {request.app.state.config.WEB_SEARCH_ENGINE, form_data.queries}")
-
-        search_tasks = [
-            run_in_threadpool(
-                search_web,
-                request,
-                request.app.state.config.WEB_SEARCH_ENGINE,
-                query,
-                user,
-            )
-            for query in form_data.queries
-        ]
-
-        search_results = await asyncio.gather(*search_tasks)
-
-        for result in search_results:
-            if result:
-                for item in result:
-                    if item and item.link:
-                        result_items.append(item)
-                        urls.append(item.link)
-
-        urls = list(dict.fromkeys(urls))
-        log.debug(f"urls: {urls}")
-
-    except Exception as e:
-        log.exception(e)
-
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ERROR_MESSAGES.WEB_SEARCH_ERROR(e),
-        )
-
-    if len(urls) == 0:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=ERROR_MESSAGES.DEFAULT("No results found from web search"),
-        )
-
-    try:
-        if request.app.state.config.BYPASS_WEB_SEARCH_WEB_LOADER:
-            flattened_results = [item for result in search_results for item in result if result]
-
-            docs = [
-                Document(
-                    page_content=result.snippet,
-                    metadata={
-                        "source": result.link,
-                        "title": result.title,
-                        "snippet": result.snippet,
-                        "link": result.link,
-                    },
-                )
-                for result in flattened_results
-                if hasattr(result, "snippet") and result.snippet is not None
-            ]
-        else:
-            loader = get_web_loader(
-                urls,
-                verify_ssl=request.app.state.config.ENABLE_WEB_LOADER_SSL_VERIFICATION,
-                requests_per_second=request.app.state.config.WEB_LOADER_CONCURRENT_REQUESTS,
-                trust_env=request.app.state.config.WEB_SEARCH_TRUST_ENV,
-            )
-            docs = await loader.aload()
-
-        urls = [
-            doc.metadata.get("source") for doc in docs if doc.metadata.get("source")
-        ]  # only keep the urls returned by the loader
-        result_items = [
-            dict(item) for item in result_items if item.link in urls
-        ]  # only keep the search results that have been loaded
-
-        if request.app.state.config.BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL:
-            return {
-                "status": True,
-                "collection_name": None,
-                "filenames": urls,
-                "items": result_items,
-                "docs": [
-                    {
-                        "content": doc.page_content,
-                        "metadata": doc.metadata,
-                    }
-                    for doc in docs
-                ],
-                "loaded_count": len(docs),
-            }
-        # Create a single collection for all documents
-        collection_name = f"web-search-{calculate_sha256_string('-'.join(form_data.queries))}"[:63]
-
-        try:
-            await run_in_threadpool(
-                save_docs_to_vector_db,
-                request,
-                docs,
-                collection_name,
-                overwrite=True,
-                user=user,
-            )
-        except Exception as e:
-            log.debug(f"error saving docs: {e}")
-
-        return {
-            "status": True,
-            "collection_names": [collection_name],
-            "items": result_items,
-            "filenames": urls,
-            "loaded_count": len(docs),
         }
     except Exception as e:
         log.exception(e)
