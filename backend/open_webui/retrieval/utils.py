@@ -646,6 +646,16 @@ def get_embedding_function(
     enable_async=True,
 ) -> Awaitable:
     if embedding_engine == "":
+        if embedding_function is None:
+
+            async def async_embedding_function(_query, _prefix=None, _user=None):
+                raise ValueError(
+                    "Internal embedding engine is unavailable (sentence-transformers/torch removed). "
+                    "Configure RAG_EMBEDDING_ENGINE to 'openai' or 'azure_openai'."
+                )
+
+            return async_embedding_function
+
         # Sentence transformers: CPU-bound sync operation
         async def async_embedding_function(query, prefix=None, user=None):
             return await asyncio.to_thread(
@@ -1078,13 +1088,18 @@ class RerankCompressor(BaseDocumentCompressor):
         if reranking:
             scores = self.reranking_function(query, documents)
         else:
-            from sentence_transformers import util
-
             query_embedding = await self.embedding_function(query, RAG_EMBEDDING_QUERY_PREFIX)
             document_embedding = await self.embedding_function(
                 [doc.page_content for doc in documents], RAG_EMBEDDING_CONTENT_PREFIX
             )
-            scores = util.cos_sim(query_embedding, document_embedding)[0]
+            import numpy as np
+
+            query_vec = np.asarray(query_embedding, dtype=np.float32)
+            doc_mat = np.asarray(document_embedding, dtype=np.float32)
+
+            query_norm = np.linalg.norm(query_vec) + 1e-12
+            doc_norms = np.linalg.norm(doc_mat, axis=1) + 1e-12
+            scores = (doc_mat @ query_vec) / (doc_norms * query_norm)
 
         if scores is not None:
             docs_with_scores = list(

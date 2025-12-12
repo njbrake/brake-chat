@@ -35,7 +35,6 @@ from open_webui.constants import ERROR_MESSAGES
 from open_webui.env import (
     AIOHTTP_CLIENT_SESSION_SSL,
     AIOHTTP_CLIENT_TIMEOUT,
-    DEVICE_TYPE,
     ENABLE_FORWARD_USER_INFO_HEADERS,
     SRC_LOG_LEVELS,
 )
@@ -116,7 +115,7 @@ def set_faster_whisper_model(model: str, auto_update: bool = False):
 
         faster_whisper_kwargs = {
             "model_size_or_path": model,
-            "device": DEVICE_TYPE if DEVICE_TYPE and DEVICE_TYPE == "cuda" else "cpu",
+            "device": "cpu",
             "compute_type": "int8",
             "download_root": WHISPER_MODEL_DIR,
             "local_files_only": not auto_update,
@@ -281,19 +280,6 @@ async def update_audio_config(request: Request, form_data: AudioConfigUpdateForm
             "MISTRAL_USE_CHAT_COMPLETIONS": request.app.state.config.AUDIO_STT_MISTRAL_USE_CHAT_COMPLETIONS,
         },
     }
-
-
-def load_speech_pipeline(request):
-    from datasets import load_dataset
-    from transformers import pipeline
-
-    if request.app.state.speech_synthesiser is None:
-        request.app.state.speech_synthesiser = pipeline("text-to-speech", "microsoft/speecht5_tts")
-
-    if request.app.state.speech_speaker_embeddings_dataset is None:
-        request.app.state.speech_speaker_embeddings_dataset = load_dataset(
-            "Matthijs/cmu-arctic-xvectors", split="validation"
-        )
 
 
 @router.post("/speech")
@@ -487,39 +473,10 @@ async def speech(request: Request, user=Depends(get_verified_user)):
             )
 
     elif request.app.state.config.TTS_ENGINE == "transformers":
-        payload = None
-        try:
-            payload = json.loads(body.decode("utf-8"))
-        except Exception as e:
-            log.exception(e)
-            raise HTTPException(status_code=400, detail="Invalid JSON payload")
-
-        import soundfile as sf
-        import torch
-
-        load_speech_pipeline(request)
-
-        embeddings_dataset = request.app.state.speech_speaker_embeddings_dataset
-
-        speaker_index = 6799
-        try:
-            speaker_index = embeddings_dataset["filename"].index(request.app.state.config.TTS_MODEL)
-        except Exception:
-            pass
-
-        speaker_embedding = torch.tensor(embeddings_dataset[speaker_index]["xvector"]).unsqueeze(0)
-
-        speech = request.app.state.speech_synthesiser(
-            payload["input"],
-            forward_params={"speaker_embeddings": speaker_embedding},
+        raise HTTPException(
+            status_code=400,
+            detail="TTS engine 'transformers' is not available (torch removed).",
         )
-
-        sf.write(file_path, speech["audio"], samplerate=speech["sampling_rate"])
-
-        async with aiofiles.open(file_body_path, "w") as f:
-            await f.write(json.dumps(payload))
-
-        return FileResponse(file_path)
 
 
 def transcription_handler(request, file_path, metadata, user=None):
