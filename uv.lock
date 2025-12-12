@@ -2543,7 +2543,6 @@ dependencies = [
     { name = "redis" },
     { name = "requests" },
     { name = "restrictedpython" },
-    { name = "ruff" },
     { name = "sentencepiece" },
     { name = "soundfile" },
     { name = "sqlalchemy" },
@@ -2589,6 +2588,7 @@ postgres = [
 [package.dev-dependencies]
 dev = [
     { name = "pytest-asyncio" },
+    { name = "ruff" },
 ]
 lint = [
     { name = "mypy" },
@@ -2688,7 +2688,6 @@ requires-dist = [
     { name = "redis" },
     { name = "requests", specifier = "==2.32.5" },
     { name = "restrictedpython", specifier = "==8.0" },
-    { name = "ruff", specifier = ">=0.8.0" },
     { name = "sentencepiece" },
     { name = "soundfile", specifier = "==0.13.1" },
     { name = "sqlalchemy", specifier = "==2.0.38" },
@@ -2705,7 +2704,10 @@ requires-dist = [
 provides-extras = ["all", "google", "postgres"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pytest-asyncio", specifier = ">=1.0.0" }]
+dev = [
+    { name = "pytest-asyncio", specifier = ">=1.0.0" },
+    { name = "ruff", specifier = "==0.14.9" },
+]
 lint = [
     { name = "mypy" },
     { name = "pre-commit", specifier = "==4.3.0" },

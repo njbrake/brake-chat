@@ -14,6 +14,7 @@ Brake Chat combines a SvelteKit frontend with a FastAPI backend; use this guide 
 - Install frontend deps: `npm install` (Node 18–22). Run UI: `npm run dev` (5173) or `npm run dev:5050`.
 - Build/preview: `npm run build`, `npm run preview`.
 - Lint/format/types: `npm run check`, `npm run lint`, `npm run lint:backend`, `npm run format`, `npm run format:backend`.
+- Before running `npm run format:backend`, install backend dev tools with `uv sync --group dev` (or `uv pip install -r requirements.txt --extra dev`).
 - Tests: `npm run test:frontend` (vitest) and `npm run cy:open` (Cypress).
 - Backend app: `cd backend && uv sync --locked` (or `uv pip install -r requirements.txt`), then `uv run uvicorn open_webui.main:app --reload --port 8080` or `./dev.sh`. Docker: `make install` to start, `make stop` to halt.
 
