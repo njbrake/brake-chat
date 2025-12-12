@@ -1179,15 +1179,15 @@
 	{/if}
 
 	<div class=" py-0.5 w-full justify-between">
-		<Tooltip
-			content={'This option enables or disables the use of the reasoning feature in Ollama, which allows the model to think before generating a response. When enabled, the model can take a moment to process the conversation context and generate a more thoughtful response.'}
-			placement="top-start"
-			className="inline-tooltip"
-		>
-			<div class=" py-0.5 flex w-full justify-between">
-				<div class=" self-center text-xs font-medium">
-					{'think'} ({'Ollama'})
-				</div>
+                <Tooltip
+                        content={'This option enables or disables the use of a reasoning feature, which allows the model to think before generating a response. When enabled, the model can take a moment to process the conversation context and generate a more thoughtful response.'}
+                        placement="top-start"
+                        className="inline-tooltip"
+                >
+                        <div class=" py-0.5 flex w-full justify-between">
+                                <div class=" self-center text-xs font-medium">
+                                        {'think'}
+                                </div>
 				<button
 					class="p-1 px-3 text-xs flex rounded-sm transition"
 					on:click={() => {
@@ -1215,7 +1215,7 @@
 		>
 			<div class=" py-0.5 flex w-full justify-between">
 				<div class=" self-center text-xs font-medium">
-					{'format'} ({'Ollama'})
+                                        {'format'}
 				</div>
 				<button
 					class="p-1 px-3 text-xs flex rounded-sm transition"
@@ -1252,7 +1252,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs font-medium">
-					{'num_keep'} ({'Ollama'})
+                                        {'num_keep'}
 				</div>
 
 				<button
@@ -1305,7 +1305,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs font-medium">
-					{'num_ctx'} ({'Ollama'})
+                                        {'num_ctx'}
 				</div>
 
 				<button
@@ -1358,7 +1358,7 @@
 		>
 			<div class="flex w-full justify-between">
 				<div class=" self-center text-xs font-medium">
-					{'num_batch'} ({'Ollama'})
+                                        {'num_batch'}
 				</div>
 
 				<button
@@ -1412,7 +1412,7 @@
 			>
 				<div class="flex w-full justify-between">
 					<div class=" self-center text-xs font-medium">
-						{'num_thread'} ({'Ollama'})
+                                                {'num_thread'}
 					</div>
 
 					<button
@@ -1466,7 +1466,7 @@
 			>
 				<div class="flex w-full justify-between">
 					<div class=" self-center text-xs font-medium">
-						{'num_gpu'} ({'Ollama'})
+                                                {'num_gpu'}
 					</div>
 
 					<button
@@ -1520,7 +1520,7 @@
 			>
 				<div class=" py-0.5 flex w-full justify-between">
 					<div class=" self-center text-xs font-medium">
-						{'keep_alive'} ({'Ollama'})
+                                                {'keep_alive'}
 					</div>
 					<button
 						class="p-1 px-3 text-xs flex rounded-sm transition"
