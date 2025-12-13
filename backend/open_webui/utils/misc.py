@@ -50,7 +50,6 @@ def is_string_allowed(string: str, filter_list: list[str] | None = None) -> bool
         return True
 
     allow_list, block_list = get_allow_block_lists(filter_list)
-    print(string, allow_list, block_list)
 
     # If allow list is non-empty, require domain to match one of them
     if allow_list:
