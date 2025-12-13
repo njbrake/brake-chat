@@ -22,8 +22,7 @@
 	export let show = false;
 	export let edit = false;
 
-	export let ollama = false;
-	export let direct = false;
+        export let direct = false;
 
 	export let connection = null;
 
@@ -105,11 +104,11 @@
 	const submitHandler = async () => {
 		loading = true;
 
-		if (!ollama && !url) {
-			loading = false;
-			toast.error('URL is required');
-			return;
-		}
+                if (!url) {
+                        loading = false;
+                        toast.error('URL is required');
+                        return;
+                }
 
 		if (azure) {
 			if (!apiVersion) {
@@ -160,9 +159,9 @@
 				connection_type: connectionType,
 				auth_type,
 				headers: headers ? JSON.parse(headers) : undefined,
-				...(!ollama && azure ? { azure: true, api_version: apiVersion } : {})
-			}
-		};
+                                ...(azure ? { azure: true, api_version: apiVersion } : {})
+                        }
+                };
 
 		await onSubmit(connection);
 
@@ -192,15 +191,11 @@
 			prefixId = connection.config?.prefix_id ?? '';
 			modelIds = connection.config?.model_ids ?? [];
 
-			if (ollama) {
-				connectionType = connection.config?.connection_type ?? 'local';
-			} else {
-				connectionType = connection.config?.connection_type ?? 'external';
-				azure = connection.config?.azure ?? false;
-				apiVersion = connection.config?.api_version ?? '';
-			}
-		}
-	};
+                        connectionType = connection.config?.connection_type ?? 'external';
+                        azure = connection.config?.azure ?? false;
+                        apiVersion = connection.config?.api_version ?? '';
+                }
+        };
 
 	$: if (show) {
 		init();
@@ -340,16 +335,14 @@
 											<option value="none">{'None'}</option>
 											<option value="bearer">{'Bearer'}</option>
 
-											{#if !ollama}
-												<option value="session">{'Session'}</option>
-												{#if !direct}
-													<option value="system_oauth">{'OAuth'}</option>
-													{#if azure}
-														<option value="microsoft_entra_id">{'Entra ID'}</option>
-													{/if}
-												{/if}
-											{/if}
-										</select>
+                                                                                        <option value="session">{'Session'}</option>
+                                                                                        {#if !direct}
+                                                                                                <option value="system_oauth">{'OAuth'}</option>
+                                                                                                {#if azure}
+                                                                                                        <option value="microsoft_entra_id">{'Entra ID'}</option>
+                                                                                                {/if}
+                                                                                        {/if}
+                                                                                </select>
 									</div>
 
 									<div class="flex flex-1 items-center">
@@ -385,7 +378,7 @@
 							</div>
 						</div>
 
-						{#if !ollama && !direct}
+                                                {#if !direct}
 							<div class="flex gap-2 mt-2">
 								<div class="flex flex-col w-full">
 									<label
@@ -438,7 +431,7 @@
 							</div>
 						</div>
 
-						{#if !ollama && !direct}
+                                                {#if !direct}
 							<div class="flex flex-row justify-between items-center w-full mt-2">
 								<label
 									for="prefix-id-input"
@@ -522,16 +515,11 @@
 									class={`text-gray-500 text-xs text-center py-2 px-10
 								${($settings?.highContrastMode ?? false) ? 'text-gray-800 dark:text-gray-100' : ''}`}
 								>
-									{#if ollama}
-										{'Leave empty to include all models from "{{url}}/api/tags" endpoint'.replace(
-											'{{' + 'url' + '}}',
-											url
-										)}
-									{:else if azure}
-										{'Deployment names are required for Azure OpenAI'}
-										<!-- {'Leave empty to include all models from "{{url}}" endpoint', {
-											url: `${url}/openai/deployments`
-										}} -->
+                                                                        {#if azure}
+                                                                                {'Deployment names are required for Azure OpenAI'}
+                                                                                <!-- {'Leave empty to include all models from "{{url}}" endpoint', {
+                                                                                        url: `${url}/openai/deployments`
+                                                                                }} -->
 									{:else}
 										{'Leave empty to include all models from "{{url}}/models" endpoint'.replace(
 											'{{' + 'url' + '}}',
