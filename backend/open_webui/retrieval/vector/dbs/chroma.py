@@ -1,8 +1,16 @@
+import importlib.util
 import logging
 
-import chromadb
-from chromadb import Settings
-from chromadb.utils.batch_utils import create_batches
+chromadb_spec = importlib.util.find_spec("chromadb")
+
+if chromadb_spec:
+    import chromadb
+    from chromadb import Settings
+    from chromadb.utils.batch_utils import create_batches
+else:
+    chromadb = None
+    Settings = None
+    create_batches = None
 from open_webui.config import (
     CHROMA_CLIENT_AUTH_CREDENTIALS,
     CHROMA_CLIENT_AUTH_PROVIDER,
@@ -29,6 +37,11 @@ log.setLevel(SRC_LOG_LEVELS["RAG"])
 
 class ChromaClient(VectorDBBase):
     def __init__(self):
+        if chromadb is None or Settings is None or create_batches is None:
+            raise RuntimeError(
+                "chromadb package is required to use the Chroma vector database backend."
+            )
+
         settings_dict = {
             "allow_reset": True,
             "anonymized_telemetry": False,

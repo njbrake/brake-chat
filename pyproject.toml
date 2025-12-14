@@ -51,7 +51,6 @@ dependencies = [
     "langchain-community==0.3.29",
 
     "fake-useragent==2.2.0",
-    "chromadb==1.0.20",
     "opensearch-py==2.8.0",
     "PyMySQL==1.1.1",
     "boto3==1.40.5",
@@ -83,11 +82,7 @@ dependencies = [
 
     "pillow==11.3.0",
     "opencv-python-headless==4.11.0.86",
-    "rapidocr-onnxruntime==1.4.4",
     "rank-bm25==0.2.2",
-
-    "onnxruntime==1.20.1",
-    "faster-whisper==1.1.1",
 
     "youtube-transcript-api==1.2.2",
     "pytube==15.0.0",

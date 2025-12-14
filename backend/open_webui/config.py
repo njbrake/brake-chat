@@ -1,3 +1,4 @@
+import importlib.util
 import json
 import logging
 import os
@@ -1713,7 +1714,15 @@ Responses from models: {{responses}}"""
 # Vector Database
 ####################################
 
-VECTOR_DB = os.environ.get("VECTOR_DB", "chroma")
+CHROMADB_AVAILABLE = importlib.util.find_spec("chromadb") is not None
+
+VECTOR_DB = os.environ.get("VECTOR_DB", "chroma" if CHROMADB_AVAILABLE else "none")
+
+if VECTOR_DB == "chroma" and not CHROMADB_AVAILABLE:
+    logging.getLogger(__name__).warning(
+        "chromadb package is not installed; falling back to VECTOR_DB=none"
+    )
+    VECTOR_DB = "none"
 
 # Chroma
 CHROMA_DATA_PATH = f"{DATA_DIR}/vector_db"
