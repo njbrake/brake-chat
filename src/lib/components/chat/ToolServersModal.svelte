@@ -13,6 +13,12 @@
 
 	export let show = false;
 	export let selectedToolIds = [];
+
+	let selectedToolServers = [];
+
+	$: selectedToolServers = ($toolServers ?? []).filter((_, idx) =>
+		selectedToolIds.includes(`direct_server:${idx}`)
+	);
 </script>
 
 <Modal bind:show size="md">
@@ -28,6 +34,48 @@
 				<XMark className={'size-5'} />
 			</button>
 		</div>
+
+		{#if selectedToolServers.length > 0}
+			<div class=" flex justify-between dark:text-gray-300 px-5 pb-0.5">
+				<div class=" text-base font-medium self-center">{'Selected Tool Servers'}</div>
+			</div>
+
+			<div class="px-5 pb-3 w-full flex flex-col justify-center">
+				<div class=" text-sm dark:text-gray-300 mb-1">
+					{#each selectedToolServers as toolServer}
+						<Collapsible buttonClassName="w-full" chevron>
+							<div>
+								<div class="text-sm font-medium dark:text-gray-100 text-gray-800">
+									{toolServer?.info?.title} - v{toolServer?.info?.version}
+								</div>
+
+								<div class="text-xs text-gray-500">
+									{toolServer?.info?.description}
+								</div>
+
+								<div class="text-xs text-gray-500">
+									{toolServer?.url}
+								</div>
+							</div>
+
+							<div slot="content">
+								{#each toolServer?.specs ?? [] as tool_spec}
+									<div class="my-1">
+										<div class="font-medium text-gray-800 dark:text-gray-100">
+											{tool_spec?.name}
+										</div>
+
+										<div>
+											{tool_spec?.description}
+										</div>
+									</div>
+								{/each}
+							</div>
+						</Collapsible>
+					{/each}
+				</div>
+			</div>
+		{/if}
 
 		{#if $toolServers.length > 0}
 			<div class=" flex justify-between dark:text-gray-300 px-5 pb-0.5">
