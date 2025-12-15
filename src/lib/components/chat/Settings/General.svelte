@@ -52,11 +52,7 @@
 		min_p: null,
 		stop: null,
 		tfs_z: null,
-		num_ctx: null,
-		num_batch: null,
-		num_keep: null,
-		max_tokens: null,
-		num_gpu: null
+		max_tokens: null
 	};
 
 	const saveHandler = async () => {
@@ -83,17 +79,9 @@
 				top_p: params.top_p !== null ? params.top_p : undefined,
 				min_p: params.min_p !== null ? params.min_p : undefined,
 				tfs_z: params.tfs_z !== null ? params.tfs_z : undefined,
-				num_ctx: params.num_ctx !== null ? params.num_ctx : undefined,
-				num_batch: params.num_batch !== null ? params.num_batch : undefined,
-				num_keep: params.num_keep !== null ? params.num_keep : undefined,
 				max_tokens: params.max_tokens !== null ? params.max_tokens : undefined,
 				use_mmap: params.use_mmap !== null ? params.use_mmap : undefined,
-				use_mlock: params.use_mlock !== null ? params.use_mlock : undefined,
-				num_thread: params.num_thread !== null ? params.num_thread : undefined,
-				num_gpu: params.num_gpu !== null ? params.num_gpu : undefined,
-				think: params.think !== null ? params.think : undefined,
-				keep_alive: params.keep_alive !== null ? params.keep_alive : undefined,
-				format: params.format !== null ? params.format : undefined
+				use_mlock: params.use_mlock !== null ? params.use_mlock : undefined
 			}
 		});
 		dispatch('save');
