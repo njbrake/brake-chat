@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getContext, onMount } from 'svelte';
-	import { models, config, toolServers, tools } from '$lib/stores';
+	import { models, config, toolServers } from '$lib/stores';
 
 	import { toast } from 'svelte-sonner';
 	import { deleteChatShareById, getChatById, shareChatById } from '$lib/apis/chats';
@@ -13,10 +13,6 @@
 
 	export let show = false;
 	export let selectedToolIds = [];
-
-	let selectedTools = [];
-
-	$: selectedTools = ($tools ?? []).filter((tool) => selectedToolIds.includes(tool.id));
 </script>
 
 <Modal bind:show size="md">
@@ -32,38 +28,6 @@
 				<XMark className={'size-5'} />
 			</button>
 		</div>
-
-		{#if selectedTools.length > 0}
-			{#if $toolServers.length > 0}
-				<div class=" flex justify-between dark:text-gray-300 px-5 pb-1">
-					<div class=" text-base font-medium self-center">{'Tools'}</div>
-				</div>
-			{/if}
-
-			<div class="px-5 pb-3 w-full flex flex-col justify-center">
-				<div class=" text-sm dark:text-gray-300 mb-1">
-					{#each selectedTools as tool}
-						<Collapsible buttonClassName="w-full mb-0.5">
-							<div class="truncate">
-								<div class="text-sm font-medium dark:text-gray-100 text-gray-800 truncate">
-									{tool?.name}
-								</div>
-
-								{#if tool?.meta?.description}
-									<div class="text-xs text-gray-500">
-										{tool?.meta?.description}
-									</div>
-								{/if}
-							</div>
-
-							<!-- <div slot="content">
-							{JSON.stringify(tool, null, 2)}
-						</div> -->
-						</Collapsible>
-					{/each}
-				</div>
-			</div>
-		{/if}
 
 		{#if $toolServers.length > 0}
 			<div class=" flex justify-between dark:text-gray-300 px-5 pb-0.5">

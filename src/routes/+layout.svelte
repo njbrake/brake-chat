@@ -153,7 +153,6 @@
 	};
 
 	const executeTool = async (data, cb) => {
-		// MCP tool servers are now handled server-side
 		if (cb) {
 			cb(
 				JSON.parse(

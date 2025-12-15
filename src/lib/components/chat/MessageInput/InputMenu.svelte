@@ -4,7 +4,7 @@
 	import { fly } from 'svelte/transition';
 	import { flyAndScale } from '$lib/utils/transitions';
 
-	import { config, user, tools as _tools, mobile, knowledge, chats } from '$lib/stores';
+	import { config, user, mobile, knowledge, chats } from '$lib/stores';
 	import { getKnowledgeBases } from '$lib/apis/knowledge';
 
 	import { createPicker } from '$lib/utils/google-drive-picker';

@@ -120,7 +120,6 @@
 	};
 
 	const setToolServers = async () => {
-		// MCP tool servers are now handled server-side
 		toolServers.set([]);
 	};
 

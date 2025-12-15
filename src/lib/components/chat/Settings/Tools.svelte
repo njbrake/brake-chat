@@ -29,7 +29,6 @@
 			toolServers: servers
 		});
 
-		// MCP tool servers are now handled server-side
 		toolServers.set([]);
 	};
 

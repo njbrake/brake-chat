@@ -18,7 +18,6 @@
 		models,
 		config,
 		showCallOverlay,
-		tools,
 		toolServers,
 		user as _user,
 		showControls,
@@ -864,9 +863,6 @@
 		dropzoneElement?.addEventListener('dragover', onDragOver);
 		dropzoneElement?.addEventListener('drop', onDrop);
 		dropzoneElement?.addEventListener('dragleave', onDragLeave);
-
-		// Custom tools removed - only MCP tool servers supported now
-		tools.set([]);
 	});
 
 	onDestroy(() => {

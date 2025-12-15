@@ -62,7 +62,6 @@ export const models: Writable<Model[]> = writable([]);
 
 export const prompts: Writable<null | Prompt[]> = writable(null);
 export const knowledge: Writable<null | Document[]> = writable(null);
-export const tools = writable(null);
 export const functions = writable(null);
 
 export const toolServers = writable([]);

@@ -34,7 +34,6 @@
 		chatTitle,
 		showArtifacts,
 		artifactContents,
-		tools,
 		toolServers,
 		functions,
 		selectedFolder,
@@ -252,8 +251,6 @@
 	};
 
 	const setDefaults = async () => {
-		// Custom tools removed - only MCP tool servers supported now
-		tools.set([]);
 		if (!$functions) {
 			functions.set(await getFunctions(localStorage.token));
 		}
@@ -263,15 +260,6 @@
 
 		const model = atSelectedModel ?? $models.find((m) => m.id === selectedModels[0]);
 		if (model) {
-			// Set Default Tools
-			if (model?.info?.meta?.toolIds) {
-				selectedToolIds = [
-					...new Set(
-						[...(model?.info?.meta?.toolIds ?? [])].filter((id) => $tools.find((t) => t.id === id))
-					)
-				];
-			}
-
 			// Set Default Filters (Toggleable only)
 			if (model?.info?.meta?.defaultFilterIds) {
 				selectedFilterIds = model.info.meta.defaultFilterIds.filter((id) =>
