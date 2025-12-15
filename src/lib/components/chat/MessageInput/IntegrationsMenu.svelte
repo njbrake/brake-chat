@@ -4,10 +4,9 @@
 	import { fly } from 'svelte/transition';
 	import { flyAndScale } from '$lib/utils/transitions';
 
-	import { config, user, tools as _tools, mobile, settings, toolServers } from '$lib/stores';
+	import { config, user, mobile, settings, toolServers } from '$lib/stores';
 
 	import { getOAuthClientAuthorizationUrl } from '$lib/apis/configs';
-	import { getTools } from '$lib/apis/tools';
 
 	import Knobs from '$lib/components/icons/Knobs.svelte';
 	import Dropdown from '$lib/components/common/Dropdown.svelte';
@@ -50,21 +49,7 @@
 		($user?.role === 'admin' || $user?.permissions?.chat?.file_upload);
 
 	const init = async () => {
-		if ($_tools === null) {
-			await _tools.set(await getTools(localStorage.token));
-		}
-
-		if ($_tools) {
-			tools = $_tools.reduce((a, tool, i, arr) => {
-				a[tool.id] = {
-					name: tool.name,
-					description: tool.meta.description,
-					enabled: selectedToolIds.includes(tool.id),
-					...tool
-				};
-				return a;
-			}, {});
-		}
+		tools = {};
 
 		if ($toolServers) {
 			for (const serverIdx in $toolServers) {

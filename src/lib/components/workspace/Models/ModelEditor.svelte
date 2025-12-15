@@ -2,17 +2,15 @@
 	import { toast } from 'svelte-sonner';
 
 	import { onMount, getContext, tick } from 'svelte';
-	import { models, tools, functions, knowledge as knowledgeCollections, user } from '$lib/stores';
+	import { models, functions, knowledge as knowledgeCollections, user } from '$lib/stores';
 	import { WEBUI_BASE_URL } from '$lib/constants';
 
-	import { getTools } from '$lib/apis/tools';
 	import { getFunctions } from '$lib/apis/functions';
 	import { getKnowledgeBases } from '$lib/apis/knowledge';
 
 	import AdvancedParams from '$lib/components/chat/Settings/Advanced/AdvancedParams.svelte';
 	import Tags from '$lib/components/common/Tags.svelte';
 	import Knowledge from '$lib/components/workspace/Models/Knowledge.svelte';
-	import ToolsSelector from '$lib/components/workspace/Models/ToolsSelector.svelte';
 	import FiltersSelector from '$lib/components/workspace/Models/FiltersSelector.svelte';
 	import ActionsSelector from '$lib/components/workspace/Models/ActionsSelector.svelte';
 	import Capabilities from '$lib/components/workspace/Models/Capabilities.svelte';
@@ -213,7 +211,6 @@
 	};
 
 	onMount(async () => {
-		await tools.set(await getTools(localStorage.token));
 		await functions.set(await getFunctions(localStorage.token));
 		await knowledgeCollections.set([...(await getKnowledgeBases(localStorage.token))]);
 
@@ -677,10 +674,6 @@
 
 					<div class="my-2">
 						<Knowledge bind:selectedItems={knowledge} />
-					</div>
-
-					<div class="my-2">
-						<ToolsSelector bind:selectedToolIds={toolIds} tools={$tools} />
 					</div>
 
 					<div class="my-2">

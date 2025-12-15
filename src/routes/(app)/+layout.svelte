@@ -14,7 +14,6 @@
 	import { getModels, getVersionUpdates } from '$lib/apis';
 	import { getAllChatTags } from '$lib/apis/chats';
 	import { getPrompts } from '$lib/apis/prompts';
-	import { getTools } from '$lib/apis/tools';
 	import { getBanners } from '$lib/apis/configs';
 	import { getUserSettings } from '$lib/apis/users';
 
@@ -28,7 +27,6 @@
 		models,
 		prompts,
 		knowledge,
-		tools,
 		functions,
 		tags,
 		banners,
@@ -136,16 +134,6 @@
 		}
 	};
 
-	const setTools = async () => {
-		try {
-			const toolsData = await getTools(localStorage.token);
-			tools.set(toolsData);
-		} catch (error) {
-			console.error('Failed to load tools:', error);
-			tools.set([]);
-		}
-	};
-
 	onMount(async () => {
 		if ($user === undefined || $user === null) {
 			await goto('/auth');
@@ -159,7 +147,6 @@
 		await Promise.all([
 			checkLocalDBChats(),
 			setBanners(),
-			setTools(),
 			setUserSettings(async () => {
 				await Promise.all([setModels(), setToolServers()]);
 			})

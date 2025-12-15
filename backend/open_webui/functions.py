@@ -30,7 +30,6 @@ from open_webui.utils.payload import (
 from open_webui.utils.plugin import (
     get_function_module_from_cache,
 )
-from open_webui.utils.tools import get_tools
 
 logging.basicConfig(stream=sys.stdout, level=GLOBAL_LOG_LEVEL)
 log = logging.getLogger(__name__)
@@ -236,17 +235,6 @@ async def generate_function_chat_completion(request, form_data, user, models: di
         "__oauth_token__": oauth_token,
         "__request__": request,
     }
-    extra_params["__tools__"] = await get_tools(
-        request,
-        tool_ids,
-        user,
-        {
-            **extra_params,
-            "__model__": models.get(form_data["model"], None),
-            "__messages__": form_data["messages"],
-            "__files__": files,
-        },
-    )
 
     if model_info:
         if model_info.base_model_id:

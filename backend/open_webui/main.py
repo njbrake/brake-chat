@@ -268,7 +268,6 @@ from open_webui.config import (
     TITLE_GENERATION_PROMPT_TEMPLATE,
     # Tool Server Configs
     TOOL_SERVER_CONNECTIONS,
-    TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE,
     USER_PERMISSIONS,
     VOICE_MODE_PROMPT_TEMPLATE,
     WEB_LOADER_CONCURRENT_REQUESTS,
@@ -352,7 +351,6 @@ from open_webui.routers import (
     retrieval,
     scim,
     tasks,
-    tools,
     users,
     utils,
 )
@@ -413,7 +411,7 @@ from open_webui.utils.oauth import (
     encrypt_data,
     get_oauth_client_info_with_dynamic_client_registration,
 )
-from open_webui.utils.plugin import install_tool_and_function_dependencies
+from open_webui.utils.plugin import install_function_dependencies
 from open_webui.utils.redis import get_redis_connection, get_sentinels_from_env
 from open_webui.utils.security_headers import SecurityHeadersMiddleware
 
@@ -470,7 +468,7 @@ async def lifespan(app: FastAPI):
     # This should be blocking (sync) so functions are not deactivated on first /get_models calls
     # when the first user lands on the / route.
     log.info("Installing external dependencies of functions and tools...")
-    install_tool_and_function_dependencies()
+    install_function_dependencies()
 
     app.state.redis = get_redis_connection(
         redis_url=REDIS_URL,
@@ -687,9 +685,6 @@ app.state.WEBUI_AUTH_SIGNOUT_REDIRECT_URL = WEBUI_AUTH_SIGNOUT_REDIRECT_URL
 app.state.EXTERNAL_PWA_MANIFEST_URL = EXTERNAL_PWA_MANIFEST_URL
 
 app.state.USER_COUNT = None
-
-app.state.TOOLS = {}
-app.state.TOOL_CONTENTS = {}
 
 app.state.FUNCTIONS = {}
 app.state.FUNCTION_CONTENTS = {}
@@ -973,7 +968,6 @@ app.state.config.TAGS_GENERATION_PROMPT_TEMPLATE = TAGS_GENERATION_PROMPT_TEMPLA
 app.state.config.IMAGE_PROMPT_GENERATION_PROMPT_TEMPLATE = IMAGE_PROMPT_GENERATION_PROMPT_TEMPLATE
 app.state.config.FOLLOW_UP_GENERATION_PROMPT_TEMPLATE = FOLLOW_UP_GENERATION_PROMPT_TEMPLATE
 
-app.state.config.TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE = TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE
 app.state.config.QUERY_GENERATION_PROMPT_TEMPLATE = QUERY_GENERATION_PROMPT_TEMPLATE
 app.state.config.AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE = AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE
 app.state.config.AUTOCOMPLETE_GENERATION_INPUT_MAX_LENGTH = AUTOCOMPLETE_GENERATION_INPUT_MAX_LENGTH
@@ -1145,7 +1139,6 @@ app.include_router(chats.router, prefix="/api/v1/chats", tags=["chats"])
 app.include_router(models.router, prefix="/api/v1/models", tags=["models"])
 app.include_router(knowledge.router, prefix="/api/v1/knowledge", tags=["knowledge"])
 app.include_router(prompts.router, prefix="/api/v1/prompts", tags=["prompts"])
-app.include_router(tools.router, prefix="/api/v1/tools", tags=["tools"])
 
 app.include_router(memories.router, prefix="/api/v1/memories", tags=["memories"])
 app.include_router(folders.router, prefix="/api/v1/folders", tags=["folders"])
@@ -1315,15 +1308,6 @@ async def chat_completion(
         if model_info_params.get("reasoning_tags") is not None:
             reasoning_tags = model_info_params.get("reasoning_tags")
 
-        function_calling_param = form_data.get("params", {}).get("function_calling")
-        model_function_calling_param = model_info_params.get("function_calling")
-
-        if function_calling_param not in ("native", "default"):
-            function_calling_param = model_function_calling_param
-
-        if function_calling_param not in ("native", "default"):
-            function_calling_param = "native"
-
         metadata = {
             "user_id": user.id,
             "chat_id": form_data.pop("chat_id", None),
@@ -1340,7 +1324,6 @@ async def chat_completion(
             "params": {
                 "stream_delta_chunk_size": stream_delta_chunk_size,
                 "reasoning_tags": reasoning_tags,
-                "function_calling": function_calling_param,
             },
         }
 

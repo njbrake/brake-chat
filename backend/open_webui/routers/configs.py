@@ -14,9 +14,6 @@ from open_webui.utils.oauth import (
     get_discovery_urls,
     get_oauth_client_info_with_dynamic_client_registration,
 )
-from open_webui.utils.tools import (
-    set_tool_servers,
-)
 from pydantic import BaseModel, ConfigDict
 
 router = APIRouter()
@@ -166,7 +163,8 @@ async def set_tool_servers_config(
         connection.model_dump() for connection in form_data.TOOL_SERVER_CONNECTIONS
     ]
 
-    await set_tool_servers(request)
+    # Reset tool servers state
+    request.app.state.TOOL_SERVERS = []
 
     for connection in request.app.state.config.TOOL_SERVER_CONNECTIONS:
         server_id = connection.get("info", {}).get("id")

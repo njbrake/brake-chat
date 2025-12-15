@@ -133,9 +133,6 @@
 			...(toolIds.length > 0
 				? {
 						tool_ids: toolIds
-						// params: {
-						// 	function_calling: 'native'
-						// }
 					}
 				: {}),
 

@@ -38,7 +38,6 @@
 		ENABLE_TAGS_GENERATION: true,
 		ENABLE_RETRIEVAL_QUERY_GENERATION: true,
 		QUERY_GENERATION_PROMPT_TEMPLATE: '',
-		TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE: '',
 		VOICE_MODE_PROMPT_TEMPLATE: ''
 	};
 
@@ -381,7 +380,8 @@
 						placement="top-start"
 					>
 						<Textarea
-							bind:value={taskConfig.TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE}
+							disabled
+							value=""
 							placeholder={'Leave empty to use the default prompt, or enter a custom prompt'}
 						/>
 					</Tooltip>

@@ -8,8 +8,7 @@
 		mobile,
 		models,
 		prompts,
-		knowledge,
-		tools
+		knowledge
 	} from '$lib/stores';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
@@ -30,8 +29,6 @@
 				$page.url.pathname.includes('/prompts') &&
 				!$user?.permissions?.workspace?.prompts
 			) {
-				goto('/');
-			} else if ($page.url.pathname.includes('/tools') && !$user?.permissions?.workspace?.tools) {
 				goto('/');
 			}
 		}
@@ -103,17 +100,6 @@
 									: 'text-gray-300 dark:text-gray-600 hover:text-gray-700 dark:hover:text-white'} transition"
 								href="/workspace/prompts">{'Prompts'}</a
 							>
-						{/if}
-
-						{#if $user?.role === 'admin' || $user?.permissions?.workspace?.tools}
-							<a
-								class="min-w-fit p-1.5 {$page.url.pathname.includes('/workspace/tools')
-									? ''
-									: 'text-gray-300 dark:text-gray-600 hover:text-gray-700 dark:hover:text-white'} transition"
-								href="/workspace/tools"
-							>
-								{'Tools'}
-							</a>
 						{/if}
 					</div>
 				</div>

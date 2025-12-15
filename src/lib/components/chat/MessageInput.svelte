@@ -45,7 +45,6 @@
 	import { generateAutoCompletion } from '$lib/apis';
 	import { deleteFileById } from '$lib/apis/files';
 	import { getSessionUser } from '$lib/apis/auths';
-	import { getTools } from '$lib/apis/tools';
 
 	import { WEBUI_BASE_URL, WEBUI_API_BASE_URL, PASTED_TEXT_CHARACTER_LIMIT } from '$lib/constants';
 
@@ -432,7 +431,7 @@
 		.reduce((acc, filters) => acc.filter((f1) => filters.some((f2) => f2.id === f1.id)));
 
 	let showToolsButton = false;
-	$: showToolsButton = ($tools ?? []).length > 0 || ($toolServers ?? []).length > 0;
+	$: showToolsButton = ($toolServers ?? []).length > 0;
 
 	let showImageGenerationButton = false;
 	$: showImageGenerationButton =
@@ -866,7 +865,8 @@
 		dropzoneElement?.addEventListener('drop', onDrop);
 		dropzoneElement?.addEventListener('dragleave', onDragLeave);
 
-		await tools.set(await getTools(localStorage.token));
+		// Custom tools removed - only MCP tool servers supported now
+		tools.set([]);
 	});
 
 	onDestroy(() => {

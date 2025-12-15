@@ -73,7 +73,6 @@
 		stopTask,
 		getTaskIdsByChatId
 	} from '$lib/apis';
-	import { getTools } from '$lib/apis/tools';
 	import { uploadFile } from '$lib/apis/files';
 	import { createOpenAITextStream } from '$lib/apis/streaming';
 	import { getFunctions } from '$lib/apis/functions';
@@ -253,9 +252,8 @@
 	};
 
 	const setDefaults = async () => {
-		if (!$tools) {
-			tools.set(await getTools(localStorage.token));
-		}
+		// Custom tools removed - only MCP tool servers supported now
+		tools.set([]);
 		if (!$functions) {
 			functions.set(await getFunctions(localStorage.token));
 		}

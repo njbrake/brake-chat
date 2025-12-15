@@ -11,7 +11,6 @@ from uuid import uuid4
 from fastapi import HTTPException, Request
 from fastapi.responses import HTMLResponse
 from open_webui.config import (
-    DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE,
     DEFAULT_VOICE_MODE_PROMPT_TEMPLATE,
 )
 from open_webui.constants import TASKS
@@ -66,7 +65,6 @@ from open_webui.utils.misc import (
     add_or_update_user_message,
     convert_logit_bias_input_to_json,
     deep_update,
-    get_content_from_message,
     get_last_assistant_message,
     get_last_user_message,
     get_last_user_message_item,
@@ -76,11 +74,8 @@ from open_webui.utils.misc import (
 )
 from open_webui.utils.payload import apply_system_prompt_to_body
 from open_webui.utils.task import (
-    get_task_model_id,
     rag_template,
-    tools_function_calling_generation_template,
 )
-from open_webui.utils.tools import get_tools, get_updated_tool_function
 from open_webui.utils.webhook import post_webhook
 from starlette.responses import JSONResponse, StreamingResponse
 
@@ -232,223 +227,6 @@ def process_tool_result(
         tool_result = json.dumps(tool_result, indent=2, ensure_ascii=False)
 
     return tool_result, tool_result_files, tool_result_embeds
-
-
-async def chat_completion_tools_handler(
-    request: Request, body: dict, extra_params: dict, user: UserModel, models, tools
-) -> tuple[dict, dict]:
-    async def get_content_from_response(response) -> str | None:
-        content = None
-        if hasattr(response, "body_iterator"):
-            async for chunk in response.body_iterator:
-                data = json.loads(chunk.decode("utf-8", "replace"))
-                content = data["choices"][0]["message"]["content"]
-
-            # Cleanup any remaining background tasks if necessary
-            if response.background is not None:
-                await response.background()
-        else:
-            content = response["choices"][0]["message"]["content"]
-        return content
-
-    def get_tools_function_calling_payload(messages, task_model_id, content):
-        user_message = get_last_user_message(messages)
-
-        if user_message and messages and messages[-1]["role"] == "user":
-            # Remove the last user message to avoid duplication
-            messages = messages[:-1]
-
-        recent_messages = messages[-4:] if len(messages) > 4 else messages
-        chat_history = "\n".join(
-            f'{message["role"].upper()}: """{get_content_from_message(message)}"""' for message in recent_messages
-        )
-
-        prompt = f"History:\n{chat_history}\nQuery: {user_message}" if chat_history else f"Query: {user_message}"
-
-        return {
-            "model": task_model_id,
-            "messages": [
-                {"role": "system", "content": content},
-                {"role": "user", "content": prompt},
-            ],
-            "stream": False,
-            "metadata": {"task": str(TASKS.FUNCTION_CALLING)},
-        }
-
-    event_caller = extra_params["__event_call__"]
-    event_emitter = extra_params["__event_emitter__"]
-    metadata = extra_params["__metadata__"]
-
-    task_model_id = get_task_model_id(
-        body["model"],
-        request.app.state.config.TASK_MODEL,
-        request.app.state.config.TASK_MODEL_EXTERNAL,
-        models,
-    )
-
-    skip_files = False
-    sources = []
-
-    specs = [tool["spec"] for tool in tools.values()]
-    tools_specs = json.dumps(specs)
-
-    if request.app.state.config.TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE != "":
-        template = request.app.state.config.TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE
-    else:
-        template = DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE
-
-    tools_function_calling_prompt = tools_function_calling_generation_template(template, tools_specs)
-    payload = get_tools_function_calling_payload(body["messages"], task_model_id, tools_function_calling_prompt)
-
-    try:
-        response = await generate_chat_completion(request, form_data=payload, user=user)
-        log.debug(f"{response=}")
-        content = await get_content_from_response(response)
-        log.debug(f"{content=}")
-
-        if not content:
-            return body, {}
-
-        try:
-            content = content[content.find("{") : content.rfind("}") + 1]
-            if not content:
-                raise Exception("No JSON object found in the response")
-
-            result = json.loads(content)
-
-            async def tool_call_handler(tool_call):
-                nonlocal skip_files
-
-                log.debug(f"{tool_call=}")
-
-                tool_function_name = tool_call.get("name", None)
-                if tool_function_name not in tools:
-                    return body, {}
-
-                tool_function_params = tool_call.get("parameters", {})
-
-                tool = None
-                tool_type = ""
-                direct_tool = False
-
-                try:
-                    tool = tools[tool_function_name]
-                    tool_type = tool.get("type", "")
-                    direct_tool = tool.get("direct", False)
-
-                    spec = tool.get("spec", {})
-                    allowed_params = spec.get("parameters", {}).get("properties", {}).keys()
-                    tool_function_params = {k: v for k, v in tool_function_params.items() if k in allowed_params}
-
-                    if tool.get("direct", False):
-                        tool_result = await event_caller(
-                            {
-                                "type": "execute:tool",
-                                "data": {
-                                    "id": str(uuid4()),
-                                    "name": tool_function_name,
-                                    "params": tool_function_params,
-                                    "server": tool.get("server", {}),
-                                    "session_id": metadata.get("session_id", None),
-                                },
-                            }
-                        )
-                    else:
-                        tool_function = tool["callable"]
-                        tool_result = await tool_function(**tool_function_params)
-
-                except Exception as e:
-                    tool_result = str(e)
-
-                tool_result, tool_result_files, tool_result_embeds = process_tool_result(
-                    request,
-                    tool_function_name,
-                    tool_result,
-                    tool_type,
-                    direct_tool,
-                    metadata,
-                    user,
-                )
-
-                if event_emitter:
-                    if tool_result_files:
-                        await event_emitter(
-                            {
-                                "type": "files",
-                                "data": {
-                                    "files": tool_result_files,
-                                },
-                            }
-                        )
-
-                    if tool_result_embeds:
-                        await event_emitter(
-                            {
-                                "type": "embeds",
-                                "data": {
-                                    "embeds": tool_result_embeds,
-                                },
-                            }
-                        )
-
-                print(
-                    f"Tool {tool_function_name} result: {tool_result}",
-                    tool_result_files,
-                    tool_result_embeds,
-                )
-
-                if tool_result:
-                    tool = tools[tool_function_name]
-                    tool_id = tool.get("tool_id", "")
-
-                    tool_name = f"{tool_id}/{tool_function_name}" if tool_id else f"{tool_function_name}"
-
-                    # Citation is enabled for this tool
-                    sources.append(
-                        {
-                            "source": {
-                                "name": (f"{tool_name}"),
-                            },
-                            "document": [str(tool_result)],
-                            "metadata": [
-                                {
-                                    "source": (f"{tool_name}"),
-                                    "parameters": tool_function_params,
-                                }
-                            ],
-                            "tool_result": True,
-                        }
-                    )
-
-                    # Citation is not enabled for this tool
-                    body["messages"] = add_or_update_user_message(
-                        f"\nTool `{tool_name}` Output: {tool_result}",
-                        body["messages"],
-                    )
-
-                    if tools[tool_function_name].get("metadata", {}).get("file_handler", False):
-                        skip_files = True
-
-            # check if "tool_calls" in result
-            if result.get("tool_calls"):
-                for tool_call in result.get("tool_calls"):
-                    await tool_call_handler(tool_call)
-            else:
-                await tool_call_handler(result)
-
-        except Exception as e:
-            log.debug(f"Error: {e}")
-            content = None
-    except Exception as e:
-        log.debug(f"Error: {e}")
-        content = None
-
-    log.debug(f"tool_contexts: {sources}")
-
-    if skip_files and "files" in body.get("metadata", {}):
-        del body["metadata"]["files"]
-
-    return body, {"sources": sources}
 
 
 async def chat_memory_handler(request: Request, form_data: dict, extra_params: dict, user):
@@ -804,7 +582,6 @@ def apply_params_to_form_data(form_data, model):
     open_webui_params = {
         "stream_response": bool,
         "stream_delta_chunk_size": int,
-        "function_calling": str,
         "reasoning_tags": list,
         "system": str,
     }
@@ -888,13 +665,6 @@ async def process_chat_payload(request, form_data, user, metadata, model):
         }
     else:
         models = request.app.state.MODELS
-
-    task_model_id = get_task_model_id(
-        form_data["model"],
-        request.app.state.config.TASK_MODEL,
-        request.app.state.config.TASK_MODEL_EXTERNAL,
-        models,
-    )
 
     events = []
     sources = []
@@ -1156,20 +926,8 @@ async def process_chat_payload(request, form_data, user, metadata, model):
                         )
                     continue
 
-        tools_dict = await get_tools(
-            request,
-            tool_ids,
-            user,
-            {
-                **extra_params,
-                "__model__": models[task_model_id],
-                "__messages__": form_data["messages"],
-                "__files__": metadata.get("files", []),
-            },
-        )
-
-        if mcp_tools_dict:
-            tools_dict = {**tools_dict, **mcp_tools_dict}
+        # Only MCP tools are supported now
+        tools_dict = mcp_tools_dict if mcp_tools_dict else {}
 
     if direct_tool_servers:
         for tool_server in direct_tool_servers:
@@ -1186,21 +944,8 @@ async def process_chat_payload(request, form_data, user, metadata, model):
         metadata["mcp_clients"] = mcp_clients
 
     if tools_dict:
-        if metadata.get("params", {}).get("function_calling") == "native":
-            # If the function calling is native, then call the tools function calling handler
-            metadata["tools"] = tools_dict
-            form_data["tools"] = [
-                {"type": "function", "function": tool.get("spec", {})} for tool in tools_dict.values()
-            ]
-        else:
-            # If the function calling is not native, then call the tools function calling handler
-            try:
-                form_data, flags = await chat_completion_tools_handler(
-                    request, form_data, extra_params, user, models, tools_dict
-                )
-                sources.extend(flags.get("sources", []))
-            except Exception as e:
-                log.exception(e)
+        metadata["tools"] = tools_dict
+        form_data["tools"] = [{"type": "function", "function": tool.get("spec", {})} for tool in tools_dict.values()]
 
     try:
         form_data, flags = await chat_completion_files_handler(request, form_data, extra_params, user)
@@ -2408,14 +2153,8 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                                     )
 
                                 else:
-                                    tool_function = get_updated_tool_function(
-                                        function=tool["callable"],
-                                        extra_params={
-                                            "__messages__": form_data.get("messages", []),
-                                            "__files__": metadata.get("files", []),
-                                        },
-                                    )
-
+                                    # Directly call MCP tool function
+                                    tool_function = tool["callable"]
                                     tool_result = await tool_function(**tool_function_params)
 
                             except Exception as e:
