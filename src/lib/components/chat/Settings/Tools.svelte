@@ -2,7 +2,6 @@
 	import { toast } from 'svelte-sonner';
 	import { createEventDispatcher, onMount, getContext, tick } from 'svelte';
 	import { getModels as _getModels } from '$lib/apis';
-	import { getToolServerConnections } from '$lib/apis/configs';
 
 	const dispatch = createEventDispatcher();
 	import { models, settings, toolServers, user } from '$lib/stores';
@@ -30,12 +29,7 @@
 			toolServers: servers
 		});
 
-		try {
-			const connections = await getToolServerConnections(localStorage.token);
-			toolServers.set(connections ?? []);
-		} catch (error) {
-			console.error('Failed to reload tool servers:', error);
-		}
+		toolServers.set(servers);
 	};
 
 	onMount(async () => {
