@@ -430,7 +430,7 @@
 		.reduce((acc, filters) => acc.filter((f1) => filters.some((f2) => f2.id === f1.id)));
 
 	let showToolsButton = false;
-	$: showToolsButton = ($toolServers ?? []).length > 0;
+	$: showToolsButton = Array.isArray($toolServers) && $toolServers.length > 0;
 
 	let showImageGenerationButton = false;
 	$: showImageGenerationButton =

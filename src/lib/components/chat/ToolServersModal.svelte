@@ -16,9 +16,9 @@
 
 	let selectedToolServers = [];
 
-	$: selectedToolServers = ($toolServers ?? []).filter((_, idx) =>
-		selectedToolIds.includes(`direct_server:${idx}`)
-	);
+	$: selectedToolServers = Array.isArray($toolServers)
+		? $toolServers.filter((_, idx) => selectedToolIds.includes(`direct_server:${idx}`))
+		: [];
 </script>
 
 <Modal bind:show size="md">
@@ -77,7 +77,7 @@
 			</div>
 		{/if}
 
-		{#if $toolServers.length > 0}
+		{#if Array.isArray($toolServers) && $toolServers.length > 0}
 			<div class=" flex justify-between dark:text-gray-300 px-5 pb-0.5">
 				<div class=" text-base font-medium self-center">{'Tool Servers'}</div>
 			</div>

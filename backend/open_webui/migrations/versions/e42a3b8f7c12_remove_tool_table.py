@@ -1,7 +1,7 @@
 """Remove tool table
 
 Revision ID: e42a3b8f7c12
-Revises: d31026856c01
+Revises: 37f288994c47
 Create Date: 2025-12-15 10:24:35.000000
 
 """
@@ -11,7 +11,7 @@ from alembic import op
 from open_webui.internal.db import JSONField
 
 revision = "e42a3b8f7c12"
-down_revision = "d31026856c01"
+down_revision = "37f288994c47"
 branch_labels = None
 depends_on = None
 

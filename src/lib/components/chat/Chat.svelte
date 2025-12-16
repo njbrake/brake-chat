@@ -1832,9 +1832,11 @@
 
 				filter_ids: selectedFilterIds.length > 0 ? selectedFilterIds : undefined,
 				tool_ids: toolIds.length > 0 ? toolIds : undefined,
-				tool_servers: ($toolServers ?? []).filter(
-					(server, idx) => toolServerIds.includes(idx) || toolServerIds.includes(server?.id)
-				),
+				tool_servers: Array.isArray($toolServers)
+					? $toolServers.filter(
+							(server, idx) => toolServerIds.includes(idx) || toolServerIds.includes(server?.id)
+						)
+					: [],
 				features: getFeatures(),
 				variables: {
 					...getPromptVariables($user?.name, $settings?.userLocation ? userLocation : undefined)

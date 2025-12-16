@@ -51,17 +51,16 @@
 	const init = async () => {
 		tools = {};
 
-		if ($toolServers) {
-			for (const serverIdx in $toolServers) {
-				const server = $toolServers[serverIdx];
-				if (server.info) {
+		if (Array.isArray($toolServers)) {
+			$toolServers.forEach((server, serverIdx) => {
+				if (server?.info) {
 					tools[`direct_server:${serverIdx}`] = {
 						name: server?.info?.title ?? server.url,
 						description: server.info.description ?? '',
 						enabled: selectedToolIds.includes(`direct_server:${serverIdx}`)
 					};
 				}
-			}
+			});
 		}
 
 		selectedToolIds = selectedToolIds.filter((id) => Object.keys(tools).includes(id));
