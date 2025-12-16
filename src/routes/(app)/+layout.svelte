@@ -14,7 +14,7 @@
 	import { getModels, getVersionUpdates } from '$lib/apis';
 	import { getAllChatTags } from '$lib/apis/chats';
 	import { getPrompts } from '$lib/apis/prompts';
-	import { getBanners } from '$lib/apis/configs';
+	import { getBanners, getToolServerConnections } from '$lib/apis/configs';
 	import { getUserSettings } from '$lib/apis/users';
 
 	import { WEBUI_VERSION } from '$lib/constants';
@@ -120,7 +120,13 @@
 	};
 
 	const setToolServers = async () => {
-		toolServers.set([]);
+		try {
+			const connections = await getToolServerConnections(localStorage.token);
+			toolServers.set(connections ?? []);
+		} catch (error) {
+			console.error('Failed to load tool servers:', error);
+			toolServers.set([]);
+		}
 	};
 
 	const setBanners = async () => {
