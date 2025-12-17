@@ -228,6 +228,7 @@ class ChatTable:
 
                 return ChatModel.model_validate(chat_item)
         except Exception:
+            log.exception(f"Error updating chat id={id}")
             return None
 
     def update_chat_title_by_id(self, id: str, title: str) -> ChatModel | None:
@@ -395,6 +396,7 @@ class ChatTable:
 
                 return ChatModel.model_validate(shared_chat)
         except Exception:
+            log.exception(f"Error updating shared chat for chat_id={chat_id}")
             return None
 
     def delete_shared_chat_by_chat_id(self, chat_id: str) -> bool:
@@ -405,6 +407,7 @@ class ChatTable:
 
                 return True
         except Exception:
+            log.exception(f"Error deleting shared chat for chat_id={chat_id}")
             return False
 
     def unarchive_all_chats_by_user_id(self, user_id: str) -> bool:
@@ -414,6 +417,7 @@ class ChatTable:
                 db.commit()
                 return True
         except Exception:
+            log.exception(f"Error unarchiving chats for user_id={user_id}")
             return False
 
     def update_chat_share_id_by_id(self, id: str, share_id: str | None) -> ChatModel | None:
@@ -425,6 +429,7 @@ class ChatTable:
                 db.refresh(chat)
                 return ChatModel.model_validate(chat)
         except Exception:
+            log.exception(f"Error updating share_id for chat id={id}")
             return None
 
     def toggle_chat_pinned_by_id(self, id: str) -> ChatModel | None:
@@ -437,6 +442,7 @@ class ChatTable:
                 db.refresh(chat)
                 return ChatModel.model_validate(chat)
         except Exception:
+            log.exception(f"Error toggling pinned for chat id={id}")
             return None
 
     def toggle_chat_archive_by_id(self, id: str) -> ChatModel | None:
@@ -450,6 +456,7 @@ class ChatTable:
                 db.refresh(chat)
                 return ChatModel.model_validate(chat)
         except Exception:
+            log.exception(f"Error toggling archive for chat id={id}")
             return None
 
     def archive_all_chats_by_user_id(self, user_id: str) -> bool:
@@ -459,6 +466,7 @@ class ChatTable:
                 db.commit()
                 return True
         except Exception:
+            log.exception(f"Error archiving all chats for user_id={user_id}")
             return False
 
     def get_archived_chat_list_by_user_id(
@@ -608,6 +616,7 @@ class ChatTable:
 
                 return ChatModel.model_validate(chat_item)
         except Exception:
+            log.exception(f"Error retrieving chat by id={id}")
             return None
 
     def get_chat_by_share_id(self, id: str) -> ChatModel | None:
@@ -621,6 +630,7 @@ class ChatTable:
                     return self.get_chat_by_id(id)
                 return None
         except Exception:
+            log.exception(f"Error retrieving chat by share_id={id}")
             return None
 
     def get_chat_by_id_and_user_id(self, id: str, user_id: str) -> ChatModel | None:
@@ -629,6 +639,7 @@ class ChatTable:
                 chat = db.query(Chat).filter_by(id=id, user_id=user_id).first()
                 return ChatModel.model_validate(chat)
         except Exception:
+            log.exception(f"Error retrieving chat id={id} for user_id={user_id}")
             return None
 
     def get_chats(self, skip: int = 0, limit: int = 50) -> list[ChatModel]:
@@ -895,6 +906,7 @@ class ChatTable:
                 db.refresh(chat)
                 return ChatModel.model_validate(chat)
         except Exception:
+            log.exception(f"Error updating folder_id for chat id={id}")
             return None
 
     def get_chat_tags_by_id_and_user_id(self, id: str, user_id: str) -> list[TagModel]:
@@ -947,6 +959,7 @@ class ChatTable:
                 db.refresh(chat)
                 return ChatModel.model_validate(chat)
         except Exception:
+            log.exception(f"Error adding tag to chat id={id}")
             return None
 
     def count_chats_by_tag_name_and_user_id(self, tag_name: str, user_id: str) -> int:
@@ -1004,6 +1017,7 @@ class ChatTable:
                 db.commit()
                 return True
         except Exception:
+            log.exception(f"Error deleting tag from chat id={id}")
             return False
 
     def delete_all_tags_by_id_and_user_id(self, id: str, user_id: str) -> bool:
@@ -1018,6 +1032,7 @@ class ChatTable:
 
                 return True
         except Exception:
+            log.exception(f"Error deleting all tags from chat id={id}")
             return False
 
     def delete_chat_by_id(self, id: str) -> bool:
@@ -1028,6 +1043,7 @@ class ChatTable:
 
                 return True and self.delete_shared_chat_by_chat_id(id)
         except Exception:
+            log.exception(f"Error deleting chat id={id}")
             return False
 
     def delete_chat_by_id_and_user_id(self, id: str, user_id: str) -> bool:
@@ -1038,6 +1054,7 @@ class ChatTable:
 
                 return True and self.delete_shared_chat_by_chat_id(id)
         except Exception:
+            log.exception(f"Error deleting chat id={id} for user_id={user_id}")
             return False
 
     def delete_chats_by_user_id(self, user_id: str) -> bool:
@@ -1050,6 +1067,7 @@ class ChatTable:
 
                 return True
         except Exception:
+            log.exception(f"Error deleting chats for user_id={user_id}")
             return False
 
     def delete_chats_by_user_id_and_folder_id(self, user_id: str, folder_id: str) -> bool:
@@ -1060,6 +1078,7 @@ class ChatTable:
 
                 return True
         except Exception:
+            log.exception(f"Error deleting chats for user_id={user_id} folder_id={folder_id}")
             return False
 
     def move_chats_by_user_id_and_folder_id(self, user_id: str, folder_id: str, new_folder_id: str | None) -> bool:
@@ -1070,6 +1089,7 @@ class ChatTable:
 
                 return True
         except Exception:
+            log.exception(f"Error moving chats for user_id={user_id} from folder_id={folder_id}")
             return False
 
     def delete_shared_chats_by_user_id(self, user_id: str) -> bool:
@@ -1083,6 +1103,7 @@ class ChatTable:
 
                 return True
         except Exception:
+            log.exception(f"Error deleting shared chats for user_id={user_id}")
             return False
 
 

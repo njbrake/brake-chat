@@ -116,6 +116,7 @@ class KnowledgeTable:
                     return KnowledgeModel.model_validate(result)
                 return None
             except Exception:
+                log.exception(f"Error inserting new knowledge name={form_data.name}")
                 return None
 
     def get_knowledge_bases(self) -> list[KnowledgeUserModel]:
@@ -165,6 +166,7 @@ class KnowledgeTable:
                 knowledge = db.query(Knowledge).filter_by(id=id).first()
                 return KnowledgeModel.model_validate(knowledge) if knowledge else None
         except Exception:
+            log.exception(f"Error retrieving knowledge by id={id}")
             return None
 
     def update_knowledge_by_id(
@@ -208,6 +210,7 @@ class KnowledgeTable:
                 db.commit()
                 return True
         except Exception:
+            log.exception(f"Error deleting knowledge id={id}")
             return False
 
     def delete_all_knowledge(self) -> bool:
@@ -218,6 +221,7 @@ class KnowledgeTable:
 
                 return True
             except Exception:
+                log.exception("Error deleting all knowledge")
                 return False
 
 

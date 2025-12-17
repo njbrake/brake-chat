@@ -117,6 +117,7 @@ class FolderTable:
 
                 return FolderModel.model_validate(folder)
         except Exception:
+            log.exception(f"Error retrieving folder id={id} for user_id={user_id}")
             return None
 
     def get_children_folders_by_id_and_user_id(self, id: str, user_id: str) -> list[FolderModel] | None:
@@ -137,6 +138,7 @@ class FolderTable:
                 get_children(folder)
                 return folders
         except Exception:
+            log.exception(f"Error retrieving children folders for id={id} user_id={user_id}")
             return None
 
     def get_folders_by_user_id(self, user_id: str) -> list[FolderModel]:

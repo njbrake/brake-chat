@@ -70,6 +70,7 @@ class TagTable:
                 tag = db.query(Tag).filter_by(id=id, user_id=user_id).first()
                 return TagModel.model_validate(tag)
         except Exception:
+            log.exception(f"Error retrieving tag name={name} for user_id={user_id}")
             return None
 
     def get_tags_by_user_id(self, user_id: str) -> list[TagModel]:
