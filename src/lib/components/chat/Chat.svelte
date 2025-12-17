@@ -1640,10 +1640,6 @@
 						: false
 			};
 
-		if ($settings?.memory ?? false) {
-			features = { ...features, memory: true };
-		}
-
 		return features;
 	};
 

@@ -33,7 +33,6 @@ from open_webui.routers.images import (
     image_edits,
     image_generations,
 )
-from open_webui.routers.memories import QueryMemoryForm, query_memory
 from open_webui.routers.tasks import (
     generate_chat_tags,
     generate_follow_ups,
@@ -443,36 +442,6 @@ async def chat_completion_tools_handler(
     return body, {"sources": sources}
 
 
-async def chat_memory_handler(request: Request, form_data: dict, extra_params: dict, user):
-    try:
-        results = await query_memory(
-            request,
-            QueryMemoryForm(content=get_last_user_message(form_data["messages"]) or "", k=3),
-            user,
-        )
-    except Exception as e:
-        log.debug(e)
-        results = None
-
-    user_context = ""
-    if results and hasattr(results, "documents"):
-        if results.documents and len(results.documents) > 0:
-            for doc_idx, doc in enumerate(results.documents[0]):
-                created_at_date = "Unknown Date"
-
-                if results.metadatas[0][doc_idx].get("created_at"):
-                    created_at_timestamp = results.metadatas[0][doc_idx]["created_at"]
-                    created_at_date = time.strftime("%Y-%m-%d", time.localtime(created_at_timestamp))
-
-                user_context += f"{doc_idx + 1}. [{created_at_date}] {doc}\n"
-    if user_context.strip() != "":
-        form_data["messages"] = add_or_update_system_message(
-            f"User Context:\n{user_context}\n", form_data["messages"], append=True
-        )
-
-    return form_data
-
-
 def get_last_images(message_list):
     images = []
     for message in reversed(message_list):
@@ -834,7 +803,7 @@ def apply_params_to_form_data(form_data, model):
 
 
 async def process_chat_payload(request, form_data, user, metadata, model):
-    # Pipeline Inlet -> Filter Inlet -> Chat Memory -> Chat Web Search -> Chat Image Generation
+    # Pipeline Inlet -> Filter Inlet -> Chat Web Search -> Chat Image Generation
     # -> (Default) Chat Tools Function Calling
     # -> Chat Files
 
@@ -965,9 +934,6 @@ async def process_chat_payload(request, form_data, user, metadata, model):
                     template,
                     form_data["messages"],
                 )
-
-        if features.get("memory"):
-            form_data = await chat_memory_handler(request, form_data, extra_params, user)
 
         if features.get("image_generation"):
             form_data = await chat_image_generation_handler(request, form_data, extra_params, user)
