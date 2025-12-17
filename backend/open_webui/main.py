@@ -313,7 +313,6 @@ from open_webui.env import (
     REDIS_SENTINEL_PORT,
     REDIS_URL,
     RESET_CONFIG_ON_START,
-    SAFE_MODE,
     SCIM_TOKEN,
     SRC_LOG_LEVELS,
     VERSION,
@@ -328,7 +327,6 @@ from open_webui.env import (
 )
 from open_webui.internal.db import Session, engine
 from open_webui.models.chats import Chats
-from open_webui.models.functions import Functions
 from open_webui.models.models import Models
 from open_webui.models.users import Users
 from open_webui.routers import (
@@ -340,7 +338,6 @@ from open_webui.routers import (
     evaluations,
     files,
     folders,
-    functions,
     groups,
     images,
     knowledge,
@@ -387,9 +384,6 @@ from open_webui.utils.auth import (
     get_verified_user,
 )
 from open_webui.utils.chat import (
-    chat_action as chat_action_handler,
-)
-from open_webui.utils.chat import (
     chat_completed as chat_completed_handler,
 )
 from open_webui.utils.chat import (
@@ -412,13 +406,8 @@ from open_webui.utils.oauth import (
     encrypt_data,
     get_oauth_client_info_with_dynamic_client_registration,
 )
-from open_webui.utils.plugin import install_tool_and_function_dependencies
 from open_webui.utils.redis import get_redis_connection, get_sentinels_from_env
 from open_webui.utils.security_headers import SecurityHeadersMiddleware
-
-if SAFE_MODE:
-    print("SAFE MODE ENABLED")
-    Functions.deactivate_all_functions()
 
 logging.basicConfig(stream=sys.stdout, level=GLOBAL_LOG_LEVEL)
 log = logging.getLogger(__name__)
@@ -465,11 +454,6 @@ async def lifespan(app: FastAPI):
 
     if LICENSE_KEY:
         get_license_data(app, LICENSE_KEY)
-
-    # This should be blocking (sync) so functions are not deactivated on first /get_models calls
-    # when the first user lands on the / route.
-    log.info("Installing external dependencies of functions and tools...")
-    install_tool_and_function_dependencies()
 
     app.state.redis = get_redis_connection(
         redis_url=REDIS_URL,
@@ -689,9 +673,6 @@ app.state.USER_COUNT = None
 
 app.state.TOOLS = {}
 app.state.TOOL_CONTENTS = {}
-
-app.state.FUNCTIONS = {}
-app.state.FUNCTION_CONTENTS = {}
 
 ########################################
 #
@@ -1149,7 +1130,6 @@ app.include_router(memories.router, prefix="/api/v1/memories", tags=["memories"]
 app.include_router(folders.router, prefix="/api/v1/folders", tags=["folders"])
 app.include_router(groups.router, prefix="/api/v1/groups", tags=["groups"])
 app.include_router(files.router, prefix="/api/v1/files", tags=["files"])
-app.include_router(functions.router, prefix="/api/v1/functions", tags=["functions"])
 app.include_router(evaluations.router, prefix="/api/v1/evaluations", tags=["evaluations"])
 app.include_router(utils.router, prefix="/api/v1/utils", tags=["utils"])
 
@@ -1478,23 +1458,6 @@ async def chat_completed(request: Request, form_data: dict, user=Depends(get_ver
             request.state.model = model_item
 
         return await chat_completed_handler(request, form_data, user)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
-
-
-@app.post("/api/chat/actions/{action_id}")
-async def chat_action(request: Request, action_id: str, form_data: dict, user=Depends(get_verified_user)):
-    try:
-        model_item = form_data.pop("model_item", {})
-
-        if model_item.get("direct", False):
-            request.state.direct = True
-            request.state.model = model_item
-
-        return await chat_action_handler(request, action_id, form_data, user)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

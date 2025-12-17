@@ -25,7 +25,6 @@ from open_webui.env import (
 )
 from open_webui.models.chats import Chats
 from open_webui.models.folders import Folders
-from open_webui.models.functions import Functions
 from open_webui.models.users import UserModel, Users
 from open_webui.retrieval.utils import get_sources_from_items
 from open_webui.routers.images import (
@@ -52,10 +51,6 @@ from open_webui.utils.files import (
     convert_markdown_base64_images,
     get_file_url_from_base64,
     get_image_url_from_base64,
-)
-from open_webui.utils.filter import (
-    get_sorted_filter_ids,
-    process_filter_functions,
 )
 from open_webui.utils.mcp.client import MCPClient
 from open_webui.utils.misc import (
@@ -957,22 +952,6 @@ async def process_chat_payload(request, form_data, user, metadata, model):
 
     form_data.pop("variables", None)
 
-    try:
-        filter_functions = [
-            Functions.get_function_by_id(filter_id)
-            for filter_id in get_sorted_filter_ids(request, model, metadata.get("filter_ids", []))
-        ]
-
-        form_data, flags = await process_filter_functions(
-            request=request,
-            filter_functions=filter_functions,
-            filter_type="inlet",
-            form_data=form_data,
-            extra_params=extra_params,
-        )
-    except Exception as e:
-        raise Exception(f"{e}")
-
     features = form_data.pop("features", None)
     if features:
         if features.get("voice"):
@@ -1623,30 +1602,6 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
     ):
         return response
 
-    oauth_token = None
-    try:
-        if request.cookies.get("oauth_session_id", None):
-            oauth_token = await request.app.state.oauth_manager.get_oauth_token(
-                user.id,
-                request.cookies.get("oauth_session_id", None),
-            )
-    except Exception as e:
-        log.error(f"Error getting OAuth token: {e}")
-
-    extra_params = {
-        "__event_emitter__": event_emitter,
-        "__event_call__": event_caller,
-        "__user__": user.model_dump() if isinstance(user, UserModel) else {},
-        "__metadata__": metadata,
-        "__oauth_token__": oauth_token,
-        "__request__": request,
-        "__model__": model,
-    }
-    filter_functions = [
-        Functions.get_function_by_id(filter_id)
-        for filter_id in get_sorted_filter_ids(request, model, metadata.get("filter_ids", []))
-    ]
-
     # Streaming response
     if event_emitter and event_caller:
         _task_id = str(uuid4())  # Create a unique task ID.
@@ -2035,14 +1990,6 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
 
                         try:
                             data = json.loads(data)
-
-                            data, _ = await process_filter_functions(
-                                request=request,
-                                filter_functions=filter_functions,
-                                filter_type="stream",
-                                form_data=data,
-                                extra_params={"__body__": form_data, **extra_params},
-                            )
 
                             if data:
                                 if "event" in data and not getattr(request.state, "direct", False):
@@ -2540,26 +2487,10 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
             return f"data: {item}\n\n"
 
         for event in events:
-            event, _ = await process_filter_functions(
-                request=request,
-                filter_functions=filter_functions,
-                filter_type="stream",
-                form_data=event,
-                extra_params=extra_params,
-            )
-
             if event:
                 yield wrap_item(json.dumps(event))
 
         async for data in original_generator:
-            data, _ = await process_filter_functions(
-                request=request,
-                filter_functions=filter_functions,
-                filter_type="stream",
-                form_data=data,
-                extra_params=extra_params,
-            )
-
             if data:
                 yield data
 

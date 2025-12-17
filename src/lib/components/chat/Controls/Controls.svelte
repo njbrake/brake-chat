@@ -3,7 +3,6 @@
 	const dispatch = createEventDispatcher();
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import AdvancedParams from '../Settings/Advanced/AdvancedParams.svelte';
-	import Valves from '$lib/components/chat/Controls/Valves.svelte';
 	import FileItem from '$lib/components/common/FileItem.svelte';
 	import Collapsible from '$lib/components/common/Collapsible.svelte';
 
@@ -11,8 +10,6 @@
 	export let models = [];
 	export let chatFiles = [];
 	export let params = {};
-
-	let showValves = false;
 </script>
 
 <div class=" dark:text-white">
@@ -55,16 +52,6 @@
 								}}
 							/>
 						{/each}
-					</div>
-				</Collapsible>
-
-				<hr class="my-2 border-gray-50 dark:border-gray-700/10" />
-			{/if}
-
-			{#if $user?.role === 'admin' || ($user?.permissions.chat?.valves ?? true)}
-				<Collapsible bind:open={showValves} title={'Valves'} buttonClassName="w-full">
-					<div class="text-sm" slot="content">
-						<Valves show={showValves} />
 					</div>
 				</Collapsible>
 

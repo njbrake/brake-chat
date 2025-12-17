@@ -60,25 +60,11 @@
 							href="/admin">{'Users'}</a
 						>
 
-						<!-- <a
-							class="min-w-fit p-1.5 {$page.url.pathname.includes('/admin/analytics')
-								? ''
-								: 'text-gray-300 dark:text-gray-600 hover:text-gray-700 dark:hover:text-white'} transition"
-							href="/admin/analytics">{'Analytics'}</a
-						> -->
-
 						<a
 							class="min-w-fit p-1.5 {$page.url.pathname.includes('/admin/evaluations')
 								? ''
 								: 'text-gray-300 dark:text-gray-600 hover:text-gray-700 dark:hover:text-white'} transition"
 							href="/admin/evaluations">{'Evaluations'}</a
-						>
-
-						<a
-							class="min-w-fit p-1.5 {$page.url.pathname.includes('/admin/functions')
-								? ''
-								: 'text-gray-300 dark:text-gray-600 hover:text-gray-700 dark:hover:text-white'} transition"
-							href="/admin/functions">{'Functions'}</a
 						>
 
 						<a
