@@ -36,7 +36,6 @@
 		artifactContents,
 		tools,
 		toolServers,
-		functions,
 		selectedFolder,
 		pinnedChats,
 		showEmbeds
@@ -76,7 +75,6 @@
 	import { getTools } from '$lib/apis/tools';
 	import { uploadFile } from '$lib/apis/files';
 	import { createOpenAITextStream } from '$lib/apis/streaming';
-	import { getFunctions } from '$lib/apis/functions';
 	import { updateFolderById } from '$lib/apis/folders';
 
 	import Banner from '../common/Banner.svelte';
@@ -255,9 +253,6 @@
 	const setDefaults = async () => {
 		if (!$tools) {
 			tools.set(await getTools(localStorage.token));
-		}
-		if (!$functions) {
-			functions.set(await getFunctions(localStorage.token));
 		}
 		if (selectedModels.length !== 1 && !atSelectedModel) {
 			return;
