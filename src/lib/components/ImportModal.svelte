@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
-	import { getContext, onMount } from 'svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
@@ -8,7 +7,7 @@
 
 	export let show = false;
 
-	export let onImport = (e) => {};
+	export let onImport = () => {};
 	export let onClose = () => {};
 
 	export let loadUrlHandler: Function = () => {};

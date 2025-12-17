@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Checkbox from '$lib/components/common/Checkbox.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	export let tools = [];
 

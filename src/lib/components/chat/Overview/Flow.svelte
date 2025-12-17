@@ -11,8 +11,6 @@
 		BackgroundVariant,
 		ControlButton
 	} from '@xyflow/svelte';
-	import BarsArrowUp from '$lib/components/icons/BarsArrowUp.svelte';
-	import Bars3BottomLeft from '$lib/components/icons/Bars3BottomLeft.svelte';
 	import AlignVertical from '$lib/components/icons/AlignVertical.svelte';
 	import AlignHorizontal from '$lib/components/icons/AlignHorizontal.svelte';
 

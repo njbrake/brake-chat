@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { getContext, createEventDispatcher, onDestroy } from 'svelte';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 	import { useSvelteFlow, useNodesInitialized, useStore } from '@xyflow/svelte';
 
 	const dispatch = createEventDispatcher();
 	import { onMount, tick } from 'svelte';
 
 	import { writable } from 'svelte/store';
-	import { models, showOverview, theme, user } from '$lib/stores';
+	import { models, showOverview, user } from '$lib/stores';
 
 	import '@xyflow/svelte/dist/style.css';
 

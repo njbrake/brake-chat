@@ -3,8 +3,7 @@
 	const { saveAs } = fileSaver;
 
 	import { downloadDatabase } from '$lib/apis/utils';
-	import { onMount, getContext } from 'svelte';
-	import { config, user } from '$lib/stores';
+	import { config } from '$lib/stores';
 	import { toast } from 'svelte-sonner';
 	import { getAllUserChats } from '$lib/apis/chats';
 	import { getAllUsers } from '$lib/apis/users';
@@ -40,10 +39,6 @@
 		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 		saveAs(blob, 'users.csv');
 	};
-
-	onMount(async () => {
-		// permissions = await getUserPermissions(localStorage.token);
-	});
 </script>
 
 <form

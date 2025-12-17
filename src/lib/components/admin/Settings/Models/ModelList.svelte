@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Sortable from 'sortablejs';
 
-	import { createEventDispatcher, getContext, onMount } from 'svelte';
 	import { models } from '$lib/stores';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import EllipsisVertical from '$lib/components/icons/EllipsisVertical.svelte';
@@ -32,7 +31,7 @@
 			sortable = new Sortable(modelListElement, {
 				animation: 150,
 				handle: '.model-item-handle',
-				onUpdate: async (event) => {
+				onUpdate: async () => {
 					positionChangeHandler();
 				}
 			});

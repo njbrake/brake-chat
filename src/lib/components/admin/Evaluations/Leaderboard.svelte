@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, getContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import { models } from '$lib/stores';
 
 	import ModelModal from './LeaderboardModal.svelte';
@@ -10,7 +10,7 @@
 
 	import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
 	import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
-	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
+	import { WEBUI_API_BASE_URL } from '$lib/constants';
 	const EMBEDDING_MODEL = 'TaylorAI/bge-micro-v2';
 
 	let tokenizer = null;

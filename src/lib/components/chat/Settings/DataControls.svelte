@@ -2,14 +2,7 @@
 	import fileSaver from 'file-saver';
 	const { saveAs } = fileSaver;
 
-	import {
-		chats,
-		user,
-		settings,
-		scrollPaginationEnabled,
-		currentChatPage,
-		pinnedChats
-	} from '$lib/stores';
+	import { chats, user, scrollPaginationEnabled, currentChatPage, pinnedChats } from '$lib/stores';
 
 	import {
 		deleteAllChats,
@@ -19,7 +12,6 @@
 		importChats
 	} from '$lib/apis/chats';
 	import { getImportOrigin, convertOpenAIChats } from '$lib/utils';
-	import { onMount, getContext } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
 	import ArchivedChatsModal from '$lib/components/layout/ArchivedChatsModal.svelte';

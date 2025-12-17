@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Switch } from 'bits-ui';
 
-	import { createEventDispatcher, tick, getContext } from 'svelte';
+	import { createEventDispatcher, tick } from 'svelte';
 	import { settings } from '$lib/stores';
 
 	import Tooltip from './Tooltip.svelte';

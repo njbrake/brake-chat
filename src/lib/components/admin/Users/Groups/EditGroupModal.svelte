@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { toast } from 'svelte-sonner';
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import General from './General.svelte';

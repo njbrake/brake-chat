@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
-	import { createEventDispatcher, onMount, getContext } from 'svelte';
-	const dispatch = createEventDispatcher();
+	import { onMount } from 'svelte';
 
 	import { getBackendConfig } from '$lib/apis';
 	import {
@@ -17,7 +16,6 @@
 
 	import { TTS_RESPONSE_SPLIT } from '$lib/types';
 
-	import type { Writable } from 'svelte/store';
 	import Textarea from '$lib/components/common/Textarea.svelte';
 
 	export let saveHandler: () => void;
@@ -104,7 +102,7 @@
 		try {
 			openaiParams = TTS_OPENAI_PARAMS ? JSON.parse(TTS_OPENAI_PARAMS) : {};
 			TTS_OPENAI_PARAMS = JSON.stringify(openaiParams, null, 2);
-		} catch (e) {
+		} catch {
 			toast.error('Invalid JSON format for Parameters');
 			return;
 		}
@@ -201,7 +199,6 @@
 	class="flex flex-col h-full justify-between space-y-3 text-sm"
 	on:submit|preventDefault={async () => {
 		await updateConfigHandler();
-		dispatch('save');
 	}}
 >
 	<div class=" space-y-3 overflow-y-scroll scrollbar-hidden h-full">

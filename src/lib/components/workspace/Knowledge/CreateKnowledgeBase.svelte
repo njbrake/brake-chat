@@ -1,6 +1,5 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { getContext } from 'svelte';
 	import { createNewKnowledge, getKnowledgeBases } from '$lib/apis/knowledge';
 	import { toast } from 'svelte-sonner';
 	import { knowledge, user } from '$lib/stores';

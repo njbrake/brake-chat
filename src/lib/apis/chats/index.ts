@@ -128,7 +128,7 @@ export const addChatTagById = async (token: string, id: string, tagName: string)
 	return api.post(`/chats/${id}/tags`, { tag_name: tagName, chat_id: id }, token);
 };
 
-export const deleteChatTagById = async (token: string, id: string, tagName: string) => {
+export const deleteChatTagById = async (token: string, id: string) => {
 	return api.delete(`/chats/${id}/tags`, token);
 };
 
@@ -181,7 +181,11 @@ export const unpinChatById = async (token: string, id: string) => {
 };
 
 export const searchChats = async (token: string, text: string, page: number = 1) => {
-	const res = await api.post('/chats/search', { text, page }, token);
+	const searchParams = new URLSearchParams();
+	searchParams.append('text', text);
+	searchParams.append('page', `${page}`);
+
+	const res = await api.get(`/chats/search?${searchParams.toString()}`, token);
 	return res.map((chat) => ({
 		...chat,
 		time_range: getTimeRange(chat.updated_at)

@@ -12,7 +12,6 @@
 	import MessageInput from './MessageInput.svelte';
 	import Navbar from './Navbar.svelte';
 	import Drawer from '../common/Drawer.svelte';
-	import EllipsisVertical from '../icons/EllipsisVertical.svelte';
 	import Thread from './Thread.svelte';
 
 	export let id = '';

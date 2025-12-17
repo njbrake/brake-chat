@@ -1,22 +1,15 @@
 <script lang="ts">
-	import { v4 as uuidv4 } from 'uuid';
-
 	import fileSaver from 'file-saver';
 	const { saveAs } = fileSaver;
 
 	import { toast } from 'svelte-sonner';
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { settings } from '$lib/stores';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import Plus from '$lib/components/icons/Plus.svelte';
-	import Minus from '$lib/components/icons/Minus.svelte';
-	import PencilSolid from '$lib/components/icons/PencilSolid.svelte';
 	import SensitiveInput from '$lib/components/common/SensitiveInput.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Switch from '$lib/components/common/Switch.svelte';
-	import Tags from './common/Tags.svelte';
 	import Collapsible from '$lib/components/common/Collapsible.svelte';
-	import { getToolServerData } from '$lib/apis';
 	import { verifyToolServerConnection, registerOAuthClient } from '$lib/apis/configs';
 	import AccessControl from './workspace/common/AccessControl.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
@@ -73,7 +66,7 @@
 				client_id: id
 			},
 			'mcp'
-		).catch((err) => {
+		).catch(() => {
 			toast.error('Registration failed');
 			return null;
 		});
@@ -103,7 +96,7 @@
 					throw new Error('Headers must be a valid JSON object');
 				}
 				headers = JSON.stringify(_headers, null, 2);
-			} catch (error) {
+			} catch {
 				toast.error('Headers must be a valid JSON object');
 				return;
 			}
@@ -123,7 +116,7 @@
 				name,
 				description
 			}
-		}).catch((err) => {
+		}).catch(() => {
 			toast.error('Connection failed');
 		});
 
@@ -174,7 +167,7 @@
 				}
 
 				toast.success('Import successful');
-			} catch (error) {
+			} catch {
 				toast.error('Please select a valid JSON file');
 			}
 		};
@@ -230,7 +223,7 @@
 					throw new Error('Headers must be a valid JSON object');
 				}
 				headers = JSON.stringify(_headers, null, 2);
-			} catch (error) {
+			} catch {
 				toast.error('Headers must be a valid JSON object');
 				loading = false;
 				return;

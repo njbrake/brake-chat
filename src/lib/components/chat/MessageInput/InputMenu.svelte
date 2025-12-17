@@ -1,27 +1,19 @@
 <script lang="ts">
 	import { DropdownMenu } from 'bits-ui';
-	import { getContext, onMount, tick } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { flyAndScale } from '$lib/utils/transitions';
 
-	import { config, user, tools as _tools, mobile, knowledge, chats } from '$lib/stores';
+	import { config, user, knowledge, chats } from '$lib/stores';
 	import { getKnowledgeBases } from '$lib/apis/knowledge';
-
-	import { createPicker } from '$lib/utils/google-drive-picker';
 
 	import Dropdown from '$lib/components/common/Dropdown.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
-	import DocumentArrowUp from '$lib/components/icons/DocumentArrowUp.svelte';
 	import Camera from '$lib/components/icons/Camera.svelte';
 	import Clip from '$lib/components/icons/Clip.svelte';
-	import ChatBubbleOval from '$lib/components/icons/ChatBubbleOval.svelte';
-	import Refresh from '$lib/components/icons/Refresh.svelte';
-	import Agile from '$lib/components/icons/Agile.svelte';
 	import ClockRotateRight from '$lib/components/icons/ClockRotateRight.svelte';
 	import Database from '$lib/components/icons/Database.svelte';
 	import ChevronRight from '$lib/components/icons/ChevronRight.svelte';
 	import ChevronLeft from '$lib/components/icons/ChevronLeft.svelte';
-	import PageEdit from '$lib/components/icons/PageEdit.svelte';
 	import Chats from './InputMenu/Chats.svelte';
 	import Knowledge from './InputMenu/Knowledge.svelte';
 	import AttachWebpageModal from './AttachWebpageModal.svelte';

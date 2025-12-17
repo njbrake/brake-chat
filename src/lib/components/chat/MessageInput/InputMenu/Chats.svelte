@@ -1,6 +1,6 @@
 <script lang="ts">
 	import dayjs from 'dayjs';
-	import { onMount, tick, getContext } from 'svelte';
+	import { onMount, tick } from 'svelte';
 
 	import { decodeString } from '$lib/utils';
 	import { getChatList } from '$lib/apis/chats';

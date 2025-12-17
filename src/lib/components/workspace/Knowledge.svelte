@@ -6,7 +6,7 @@
 	dayjs.extend(relativeTime);
 
 	import { toast } from 'svelte-sonner';
-	import { onMount, getContext, tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { WEBUI_NAME, knowledge, user } from '$lib/stores';
 	import {
 		getKnowledgeBases,

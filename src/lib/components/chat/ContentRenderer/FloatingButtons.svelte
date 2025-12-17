@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 
-	import DOMPurify from 'dompurify';
-	import { marked } from 'marked';
-
-	import { getContext, tick, onDestroy } from 'svelte';
+	import { tick, onDestroy } from 'svelte';
 	import { chatCompletion } from '$lib/apis/openai';
 
 	import ChatBubble from '$lib/components/icons/ChatBubble.svelte';

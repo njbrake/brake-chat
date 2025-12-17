@@ -1,8 +1,5 @@
 <script>
-	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
-	import { WEBUI_NAME, config, user, showSidebar } from '$lib/stores';
-	import { goto } from '$app/navigation';
-	import { onMount, getContext } from 'svelte';
+	import { WEBUI_API_BASE_URL } from '$lib/constants';
 
 	import dayjs from 'dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime';
@@ -14,23 +11,11 @@
 	import { getChannelUsersById } from '$lib/apis/channels';
 
 	import Pagination from '$lib/components/common/Pagination.svelte';
-	import ChatBubbles from '$lib/components/icons/ChatBubbles.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 
-	import EditUserModal from '$lib/components/admin/Users/UserList/EditUserModal.svelte';
-	import UserChatsModal from '$lib/components/admin/Users/UserList/UserChatsModal.svelte';
-	import AddUserModal from '$lib/components/admin/Users/UserList/AddUserModal.svelte';
-
-	import ConfirmDialog from '$lib/components/common/ConfirmDialog.svelte';
-	import RoleUpdateConfirmDialog from '$lib/components/common/ConfirmDialog.svelte';
-
 	import Badge from '$lib/components/common/Badge.svelte';
-	import Plus from '$lib/components/icons/Plus.svelte';
 	import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
 	import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
-	import About from '$lib/components/chat/Settings/About.svelte';
-	import Banner from '$lib/components/common/Banner.svelte';
-	import Markdown from '$lib/components/chat/Messages/Markdown.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import ProfilePreview from '../Messages/Message/ProfilePreview.svelte';
 	export let channel = null;

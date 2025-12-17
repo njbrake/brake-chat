@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { config, knowledge, settings, user } from '$lib/stores';
 
 	import Selector from './Knowledge/Selector.svelte';

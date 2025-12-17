@@ -1,12 +1,9 @@
 <script lang="ts">
-	import { toast } from 'svelte-sonner';
-	import { createEventDispatcher, onMount, getContext, tick } from 'svelte';
-	import { getModels as _getModels } from '$lib/apis';
+	import { createEventDispatcher, onMount } from 'svelte';
 
 	const dispatch = createEventDispatcher();
-	import { models, settings, toolServers, user } from '$lib/stores';
+	import { settings, toolServers } from '$lib/stores';
 
-	import Switch from '$lib/components/common/Switch.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Plus from '$lib/components/icons/Plus.svelte';

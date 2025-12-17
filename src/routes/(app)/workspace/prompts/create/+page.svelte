@@ -2,7 +2,7 @@
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
 	import { prompts } from '$lib/stores';
-	import { onMount, tick, getContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import { createNewPrompt, getPrompts } from '$lib/apis/prompts';
 	import PromptEditor from '$lib/components/workspace/Prompts/PromptEditor.svelte';
 

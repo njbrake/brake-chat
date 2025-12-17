@@ -1,7 +1,5 @@
 <script lang="ts">
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
-	import { tick, getContext, onMount, onDestroy } from 'svelte';
-	import { toast } from 'svelte-sonner';
 	export let query = '';
 	export let prompts = [];
 	export let onSelect = (e) => {};

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
-	import { onMount, getContext, tick, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { mobile, showSidebar, user } from '$lib/stores';
 	import { updateChannelById } from '$lib/apis/channels';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 
-	import { onMount, getContext, tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { models, tools, knowledge as knowledgeCollections, user } from '$lib/stores';
 	import { WEBUI_BASE_URL } from '$lib/constants';
 
@@ -16,7 +16,6 @@
 	import Textarea from '$lib/components/common/Textarea.svelte';
 	import AccessControl from '../common/AccessControl.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-	import XMark from '$lib/components/icons/XMark.svelte';
 	import DefaultFeatures from './DefaultFeatures.svelte';
 	import PromptSuggestions from './PromptSuggestions.svelte';
 	export let onSubmit: Function;

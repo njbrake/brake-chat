@@ -1,5 +1,5 @@
 <script>
-	import { getContext, tick, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 

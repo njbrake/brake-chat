@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { createEventDispatcher } from 'svelte';
-	import { onMount, getContext } from 'svelte';
 	import { addUser } from '$lib/apis/auths';
 
 	import { WEBUI_BASE_URL } from '$lib/constants';

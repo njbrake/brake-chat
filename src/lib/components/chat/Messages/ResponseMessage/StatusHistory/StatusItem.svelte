@@ -1,5 +1,4 @@
 <script>
-	import { getContext } from 'svelte';
 	import Search from '$lib/components/icons/Search.svelte';
 
 	export let status = null;

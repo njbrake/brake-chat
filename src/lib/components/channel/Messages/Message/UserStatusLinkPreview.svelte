@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { LinkPreview } from 'bits-ui';
 	import { getUserById } from '$lib/apis/users';
 

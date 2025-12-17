@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, createEventDispatcher } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 	import { WEBUI_VERSION } from '$lib/constants';

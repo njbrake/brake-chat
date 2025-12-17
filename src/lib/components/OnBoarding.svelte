@@ -1,5 +1,4 @@
 <script>
-	import { getContext, onMount } from 'svelte';
 	import { WEBUI_BASE_URL } from '$lib/constants';
 
 	import Marquee from './common/Marquee.svelte';

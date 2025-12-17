@@ -1,18 +1,12 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 
-	import { onMount, getContext, createEventDispatcher } from 'svelte';
-
-	const dispatch = createEventDispatcher();
+	import { onMount } from 'svelte';
 
 	import {
-		getQuerySettings,
-		updateQuerySettings,
 		resetVectorDB,
 		getEmbeddingConfig,
 		updateEmbeddingConfig,
-		getRerankingConfig,
-		updateRerankingConfig,
 		getRAGConfig,
 		updateRAGConfig
 	} from '$lib/apis/retrieval';
@@ -29,7 +23,6 @@
 	import Textarea from '$lib/components/common/Textarea.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	let updateEmbeddingModelLoading = false;
-	let updateRerankingModelLoading = false;
 
 	let showResetConfirm = false;
 	let showResetUploadDirConfirm = false;
@@ -40,22 +33,12 @@
 	let RAG_EMBEDDING_BATCH_SIZE = 1;
 	let ENABLE_ASYNC_EMBEDDING = true;
 
-	let rerankingModel = '';
-
 	let OpenAIUrl = '';
 	let OpenAIKey = '';
 
 	let AzureOpenAIUrl = '';
 	let AzureOpenAIKey = '';
 	let AzureOpenAIVersion = '';
-
-	let querySettings = {
-		template: '',
-		r: 0.0,
-		k: 4,
-		k_reranker: 4,
-		hybrid: false
-	};
 
 	let RAGConfig = null;
 
@@ -139,7 +122,7 @@
 		) {
 			try {
 				JSON.parse(RAGConfig.DATALAB_MARKER_ADDITIONAL_CONFIG);
-			} catch (e) {
+			} catch {
 				toast.error('Invalid JSON format in Additional Config');
 				return;
 			}
@@ -176,7 +159,7 @@
 		if (RAGConfig.DOCLING_PARAMS) {
 			try {
 				JSON.parse(RAGConfig.DOCLING_PARAMS);
-			} catch (e) {
+			} catch {
 				toast.error(`Invalid JSON format in ${'Docling Parameters'}`);
 				return;
 			}
@@ -184,13 +167,13 @@
 		if (RAGConfig.MINERU_PARAMS) {
 			try {
 				JSON.parse(RAGConfig.MINERU_PARAMS);
-			} catch (e) {
+			} catch {
 				toast.error('Invalid JSON format in MinerU Parameters');
 				return;
 			}
 		}
 
-		const res = await updateRAGConfig(localStorage.token, {
+		await updateRAGConfig(localStorage.token, {
 			...RAGConfig,
 			ALLOWED_FILE_EXTENSIONS: RAGConfig.ALLOWED_FILE_EXTENSIONS.split(',')
 				.map((ext) => ext.trim())
@@ -204,7 +187,6 @@
 					? JSON.parse(RAGConfig.MINERU_PARAMS)
 					: {}
 		});
-		dispatch('save');
 	};
 
 	const setEmbeddingConfig = async () => {

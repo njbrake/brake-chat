@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
 	import dayjs from 'dayjs';
 	import localizedFormat from 'dayjs/plugin/localizedFormat';
 	import { getTimeRange } from '$lib/utils';

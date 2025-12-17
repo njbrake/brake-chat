@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { onMount, getContext } from 'svelte';
-
 	import CodeEditor from './CodeEditor.svelte';
 	import Drawer from './Drawer.svelte';
 	let {

@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 
-	import { createEventDispatcher, onMount, getContext } from 'svelte';
+	import { onMount, createEventDispatcher } from 'svelte';
 	import { config as backendConfig, user } from '$lib/stores';
+
+	const dispatch = createEventDispatcher();
 
 	import { getBackendConfig } from '$lib/apis';
 	import {
 		getImageGenerationModels,
-		getImageGenerationConfig,
-		updateImageGenerationConfig,
 		getConfig,
 		updateConfig,
 		verifyConfigUrl
@@ -19,7 +19,6 @@
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Textarea from '$lib/components/common/Textarea.svelte';
 	import CodeEditorModal from '$lib/components/common/CodeEditorModal.svelte';
-	const dispatch = createEventDispatcher();
 	let loading = false;
 
 	let models = null;
@@ -156,7 +155,7 @@
 			if (obj && typeof obj === 'object') {
 				return true;
 			}
-		} catch (e) {}
+		} catch {}
 		return false;
 	};
 

@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { config, models, settings, user } from '$lib/stores';
-	import { createEventDispatcher, onMount, onDestroy, getContext } from 'svelte';
+	import { config, settings, user } from '$lib/stores';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import { updateUserInfo } from '$lib/apis/users';
 	import { getUserPosition } from '$lib/utils';
 	import { setTextScale } from '$lib/utils/text-scale';

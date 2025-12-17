@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 
-	import { getContext } from 'svelte';
 	import { settings } from '$lib/stores';
 
 	import Modal from '$lib/components/common/Modal.svelte';

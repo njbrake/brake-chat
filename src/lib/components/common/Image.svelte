@@ -4,7 +4,6 @@
 	import { settings } from '$lib/stores';
 	import ImagePreview from './ImagePreview.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
-	import { getContext } from 'svelte';
 
 	export let src = '';
 	export let alt = '';

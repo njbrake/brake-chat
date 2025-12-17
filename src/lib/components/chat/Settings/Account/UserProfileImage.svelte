@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
-	import { getContext } from 'svelte';
 	import { getGravatarUrl } from '$lib/apis/utils';
 	import { canvasPixelTest, generateInitialsImage } from '$lib/utils';
 

@@ -1,13 +1,9 @@
 <script lang="ts">
 	import dayjs from 'dayjs';
-	import { onMount, tick, getContext } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { createEventDispatcher } from 'svelte';
 
 	import { mobile, models, settings } from '$lib/stores';
-
-	import { generateMoACompletion } from '$lib/apis';
-	import { updateChatById } from '$lib/apis/chats';
-	import { createOpenAITextStream } from '$lib/apis/streaming';
 
 	import ResponseMessage from './ResponseMessage.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
@@ -17,8 +13,6 @@
 	import Name from './Name.svelte';
 	import Skeleton from './Skeleton.svelte';
 	import localizedFormat from 'dayjs/plugin/localizedFormat';
-	import ProfileImage from './ProfileImage.svelte';
-	import { WEBUI_BASE_URL } from '$lib/constants';
 	dayjs.extend(localizedFormat);
 
 	export let chatId;

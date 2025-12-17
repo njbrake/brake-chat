@@ -14,10 +14,10 @@
 	import SensitiveInput from '$lib/components/common/SensitiveInput.svelte';
 	import Switch from '$lib/components/common/Switch.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
-	import { WEBUI_BUILD_HASH, WEBUI_VERSION } from '$lib/constants';
+	import { WEBUI_VERSION } from '$lib/constants';
 	import { config } from '$lib/stores';
 	import { compareVersion } from '$lib/utils';
-	import { onMount, getContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import Textarea from '$lib/components/common/Textarea.svelte';
 	export let saveHandler: Function;
@@ -51,7 +51,7 @@
 
 	const checkForVersionUpdates = async () => {
 		updateAvailable = null;
-		version = await getVersionUpdates(localStorage.token).catch((error) => {
+		version = await getVersionUpdates(localStorage.token).catch(() => {
 			return {
 				current: WEBUI_VERSION,
 				latest: WEBUI_VERSION

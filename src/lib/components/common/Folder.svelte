@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, createEventDispatcher, onMount, onDestroy } from 'svelte';
+	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
 	const dispatch = createEventDispatcher();
 
 	import ChevronDown from '../icons/ChevronDown.svelte';

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
 	import Minus from '$lib/components/icons/Minus.svelte';
 
 	export let title = '';

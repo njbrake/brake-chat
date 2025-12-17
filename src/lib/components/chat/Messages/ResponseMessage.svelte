@@ -3,12 +3,11 @@
 	import dayjs from 'dayjs';
 
 	import { createEventDispatcher, onDestroy } from 'svelte';
-	import { onMount, tick, getContext } from 'svelte';
-	import type { Writable } from 'svelte/store';
+	import { onMount, tick } from 'svelte';
 
 	const dispatch = createEventDispatcher();
 
-	import { createNewFeedback, getFeedbackById, updateFeedbackById } from '$lib/apis/evaluations';
+	import { createNewFeedback, updateFeedbackById } from '$lib/apis/evaluations';
 	import { getChatById } from '$lib/apis/chats';
 	import { generateTags } from '$lib/apis';
 
@@ -25,15 +24,12 @@
 	import { imageGenerations } from '$lib/apis/images';
 	import {
 		copyToClipboard as _copyToClipboard,
-		approximateToHumanReadable,
 		getMessageContentParts,
 		sanitizeResponseContent,
 		createMessagesList,
-		formatDate,
-		removeDetails,
 		removeAllDetails
 	} from '$lib/utils';
-	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
+	import { WEBUI_API_BASE_URL } from '$lib/constants';
 
 	import Name from './Name.svelte';
 	import ProfileImage from './ProfileImage.svelte';
@@ -41,8 +37,6 @@
 	import Image from '$lib/components/common/Image.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import RateComment from './RateComment.svelte';
-	import Spinner from '$lib/components/common/Spinner.svelte';
-	import Sparkles from '$lib/components/icons/Sparkles.svelte';
 
 	import DeleteConfirmDialog from '$lib/components/common/ConfirmDialog.svelte';
 
@@ -54,7 +48,6 @@
 	import FileItem from '$lib/components/common/FileItem.svelte';
 	import FollowUps from './ResponseMessage/FollowUps.svelte';
 	import { fade } from 'svelte/transition';
-	import { flyAndScale } from '$lib/utils/transitions';
 	import RegenerateMenu from './ResponseMessage/RegenerateMenu.svelte';
 	import StatusHistory from './ResponseMessage/StatusHistory.svelte';
 	import FullHeightIframe from '$lib/components/common/FullHeightIframe.svelte';

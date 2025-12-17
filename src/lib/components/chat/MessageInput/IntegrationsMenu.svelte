@@ -1,15 +1,14 @@
 <script lang="ts">
 	import { DropdownMenu } from 'bits-ui';
-	import { getContext, onMount, tick } from 'svelte';
+	import { tick } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { flyAndScale } from '$lib/utils/transitions';
 
-	import { config, user, tools as _tools, mobile, settings, toolServers } from '$lib/stores';
+	import { user, toolServers, tools as _tools } from '$lib/stores';
 
 	import { getOAuthClientAuthorizationUrl } from '$lib/apis/configs';
 	import { getTools } from '$lib/apis/tools';
 
-	import Knobs from '$lib/components/icons/Knobs.svelte';
 	import Dropdown from '$lib/components/common/Dropdown.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Switch from '$lib/components/common/Switch.svelte';

@@ -1,21 +1,16 @@
 <script lang="ts">
 	import { marked } from 'marked';
 
-	import { getContext, tick } from 'svelte';
-	import dayjs from '$lib/dayjs';
-
-	import { mobile, settings, user } from '$lib/stores';
-	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
+	import { user } from '$lib/stores';
+	import { WEBUI_API_BASE_URL } from '$lib/constants';
 
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import { copyToClipboard, sanitizeResponseContent } from '$lib/utils';
-	import ArrowUpTray from '$lib/components/icons/ArrowUpTray.svelte';
 	import Check from '$lib/components/icons/Check.svelte';
 	import ModelItemMenu from './ModelItemMenu.svelte';
 	import EllipsisHorizontal from '$lib/components/icons/EllipsisHorizontal.svelte';
 	import { toast } from 'svelte-sonner';
 	import Tag from '$lib/components/icons/Tag.svelte';
-	import Label from '$lib/components/icons/Label.svelte';
 	export let selectedModelIdx: number = -1;
 	export let item: any = {};
 	export let index: number = -1;

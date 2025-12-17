@@ -1,8 +1,6 @@
 import { WEBUI_API_BASE_URL } from '$lib/constants';
 
 export const getGravatarUrl = async (token: string, email: string) => {
-	let error = null;
-
 	const res = await fetch(`${WEBUI_API_BASE_URL}/utils/gravatar?email=${email}`, {
 		method: 'GET',
 		headers: {
@@ -16,7 +14,6 @@ export const getGravatarUrl = async (token: string, email: string) => {
 		})
 		.catch((err) => {
 			console.error(err);
-			error = err;
 			return null;
 		});
 
@@ -24,8 +21,6 @@ export const getGravatarUrl = async (token: string, email: string) => {
 };
 
 export const formatPythonCode = async (token: string, code: string) => {
-	let error = null;
-
 	const res = await fetch(`${WEBUI_API_BASE_URL}/utils/code/format`, {
 		method: 'POST',
 		headers: {
@@ -43,23 +38,16 @@ export const formatPythonCode = async (token: string, code: string) => {
 		.catch((err) => {
 			console.error(err);
 
-			error = err;
 			if (err.detail) {
-				error = err.detail;
+				throw err.detail;
 			}
-			return null;
+			throw err;
 		});
-
-	if (error) {
-		throw error;
-	}
 
 	return res;
 };
 
 export const downloadChatAsPDF = async (token: string, title: string, messages: object[]) => {
-	let error = null;
-
 	const blob = await fetch(`${WEBUI_API_BASE_URL}/utils/pdf`, {
 		method: 'POST',
 		headers: {
@@ -77,7 +65,6 @@ export const downloadChatAsPDF = async (token: string, title: string, messages: 
 		})
 		.catch((err) => {
 			console.error(err);
-			error = err;
 			return null;
 		});
 
@@ -85,8 +72,6 @@ export const downloadChatAsPDF = async (token: string, title: string, messages: 
 };
 
 export const getHTMLFromMarkdown = async (token: string, md: string) => {
-	let error = null;
-
 	const res = await fetch(`${WEBUI_API_BASE_URL}/utils/markdown`, {
 		method: 'POST',
 		headers: {
@@ -103,7 +88,6 @@ export const getHTMLFromMarkdown = async (token: string, md: string) => {
 		})
 		.catch((err) => {
 			console.error(err);
-			error = err;
 			return null;
 		});
 
@@ -111,9 +95,7 @@ export const getHTMLFromMarkdown = async (token: string, md: string) => {
 };
 
 export const downloadDatabase = async (token: string) => {
-	let error = null;
-
-	const res = await fetch(`${WEBUI_API_BASE_URL}/utils/db/download`, {
+	await fetch(`${WEBUI_API_BASE_URL}/utils/db/download`, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
@@ -137,11 +119,8 @@ export const downloadDatabase = async (token: string) => {
 		})
 		.catch((err) => {
 			console.error(err);
-			error = err.detail;
-			return null;
+			if (err.detail) {
+				throw err.detail;
+			}
 		});
-
-	if (error) {
-		throw error;
-	}
 };

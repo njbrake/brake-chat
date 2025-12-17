@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { marked } from 'marked';
 	import DOMPurify from 'dompurify';
-	import { onMount, createEventDispatcher, getContext, tick } from 'svelte';
+	import { onMount, createEventDispatcher, tick } from 'svelte';
 	const eventDispatch = createEventDispatcher();
 
 	marked.use({

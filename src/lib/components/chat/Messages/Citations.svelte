@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
 	import CitationModal from './Citations/CitationModal.svelte';
 	import { embed, showControls, showEmbeds } from '$lib/stores';
 	export let id = '';
