@@ -1,13 +1,17 @@
 import datetime
+import logging
 import time
 
-from open_webui.env import DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL
+from open_webui.env import DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL, SRC_LOG_LEVELS
 from open_webui.internal.db import Base, JSONField, get_db
 from open_webui.models.chats import Chats
 from open_webui.models.groups import GroupMember, Groups
 from open_webui.utils.misc import throttle
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import BigInteger, Column, Date, String, Text, case, exists, or_, select
+
+log = logging.getLogger(__name__)
+log.setLevel(SRC_LOG_LEVELS["MODELS"])
 
 ####################
 # User DB Schema
@@ -191,6 +195,7 @@ class UsersTable:
                 user = db.query(User).filter_by(id=id).first()
                 return UserModel.model_validate(user)
         except Exception:
+            log.exception(f"Error retrieving user by id={id}")
             return None
 
     def get_user_by_api_key(self, api_key: str) -> UserModel | None:
@@ -199,6 +204,7 @@ class UsersTable:
                 user = db.query(User).filter_by(api_key=api_key).first()
                 return UserModel.model_validate(user)
         except Exception:
+            log.exception("Error retrieving user by api_key")
             return None
 
     def get_user_by_email(self, email: str) -> UserModel | None:
@@ -207,6 +213,7 @@ class UsersTable:
                 user = db.query(User).filter_by(email=email).first()
                 return UserModel.model_validate(user)
         except Exception:
+            log.exception(f"Error retrieving user by email={email}")
             return None
 
     def get_user_by_oauth_sub(self, sub: str) -> UserModel | None:
@@ -215,6 +222,7 @@ class UsersTable:
                 user = db.query(User).filter_by(oauth_sub=sub).first()
                 return UserModel.model_validate(user)
         except Exception:
+            log.exception(f"Error retrieving user by oauth_sub={sub}")
             return None
 
     def get_users(
@@ -362,6 +370,7 @@ class UsersTable:
                 user = db.query(User).order_by(User.created_at).first()
                 return UserModel.model_validate(user)
         except Exception:
+            log.exception("Error retrieving first user")
             return None
 
     def get_user_webhook_url_by_id(self, id: str) -> str | None:
@@ -373,6 +382,7 @@ class UsersTable:
                     return None
                 return user.settings.get("ui", {}).get("notifications", {}).get("webhook_url", None)
         except Exception:
+            log.exception(f"Error retrieving webhook url for user id={id}")
             return None
 
     def get_num_users_active_today(self) -> int | None:
@@ -390,6 +400,7 @@ class UsersTable:
                 user = db.query(User).filter_by(id=id).first()
                 return UserModel.model_validate(user)
         except Exception:
+            log.exception(f"Error updating user role by id={id}")
             return None
 
     def update_user_profile_image_url_by_id(self, id: str, profile_image_url: str) -> UserModel | None:
@@ -401,6 +412,7 @@ class UsersTable:
                 user = db.query(User).filter_by(id=id).first()
                 return UserModel.model_validate(user)
         except Exception:
+            log.exception(f"Error updating profile image url for user id={id}")
             return None
 
     @throttle(DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL)
@@ -413,6 +425,7 @@ class UsersTable:
                 user = db.query(User).filter_by(id=id).first()
                 return UserModel.model_validate(user)
         except Exception:
+            log.exception(f"Error updating last active for user id={id}")
             return None
 
     def update_user_oauth_sub_by_id(self, id: str, oauth_sub: str) -> UserModel | None:
@@ -424,6 +437,7 @@ class UsersTable:
                 user = db.query(User).filter_by(id=id).first()
                 return UserModel.model_validate(user)
         except Exception:
+            log.exception(f"Error updating oauth_sub for user id={id}")
             return None
 
     def update_user_by_id(self, id: str, updated: dict) -> UserModel | None:
@@ -434,9 +448,8 @@ class UsersTable:
 
                 user = db.query(User).filter_by(id=id).first()
                 return UserModel.model_validate(user)
-                # return UserModel(**user.dict())
-        except Exception as e:
-            print(e)
+        except Exception:
+            log.exception(f"Error updating user id={id}")
             return None
 
     def update_user_settings_by_id(self, id: str, updated: dict) -> UserModel | None:
@@ -455,6 +468,7 @@ class UsersTable:
                 user = db.query(User).filter_by(id=id).first()
                 return UserModel.model_validate(user)
         except Exception:
+            log.exception(f"Error updating settings for user id={id}")
             return None
 
     def delete_user_by_id(self, id: str) -> bool:
@@ -473,6 +487,7 @@ class UsersTable:
                 return True
             return False
         except Exception:
+            log.exception(f"Error deleting user id={id}")
             return False
 
     def update_user_api_key_by_id(self, id: str, api_key: str) -> bool:
@@ -482,6 +497,7 @@ class UsersTable:
                 db.commit()
                 return True if result == 1 else False
         except Exception:
+            log.exception(f"Error updating api_key for user id={id}")
             return False
 
     def get_user_api_key_by_id(self, id: str) -> str | None:
@@ -490,6 +506,7 @@ class UsersTable:
                 user = db.query(User).filter_by(id=id).first()
                 return user.api_key
         except Exception:
+            log.exception(f"Error retrieving api_key for user id={id}")
             return None
 
     def get_valid_user_ids(self, user_ids: list[str]) -> list[str]:

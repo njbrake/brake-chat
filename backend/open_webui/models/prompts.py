@@ -1,11 +1,16 @@
+import logging
 import time
 
+from open_webui.env import SRC_LOG_LEVELS
 from open_webui.internal.db import Base, get_db
 from open_webui.models.groups import Groups
 from open_webui.models.users import UserResponse, Users
 from open_webui.utils.access_control import has_access
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import JSON, BigInteger, Column, String, Text
+
+log = logging.getLogger(__name__)
+log.setLevel(SRC_LOG_LEVELS["MODELS"])
 
 ####################
 # Prompts DB Schema
@@ -86,6 +91,7 @@ class PromptsTable:
                     return PromptModel.model_validate(result)
                 return None
         except Exception:
+            log.exception(f"Error inserting new prompt command={form_data.command}")
             return None
 
     def get_prompt_by_command(self, command: str) -> PromptModel | None:
@@ -94,6 +100,7 @@ class PromptsTable:
                 prompt = db.query(Prompt).filter_by(command=command).first()
                 return PromptModel.model_validate(prompt)
         except Exception:
+            log.exception(f"Error retrieving prompt by command={command}")
             return None
 
     def get_prompts(self) -> list[PromptUserResponse]:
@@ -140,6 +147,7 @@ class PromptsTable:
                 db.commit()
                 return PromptModel.model_validate(prompt)
         except Exception:
+            log.exception(f"Error updating prompt command={command}")
             return None
 
     def delete_prompt_by_command(self, command: str) -> bool:
@@ -150,6 +158,7 @@ class PromptsTable:
 
                 return True
         except Exception:
+            log.exception(f"Error deleting prompt command={command}")
             return False
 
 

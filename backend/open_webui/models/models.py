@@ -282,6 +282,7 @@ class ModelsTable:
                 model = db.get(Model, id)
                 return ModelModel.model_validate(model)
         except Exception:
+            log.exception(f"Error retrieving model by id={id}")
             return None
 
     def toggle_model_by_id(self, id: str) -> ModelModel | None:
@@ -299,6 +300,7 @@ class ModelsTable:
 
                 return self.get_model_by_id(id)
             except Exception:
+                log.exception(f"Error toggling model id={id}")
                 return None
 
     def update_model_by_id(self, id: str, model: ModelForm) -> ModelModel | None:
@@ -325,6 +327,7 @@ class ModelsTable:
 
                 return True
         except Exception:
+            log.exception(f"Error deleting model id={id}")
             return False
 
     def delete_all_models(self) -> bool:
@@ -335,6 +338,7 @@ class ModelsTable:
 
                 return True
         except Exception:
+            log.exception("Error deleting all models")
             return False
 
     def sync_models(self, user_id: str, models: list[ModelModel]) -> list[ModelModel]:
