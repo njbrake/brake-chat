@@ -35,9 +35,6 @@ from open_webui.routers.images import (
     image_generations,
 )
 from open_webui.routers.memories import QueryMemoryForm, query_memory
-from open_webui.routers.pipelines import (
-    process_pipeline_inlet_filter,
-)
 from open_webui.routers.tasks import (
     generate_chat_tags,
     generate_follow_ups,
@@ -959,12 +956,6 @@ async def process_chat_payload(request, form_data, user, metadata, model):
         form_data["files"] = files
 
     form_data.pop("variables", None)
-
-    # Process the form_data through the pipeline
-    try:
-        form_data = await process_pipeline_inlet_filter(request, form_data, user, models)
-    except Exception as e:
-        raise e
 
     try:
         filter_functions = [

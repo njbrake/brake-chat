@@ -15,9 +15,6 @@ from open_webui.models.users import UserModel
 from open_webui.routers.openai import (
     generate_chat_completion as generate_openai_chat_completion,
 )
-from open_webui.routers.pipelines import (
-    process_pipeline_outlet_filter,
-)
 from open_webui.socket.main import (
     get_event_call,
     get_event_emitter,
@@ -242,11 +239,6 @@ async def chat_completed(request: Request, form_data: dict, user: Any):
         raise Exception("Model not found")
 
     model = models[model_id]
-
-    try:
-        data = await process_pipeline_outlet_filter(request, data, user, models)
-    except Exception as e:
-        return Exception(f"Error: {e}")
 
     metadata = {
         "chat_id": data["chat_id"],

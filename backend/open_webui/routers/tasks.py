@@ -14,7 +14,6 @@ from open_webui.config import (
 )
 from open_webui.constants import TASKS
 from open_webui.env import SRC_LOG_LEVELS
-from open_webui.routers.pipelines import process_pipeline_inlet_filter
 from open_webui.utils.auth import get_admin_user, get_verified_user
 from open_webui.utils.chat import generate_chat_completion
 from open_webui.utils.task import (
@@ -186,12 +185,6 @@ async def generate_title(request: Request, form_data: dict, user=Depends(get_ver
         },
     }
 
-    # Process the payload through the pipeline
-    try:
-        payload = await process_pipeline_inlet_filter(request, payload, user, models)
-    except Exception as e:
-        raise e
-
     try:
         return await generate_chat_completion(request, form_data=payload, user=user)
     except Exception:
@@ -253,12 +246,6 @@ async def generate_follow_ups(request: Request, form_data: dict, user=Depends(ge
             "chat_id": form_data.get("chat_id", None),
         },
     }
-
-    # Process the payload through the pipeline
-    try:
-        payload = await process_pipeline_inlet_filter(request, payload, user, models)
-    except Exception as e:
-        raise e
 
     try:
         return await generate_chat_completion(request, form_data=payload, user=user)
@@ -322,12 +309,6 @@ async def generate_chat_tags(request: Request, form_data: dict, user=Depends(get
         },
     }
 
-    # Process the payload through the pipeline
-    try:
-        payload = await process_pipeline_inlet_filter(request, payload, user, models)
-    except Exception as e:
-        raise e
-
     try:
         return await generate_chat_completion(request, form_data=payload, user=user)
     except Exception as e:
@@ -383,12 +364,6 @@ async def generate_image_prompt(request: Request, form_data: dict, user=Depends(
             "chat_id": form_data.get("chat_id", None),
         },
     }
-
-    # Process the payload through the pipeline
-    try:
-        payload = await process_pipeline_inlet_filter(request, payload, user, models)
-    except Exception as e:
-        raise e
 
     try:
         return await generate_chat_completion(request, form_data=payload, user=user)
@@ -463,12 +438,6 @@ async def generate_queries(request: Request, form_data: dict, user=Depends(get_v
         },
     }
 
-    # Process the payload through the pipeline
-    try:
-        payload = await process_pipeline_inlet_filter(request, payload, user, models)
-    except Exception as e:
-        raise e
-
     try:
         return await generate_chat_completion(request, form_data=payload, user=user)
     except Exception as e:
@@ -541,12 +510,6 @@ async def generate_autocompletion(request: Request, form_data: dict, user=Depend
         },
     }
 
-    # Process the payload through the pipeline
-    try:
-        payload = await process_pipeline_inlet_filter(request, payload, user, models)
-    except Exception as e:
-        raise e
-
     try:
         return await generate_chat_completion(request, form_data=payload, user=user)
     except Exception as e:
@@ -601,12 +564,6 @@ async def generate_emoji(request: Request, form_data: dict, user=Depends(get_ver
         },
     }
 
-    # Process the payload through the pipeline
-    try:
-        payload = await process_pipeline_inlet_filter(request, payload, user, models)
-    except Exception as e:
-        raise e
-
     try:
         return await generate_chat_completion(request, form_data=payload, user=user)
     except Exception as e:
@@ -652,12 +609,6 @@ async def generate_moa_response(request: Request, form_data: dict, user=Depends(
             "task_body": form_data,
         },
     }
-
-    # Process the payload through the pipeline
-    try:
-        payload = await process_pipeline_inlet_filter(request, payload, user, models)
-    except Exception as e:
-        raise e
 
     try:
         return await generate_chat_completion(request, form_data=payload, user=user)
