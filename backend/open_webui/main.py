@@ -384,9 +384,6 @@ from open_webui.utils.auth import (
     get_verified_user,
 )
 from open_webui.utils.chat import (
-    chat_action as chat_action_handler,
-)
-from open_webui.utils.chat import (
     chat_completed as chat_completed_handler,
 )
 from open_webui.utils.chat import (
@@ -1461,23 +1458,6 @@ async def chat_completed(request: Request, form_data: dict, user=Depends(get_ver
             request.state.model = model_item
 
         return await chat_completed_handler(request, form_data, user)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
-
-
-@app.post("/api/chat/actions/{action_id}")
-async def chat_action(request: Request, action_id: str, form_data: dict, user=Depends(get_verified_user)):
-    try:
-        model_item = form_data.pop("model_item", {})
-
-        if model_item.get("direct", False):
-            request.state.direct = True
-            request.state.model = model_item
-
-        return await chat_action_handler(request, action_id, form_data, user)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

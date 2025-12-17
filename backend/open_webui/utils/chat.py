@@ -224,7 +224,3 @@ async def chat_completed(request: Request, form_data: dict, user: Any):
         raise Exception("Model not found")
 
     return data
-
-
-async def chat_action(request: Request, action_id: str, form_data: dict, user: Any):
-    raise Exception("Chat actions are no longer supported. Functions feature has been removed.")
