@@ -182,7 +182,6 @@
 
 	onMount(async () => {
 		await tools.set(await getTools(localStorage.token));
-		await functions.set(await getFunctions(localStorage.token));
 		await knowledgeCollections.set([...(await getKnowledgeBases(localStorage.token))]);
 
 		// Scroll to top 'workspace-container' element
