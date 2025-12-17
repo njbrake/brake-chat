@@ -8,7 +8,6 @@ Create Date: 2025-12-16 00:00:00.000000
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects import sqlite
 
 revision = "e9f8a2b5c123"
 down_revision = "d31026856c01"
