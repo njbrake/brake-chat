@@ -3,7 +3,6 @@
 	const { saveAs } = fileSaver;
 
 	import { toast } from 'svelte-sonner';
-	import { getContext } from 'svelte';
 	import { archiveChatById, getAllArchivedChats, unarchiveAllChats } from '$lib/apis/chats';
 
 	import ChatsModal from './ChatsModal.svelte';

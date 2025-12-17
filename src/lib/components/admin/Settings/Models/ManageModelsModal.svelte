@@ -1,18 +1,8 @@
 <script>
-	import { toast } from 'svelte-sonner';
-
-	import { createEventDispatcher, getContext, onMount } from 'svelte';
-	const dispatch = createEventDispatcher();
-
-	import { user } from '$lib/stores';
-
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
-	import Spinner from '$lib/components/common/Spinner.svelte';
 
 	export let show = false;
-
-	let selected = '';
 </script>
 
 <Modal size="sm" bind:show>

@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { v4 as uuidv4 } from 'uuid';
 	import { toast } from 'svelte-sonner';
-	import { PaneGroup, Pane, PaneResizer } from 'paneforge';
+	import { PaneGroup, Pane } from 'paneforge';
 
-	import { getContext, onDestroy, onMount, tick } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
-	import { get, type Unsubscriber, type Writable } from 'svelte/store';
+	import { type Unsubscriber } from 'svelte/store';
 	import { WEBUI_BASE_URL, WEBUI_API_BASE_URL } from '$lib/constants';
 
 	import {
@@ -21,7 +21,6 @@
 		settings,
 		showSidebar,
 		WEBUI_NAME,
-		banners,
 		user,
 		socket,
 		audioQueue,
@@ -64,25 +63,20 @@
 	} from '$lib/apis/chats';
 	import { generateOpenAIChatCompletion } from '$lib/apis/openai';
 	import { processWeb, processYoutubeVideo } from '$lib/apis/retrieval';
-	import { getAndUpdateUserLocation, getUserSettings } from '$lib/apis/users';
+	import { getAndUpdateUserLocation } from '$lib/apis/users';
 	import { chatCompleted, generateMoACompletion, stopTask, getTaskIdsByChatId } from '$lib/apis';
 	import { getTools } from '$lib/apis/tools';
 	import { uploadFile } from '$lib/apis/files';
 	import { createOpenAITextStream } from '$lib/apis/streaming';
 	import { updateFolderById } from '$lib/apis/folders';
 
-	import Banner from '../common/Banner.svelte';
 	import MessageInput from '$lib/components/chat/MessageInput.svelte';
 	import Messages from '$lib/components/chat/Messages.svelte';
 	import Navbar from '$lib/components/chat/Navbar.svelte';
 	import ChatControls from './ChatControls.svelte';
 	import EventConfirmDialog from '../common/ConfirmDialog.svelte';
 	import Placeholder from './Placeholder.svelte';
-	import NotificationToast from '../NotificationToast.svelte';
 	import Spinner from '../common/Spinner.svelte';
-	import Tooltip from '../common/Tooltip.svelte';
-	import Sidebar from '../icons/Sidebar.svelte';
-	import Image from '../common/Image.svelte';
 
 	export let chatIdProp = '';
 
@@ -95,7 +89,6 @@
 	let messageInput;
 
 	let autoScroll = true;
-	let processing = '';
 	let messagesContainerElement: HTMLDivElement;
 
 	let navbarElement;
@@ -181,7 +174,7 @@
 						selectedFilterIds = input.selectedFilterIds;
 						imageGenerationEnabled = input.imageGenerationEnabled;
 					}
-				} catch (e) {}
+				} catch {}
 			} else {
 				await setDefaults();
 			}

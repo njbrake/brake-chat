@@ -2,8 +2,6 @@
 	import { DropdownMenu } from 'bits-ui';
 	import VirtualList from '@sveltejs/svelte-virtual-list';
 
-	import { getContext } from 'svelte';
-
 	import { flyAndScale } from '$lib/utils/transitions';
 	import { WEBUI_BASE_URL } from '$lib/constants';
 

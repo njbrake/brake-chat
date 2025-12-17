@@ -2,15 +2,14 @@
 	import { marked } from 'marked';
 
 	import { toast } from 'svelte-sonner';
-	import Sortable from 'sortablejs';
 
 	import fileSaver from 'file-saver';
 	const { saveAs } = fileSaver;
 
-	import { onMount, getContext, tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { WEBUI_NAME, config, mobile, models as _models, settings, user } from '$lib/stores';
-	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
+	import { WEBUI_NAME, config, models as _models, settings, user } from '$lib/stores';
+	import { WEBUI_API_BASE_URL } from '$lib/constants';
 	import {
 		createNewModel,
 		deleteModelById,

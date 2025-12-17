@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Select } from 'bits-ui';
-	import { getContext } from 'svelte';
 
 	import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
 	import Check from '$lib/components/icons/Check.svelte';

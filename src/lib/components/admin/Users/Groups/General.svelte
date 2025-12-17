@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
 	import Textarea from '$lib/components/common/Textarea.svelte';
-	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Switch from '$lib/components/common/Switch.svelte';
 	export let name = '';
 	export let color = '';

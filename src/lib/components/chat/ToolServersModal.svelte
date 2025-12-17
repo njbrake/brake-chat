@@ -1,13 +1,7 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
-	import { models, config, toolServers, tools } from '$lib/stores';
-
-	import { toast } from 'svelte-sonner';
-	import { deleteChatShareById, getChatById, shareChatById } from '$lib/apis/chats';
-	import { copyToClipboard } from '$lib/utils';
+	import { toolServers, tools } from '$lib/stores';
 
 	import Modal from '../common/Modal.svelte';
-	import Link from '../icons/Link.svelte';
 	import Collapsible from '../common/Collapsible.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
 

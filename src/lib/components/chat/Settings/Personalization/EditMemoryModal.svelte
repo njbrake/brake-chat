@@ -1,5 +1,5 @@
 <script>
-	import { createEventDispatcher, getContext } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
 
 	import { updateMemoryById } from '$lib/apis/memories';

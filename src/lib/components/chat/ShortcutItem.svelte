@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import Tooltip from '../common/Tooltip.svelte';
 	import type { Shortcut } from '$lib/shortcuts';
 

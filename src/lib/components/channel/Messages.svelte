@@ -9,9 +9,9 @@
 	dayjs.extend(relativeTime);
 	dayjs.extend(isToday);
 	dayjs.extend(isYesterday);
-	import { tick, getContext, onMount, createEventDispatcher } from 'svelte';
+	import { tick } from 'svelte';
 
-	import { settings, user } from '$lib/stores';
+	import { user } from '$lib/stores';
 
 	import Message from './Messages/Message.svelte';
 	import Loader from '../common/Loader.svelte';

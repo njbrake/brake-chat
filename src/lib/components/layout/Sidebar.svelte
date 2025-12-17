@@ -7,7 +7,6 @@
 		user,
 		chats,
 		settings,
-		showSettings,
 		chatId,
 		tags,
 		folders as _folders,
@@ -27,7 +26,7 @@
 		selectedFolder,
 		WEBUI_NAME
 	} from '$lib/stores';
-	import { onMount, getContext, tick, onDestroy } from 'svelte';
+	import { onMount, tick, onDestroy } from 'svelte';
 	import {
 		getChatList,
 		getAllChatTags,

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
-	import { onMount, tick, getContext } from 'svelte';
 	export let followUps: string[] = [];
 	export let onClick: (followUp: string) => void = () => {};
 </script>

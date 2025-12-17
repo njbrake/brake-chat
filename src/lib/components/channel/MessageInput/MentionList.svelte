@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { getContext, onDestroy, onMount } from 'svelte';
-	import { channels, models, user } from '$lib/stores';
+	import { onDestroy, onMount } from 'svelte';
+	import { channels, models } from '$lib/stores';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Hashtag from '$lib/components/icons/Hashtag.svelte';
 	import Lock from '$lib/components/icons/Lock.svelte';
-	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
+	import { WEBUI_API_BASE_URL } from '$lib/constants';
 	import { searchUsers } from '$lib/apis/users';
 
 	export let query = '';

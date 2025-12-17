@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
 	import { settings } from '$lib/stores';
 	export let id = 'password-input';
 	export let value: string = '';

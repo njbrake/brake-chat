@@ -2,8 +2,8 @@
 	import { toast } from 'svelte-sonner';
 	import { v4 as uuidv4 } from 'uuid';
 
-	import { tick, getContext, onMount, onDestroy } from 'svelte';
-	import { config, mobile, settings, socket, user } from '$lib/stores';
+	import { tick, onMount, onDestroy } from 'svelte';
+	import { config, mobile, settings } from '$lib/stores';
 	import {
 		convertHeicToJpeg,
 		compressImage,

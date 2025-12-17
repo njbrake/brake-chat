@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
 	import Modal from '../common/Modal.svelte';
 
 	import Tags from '../common/Tags.svelte';

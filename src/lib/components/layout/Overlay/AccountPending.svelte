@@ -3,7 +3,7 @@
 	import { marked } from 'marked';
 
 	import { getAdminDetails } from '$lib/apis/auths';
-	import { onMount, tick, getContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import { config } from '$lib/stores';
 	let adminDetails = null;
 

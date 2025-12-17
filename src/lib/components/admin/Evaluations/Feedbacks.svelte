@@ -7,7 +7,6 @@
 	import relativeTime from 'dayjs/plugin/relativeTime';
 	dayjs.extend(relativeTime);
 
-	import { onMount, getContext } from 'svelte';
 	import { deleteFeedbackById, exportAllFeedbacks, getFeedbackItems } from '$lib/apis/evaluations';
 
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
@@ -21,7 +20,7 @@
 
 	import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
 	import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
-	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
+	import { WEBUI_API_BASE_URL } from '$lib/constants';
 	import { config } from '$lib/stores';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 
@@ -103,6 +102,7 @@
 
 		// remove snapshot from feedbacks
 		const feedbacksToShare = items.map((f) => {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { snapshot, user, ...rest } = f;
 			return rest;
 		});
@@ -349,7 +349,7 @@
 
 							<td class=" px-3 py-1 text-right font-medium" on:click={(e) => e.stopPropagation()}>
 								<FeedbackMenu
-									on:delete={(e) => {
+									on:delete={() => {
 										deleteFeedbackHandler(feedback.id);
 									}}
 								>

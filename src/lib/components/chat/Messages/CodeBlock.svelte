@@ -1,6 +1,6 @@
 <script lang="ts">
 	import hljs from 'highlight.js';
-	import { getContext, onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import {
 		copyToClipboard,
 		initMermaid,
@@ -13,10 +13,7 @@
 	import CodeEditor from '$lib/components/common/CodeEditor.svelte';
 	import SvgPanZoom from '$lib/components/common/SVGPanZoom.svelte';
 
-	import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
 	import ChevronUpDown from '$lib/components/icons/ChevronUpDown.svelte';
-	import CommandLine from '$lib/components/icons/CommandLine.svelte';
-	import Cube from '$lib/components/icons/Cube.svelte';
 	export let id = '';
 	export let edit = true;
 

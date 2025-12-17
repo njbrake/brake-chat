@@ -5,7 +5,6 @@
 	import EllipsisVertical from '$lib/components/icons/EllipsisVertical.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import Sortable from 'sortablejs';
-	import { getContext } from 'svelte';
 	export let banners = [];
 
 	let sortable = null;

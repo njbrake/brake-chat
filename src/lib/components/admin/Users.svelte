@@ -1,6 +1,5 @@
 <script>
-	import { getContext, tick, onMount } from 'svelte';
-	import { toast } from 'svelte-sonner';
+	import { onMount } from 'svelte';
 
 	import { goto } from '$app/navigation';
 	import { user } from '$lib/stores';
@@ -27,14 +26,10 @@
 		}
 	};
 
-	let loaded = false;
-
 	onMount(async () => {
 		if ($user?.role !== 'admin') {
 			await goto('/');
 		}
-
-		loaded = true;
 
 		const containerElement = document.getElementById('users-tabs-container');
 

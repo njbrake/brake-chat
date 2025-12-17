@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
 
 	import { socket, user } from '$lib/stores';
 
@@ -8,8 +9,7 @@
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import MessageInput from './MessageInput.svelte';
 	import Messages from './Messages.svelte';
-	import { onDestroy, onMount, tick, getContext } from 'svelte';
-	import { toast } from 'svelte-sonner';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import Spinner from '../common/Spinner.svelte';
 	export let threadId = null;
 	export let channel = null;

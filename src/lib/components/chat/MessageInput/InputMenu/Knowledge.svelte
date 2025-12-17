@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, tick, getContext } from 'svelte';
+	import { onMount, tick } from 'svelte';
 
 	import { decodeString } from '$lib/utils';
 	import { knowledge } from '$lib/stores';

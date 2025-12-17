@@ -1,8 +1,7 @@
 <script lang="ts">
 	import Switch from '$lib/components/common/Switch.svelte';
-	import { config, models, settings, user } from '$lib/stores';
-	import { createEventDispatcher, onMount, getContext, tick } from 'svelte';
-	import { toast } from 'svelte-sonner';
+	import { settings } from '$lib/stores';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import ManageModal from './Personalization/ManageModal.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	const dispatch = createEventDispatcher();

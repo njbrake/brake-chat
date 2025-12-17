@@ -3,11 +3,10 @@
 	import fileSaver from 'file-saver';
 	const { saveAs } = fileSaver;
 
-	import { onMount, getContext, tick } from 'svelte';
-	import { WEBUI_NAME, config, mobile, models as _models, settings, user } from '$lib/stores';
+	import { onMount } from 'svelte';
+	import { config, models as _models, settings, user } from '$lib/stores';
 	import {
 		createNewModel,
-		deleteAllModels,
 		getBaseModels,
 		toggleModelById,
 		updateModelById,
@@ -25,17 +24,15 @@
 
 	import ModelEditor from '$lib/components/workspace/Models/ModelEditor.svelte';
 	import { toast } from 'svelte-sonner';
-	import ConfirmDialog from '$lib/components/common/ConfirmDialog.svelte';
 	import Cog6 from '$lib/components/icons/Cog6.svelte';
 	import ConfigureModelsModal from './Models/ConfigureModelsModal.svelte';
-	import Wrench from '$lib/components/icons/Wrench.svelte';
 	import Download from '$lib/components/icons/Download.svelte';
 	import ManageModelsModal from './Models/ManageModelsModal.svelte';
 	import ModelMenu from '$lib/components/admin/Settings/Models/ModelMenu.svelte';
-	import EllipsisHorizontal from '$lib/components/icons/EllipsisHorizontal.svelte';
 	import EyeSlash from '$lib/components/icons/EyeSlash.svelte';
 	import Eye from '$lib/components/icons/Eye.svelte';
-	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
+	import EllipsisHorizontal from '$lib/components/icons/EllipsisHorizontal.svelte';
+	import { WEBUI_API_BASE_URL } from '$lib/constants';
 	import { goto } from '$app/navigation';
 
 	let shiftKey = false;
@@ -107,7 +104,7 @@
 		model.base_model_id = null;
 
 		if (workspaceModels.find((m) => m.id === model.id)) {
-			const res = await updateModelById(localStorage.token, model.id, model).catch((error) => {
+			const res = await updateModelById(localStorage.token, model.id, model).catch(() => {
 				return null;
 			});
 
@@ -123,7 +120,7 @@
 				params: {},
 				access_control: {},
 				...model
-			}).catch((error) => {
+			}).catch(() => {
 				return null;
 			});
 
@@ -155,7 +152,7 @@
 				params: {},
 				access_control: {},
 				is_active: model.is_active
-			}).catch((error) => {
+			}).catch(() => {
 				return null;
 			});
 		} else {

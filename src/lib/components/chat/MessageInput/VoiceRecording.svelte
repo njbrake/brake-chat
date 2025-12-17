@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
-	import { tick, getContext, onMount, onDestroy } from 'svelte';
+	import { tick, onMount, onDestroy } from 'svelte';
 	import { config, settings } from '$lib/stores';
-	import { blobToFile, calculateSHA256, extractCurlyBraceWords } from '$lib/utils';
+	import { blobToFile } from '$lib/utils';
 
 	import { transcribeAudio } from '$lib/apis/audio';
 	import XMark from '$lib/components/icons/XMark.svelte';

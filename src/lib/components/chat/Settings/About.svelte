@@ -3,7 +3,7 @@
 	import { WEBUI_BUILD_HASH, WEBUI_VERSION } from '$lib/constants';
 	import { WEBUI_NAME, config } from '$lib/stores';
 	import { compareVersion } from '$lib/utils';
-	import { onMount, getContext } from 'svelte';
+	import { onMount } from 'svelte';
 
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	let updateAvailable = null;

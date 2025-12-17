@@ -1,6 +1,4 @@
 <script>
-	import { getContext } from 'svelte';
-
 	export let title = '';
 	export let content = '';
 </script>

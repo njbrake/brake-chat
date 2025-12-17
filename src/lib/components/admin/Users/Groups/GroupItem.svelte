@@ -1,6 +1,6 @@
 <script>
 	import { toast } from 'svelte-sonner';
-	import { onMount, getContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { deleteGroupById, updateGroupById } from '$lib/apis/groups';
 

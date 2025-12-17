@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 
-	import { createEventDispatcher, onMount, getContext } from 'svelte';
-	import { config, models, tags as _tags } from '$lib/stores';
+	import { createEventDispatcher, onMount } from 'svelte';
+	import { models, tags as _tags } from '$lib/stores';
 	import Tags from '$lib/components/common/Tags.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
 	const dispatch = createEventDispatcher();

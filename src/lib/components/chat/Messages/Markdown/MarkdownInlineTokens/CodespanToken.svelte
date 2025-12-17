@@ -3,7 +3,6 @@
 	import { toast } from 'svelte-sonner';
 	import { fade } from 'svelte/transition';
 
-	import { getContext } from 'svelte';
 	export let token;
 	export let done = true;
 </script>

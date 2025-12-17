@@ -1,37 +1,20 @@
 <script lang="ts">
 	import { DropdownMenu } from 'bits-ui';
-	import { marked } from 'marked';
 	import Fuse from 'fuse.js';
 
 	import dayjs from '$lib/dayjs';
 	import relativeTime from 'dayjs/plugin/relativeTime';
 	dayjs.extend(relativeTime);
 
-	import Spinner from '$lib/components/common/Spinner.svelte';
 	import { flyAndScale } from '$lib/utils/transitions';
-	import { createEventDispatcher, onMount, getContext, tick } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { createEventDispatcher, onMount, tick } from 'svelte';
 
-	import {
-		user,
-		MODEL_DOWNLOAD_POOL,
-		models,
-		mobile,
-		temporaryChatEnabled,
-		settings,
-		config,
-		type Model
-	} from '$lib/stores';
-	import { toast } from 'svelte-sonner';
-	import { capitalizeFirstLetter, sanitizeResponseContent, splitStream } from '$lib/utils';
+	import { models, mobile, settings, config, type Model } from '$lib/stores';
 	import { getModels } from '$lib/apis';
 
 	import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
-	import Check from '$lib/components/icons/Check.svelte';
 	import Search from '$lib/components/icons/Search.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
-	import Switch from '$lib/components/common/Switch.svelte';
-	import ChatBubbleOval from '$lib/components/icons/ChatBubbleOval.svelte';
 
 	import ModelItem from './ModelItem.svelte';
 	const dispatch = createEventDispatcher();

@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { getContext, onMount, tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { formatFileSize, getLineCount } from '$lib/utils';
 	import { WEBUI_API_BASE_URL } from '$lib/constants';
 	import { getKnowledgeById } from '$lib/apis/knowledge';
 	import Modal from './Modal.svelte';
 	import XMark from '../icons/XMark.svelte';
-	import Info from '../icons/Info.svelte';
 	import Switch from './Switch.svelte';
 	import Tooltip from './Tooltip.svelte';
 	import dayjs from 'dayjs';
