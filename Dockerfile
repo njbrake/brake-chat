@@ -114,14 +114,21 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # install python dependencies
-COPY --chown=$UID:$GID ./backend/requirements.txt ./requirements.txt
+COPY --chown=$UID:$GID ./pyproject.toml ./pyproject.toml
+COPY --chown=$UID:$GID ./package.json ./package.json
+COPY --chown=$UID:$GID ./hatch_build.py ./hatch_build.py
+COPY --chown=$UID:$GID ./LICENSE ./LICENSE
+# Copy minimal backend structure needed for package installation
+RUN mkdir -p backend/open_webui && touch backend/open_webui/__init__.py
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip3 install uv
 
+# Install dependencies only (not the package itself) to avoid triggering build hook
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system -r requirements.txt
+    python3 -c "import tomllib; deps = tomllib.load(open('pyproject.toml', 'rb'))['project']['dependencies']; print('\n'.join(deps))" | \
+    xargs -I {} uv pip install --system {}
 
 RUN mkdir -p /app/backend/data && chown -R $UID:$GID /app/backend/data/
 

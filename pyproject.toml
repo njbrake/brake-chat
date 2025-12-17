@@ -51,7 +51,7 @@ dependencies = [
     "langchain-community==0.3.29",
 
     "fake-useragent==2.2.0",
-    "chromadb==1.0.20",
+    "chromadb==1.1.0",
     "opensearch-py==2.8.0",
     "PyMySQL==1.1.1",
     "boto3==1.40.5",
@@ -104,8 +104,34 @@ dependencies = [
 
     "azure-identity==1.25.0",
     "azure-storage-blob==12.24.1",
+    "azure-search-documents==11.6.0",
+
+    "pymongo",
+    "psycopg2-binary==2.9.10",
+
+    "playwright==1.49.1",
+
+    "av==14.0.1",
+
+    "docker~=7.1.0",
+    "pytest~=8.4.1",
+    "pytest-docker~=3.1.1",
 
     "ldap3==2.9.1",
+
+    "firecrawl-py==4.5.0",
+
+    "opentelemetry-api==1.37.0",
+    "opentelemetry-sdk==1.37.0",
+    "opentelemetry-exporter-otlp==1.37.0",
+    "opentelemetry-instrumentation==0.58b0",
+    "opentelemetry-instrumentation-fastapi==0.58b0",
+    "opentelemetry-instrumentation-sqlalchemy==0.58b0",
+    "opentelemetry-instrumentation-redis==0.58b0",
+    "opentelemetry-instrumentation-requests==0.58b0",
+    "opentelemetry-instrumentation-logging==0.58b0",
+    "opentelemetry-instrumentation-httpx==0.58b0",
+    "opentelemetry-instrumentation-aiohttp-client==0.58b0",
 ]
 readme = "README.md"
 requires-python = ">= 3.11, < 3.13.0a1"
