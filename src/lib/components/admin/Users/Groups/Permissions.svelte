@@ -31,7 +31,6 @@
 		},
 		chat: {
 			controls: true,
-			valves: true,
 			system_prompt: true,
 			params: true,
 			file_upload: true,
@@ -422,22 +421,6 @@
 		</div>
 
 		{#if permissions.chat.controls}
-			<div class="flex flex-col w-full">
-				<div class="flex w-full justify-between my-1">
-					<div class=" self-center text-xs font-medium">
-						{'Allow Chat Valves'}
-					</div>
-					<Switch bind:state={permissions.chat.valves} />
-				</div>
-				{#if defaultPermissions?.chat?.valves && !permissions.chat.valves}
-					<div>
-						<div class="text-xs text-gray-500">
-							{'This is a default user permission and will remain enabled.'}
-						</div>
-					</div>
-				{/if}
-			</div>
-
 			<div class="flex flex-col w-full">
 				<div class="flex w-full justify-between my-1">
 					<div class=" self-center text-xs font-medium">

@@ -8,7 +8,7 @@
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-	import MapSelector from '$lib/components/common/Valves/MapSelector.svelte';
+	import MapSelector from '$lib/components/common/MapSelector.svelte';
 	export let show = false;
 	export let variables = {};
 
