@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, getContext } from 'svelte';
-	import { tags } from '$lib/stores';
+	import { createEventDispatcher } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	const dispatch = createEventDispatcher();
 	export let label = '';

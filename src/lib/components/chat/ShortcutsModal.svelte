@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import Modal from '../common/Modal.svelte';
 	import { shortcuts, Shortcut } from '$lib/shortcuts';
 	import { settings } from '$lib/stores';

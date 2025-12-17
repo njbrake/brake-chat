@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { DropdownMenu } from 'bits-ui';
-	import { getContext, tick } from 'svelte';
+	import { tick } from 'svelte';
 
 	import fileSaver from 'file-saver';
 	const { saveAs } = fileSaver;
 
-	import { downloadChatAsPDF } from '$lib/apis/utils';
 	import { copyToClipboard, createMessagesList } from '$lib/utils';
 
 	import {
@@ -15,7 +14,6 @@
 		showArtifacts,
 		mobile,
 		temporaryChatEnabled,
-		theme,
 		user,
 		settings,
 		folders,

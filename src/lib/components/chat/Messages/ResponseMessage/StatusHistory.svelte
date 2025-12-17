@@ -1,5 +1,4 @@
 <script>
-	import { getContext } from 'svelte';
 	import StatusItem from './StatusHistory/StatusItem.svelte';
 	export let statusHistory = [];
 	export let expand = false;

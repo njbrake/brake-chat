@@ -1,5 +1,4 @@
 <script>
-	import { getContext } from 'svelte';
 	import Modal from '$lib/components/common/Modal.svelte';
 	import AccessControl from './AccessControl.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';

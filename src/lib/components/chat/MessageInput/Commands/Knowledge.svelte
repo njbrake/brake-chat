@@ -6,8 +6,8 @@
 	import relativeTime from 'dayjs/plugin/relativeTime';
 	dayjs.extend(relativeTime);
 
-	import { tick, getContext, onMount, onDestroy } from 'svelte';
-	import { removeLastWordFromString, isValidHttpUrl, isYoutubeUrl } from '$lib/utils';
+	import { tick, onMount, onDestroy } from 'svelte';
+	import { isValidHttpUrl, isYoutubeUrl } from '$lib/utils';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import DocumentPage from '$lib/components/icons/DocumentPage.svelte';
 	import Database from '$lib/components/icons/Database.svelte';

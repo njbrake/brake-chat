@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Modal from '$lib/components/common/Modal.svelte';
-	import { getContext } from 'svelte';
 	export let show = false;
 	export let model = null;
 	export let feedbacks = [];

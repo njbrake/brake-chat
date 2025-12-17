@@ -2,11 +2,8 @@
 	import type { Token } from 'marked';
 	import { LinkPreview } from 'bits-ui';
 
-	import { getContext } from 'svelte';
-
 	import { goto } from '$app/navigation';
 	import { channels, models } from '$lib/stores';
-	import UserStatus from '$lib/components/channel/Messages/Message/UserStatus.svelte';
 	import UserStatusLinkPreview from '$lib/components/channel/Messages/Message/UserStatusLinkPreview.svelte';
 	export let token: Token;
 

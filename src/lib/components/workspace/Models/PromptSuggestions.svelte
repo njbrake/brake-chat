@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
 	import { saveAs } from 'file-saver';
 	import { toast } from 'svelte-sonner';
 	export let promptSuggestions = [];

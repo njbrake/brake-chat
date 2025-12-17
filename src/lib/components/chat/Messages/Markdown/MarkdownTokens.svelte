@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { decode } from 'html-entities';
-	import DOMPurify from 'dompurify';
-	import { onMount, getContext } from 'svelte';
 	import fileSaver from 'file-saver';
 	const { saveAs } = fileSaver;
 

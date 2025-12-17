@@ -7,7 +7,7 @@
 		stiffness: 0.05
 	});
 
-	import { onMount, tick, setContext, onDestroy } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import {
 		config,
 		user,
@@ -27,7 +27,6 @@
 		isApp,
 		appInfo,
 		appData,
-		toolServers,
 		playingNotificationSound
 	} from '$lib/stores';
 	import { goto } from '$app/navigation';
@@ -44,7 +43,7 @@
 	import { getAllChatTags, getChatList } from '$lib/apis/chats';
 	import { chatCompletion } from '$lib/apis/openai';
 
-	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL, WEBUI_HOSTNAME } from '$lib/constants';
+	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
 	import { setTextScale } from '$lib/utils/text-scale';
 
 	import NotificationToast from '$lib/components/NotificationToast.svelte';

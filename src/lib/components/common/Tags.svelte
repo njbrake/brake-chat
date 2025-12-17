@@ -1,7 +1,7 @@
 <script lang="ts">
 	import TagInput from './Tags/TagInput.svelte';
 	import TagList from './Tags/TagList.svelte';
-	import { getContext, createEventDispatcher } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 	const dispatch = createEventDispatcher();
 	export let tags = [];
 	export let suggestionTags = [];

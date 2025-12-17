@@ -1,5 +1,5 @@
 <script>
-	import { onDestroy, onMount, tick, getContext } from 'svelte';
+	import { onDestroy, onMount, tick } from 'svelte';
 	import Markdown from './Markdown.svelte';
 	import {
 		artifactCode,

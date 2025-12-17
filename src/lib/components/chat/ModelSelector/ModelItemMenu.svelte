@@ -2,8 +2,6 @@
 	import { DropdownMenu } from 'bits-ui';
 	import { flyAndScale } from '$lib/utils/transitions';
 
-	import { getContext } from 'svelte';
-
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import Link from '$lib/components/icons/Link.svelte';
 	import Eye from '$lib/components/icons/Eye.svelte';

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getAllChatTags } from '$lib/apis/chats';
 	import { folders, tags } from '$lib/stores';
-	import { getContext, createEventDispatcher, onMount, onDestroy, tick } from 'svelte';
+	import { createEventDispatcher, tick } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import Search from '$lib/components/icons/Search.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';

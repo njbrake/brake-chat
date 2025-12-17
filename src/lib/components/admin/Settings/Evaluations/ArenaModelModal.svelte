@@ -1,5 +1,5 @@
 <script>
-	import { createEventDispatcher, getContext, onMount } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	const dispatch = createEventDispatcher();
 
 	import Spinner from '$lib/components/common/Spinner.svelte';

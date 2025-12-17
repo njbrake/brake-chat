@@ -1,7 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { WEBUI_NAME, config } from '$lib/stores';
-	import { onMount, getContext } from 'svelte';
+	import { onMount } from 'svelte';
 	let loaded = false;
 
 	onMount(async () => {

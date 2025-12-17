@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount, getContext } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import panzoom, { type PanZoom } from 'panzoom';
 
 	import fileSaver from 'file-saver';

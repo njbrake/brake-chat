@@ -1,35 +1,29 @@
 <script>
 	import { toast } from 'svelte-sonner';
 
-	import { createEventDispatcher, getContext, onMount } from 'svelte';
-	const dispatch = createEventDispatcher();
+	import { onMount } from 'svelte';
 
 	import { models } from '$lib/stores';
-	import { deleteAllModels } from '$lib/apis/models';
 	import { getModelsConfig, setModelsConfig } from '$lib/apis/configs';
+	import { deleteAllModels } from '$lib/apis/models';
 
 	import Modal from '$lib/components/common/Modal.svelte';
 	import ConfirmDialog from '$lib/components/common/ConfirmDialog.svelte';
 	import Tooltip from '$lib/components/common/Tooltip.svelte';
 	import ModelList from './ModelList.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-	import Minus from '$lib/components/icons/Minus.svelte';
-	import Plus from '$lib/components/icons/Plus.svelte';
 	import ChevronUp from '$lib/components/icons/ChevronUp.svelte';
 	import ChevronDown from '$lib/components/icons/ChevronDown.svelte';
 	import XMark from '$lib/components/icons/XMark.svelte';
 	import ModelSelector from './ModelSelector.svelte';
-	import Model from '../Evaluations/Model.svelte';
 
 	export let show = false;
 	export let initHandler = () => {};
 
 	let config = null;
 
-	let selectedModelId = '';
 	let defaultModelIds = [];
 
-	let selectedPinnedModelId = '';
 	let defaultPinnedModelIds = [];
 
 	let modelIds = [];

@@ -2,9 +2,8 @@
 	import Fuse from 'fuse.js';
 
 	import { DropdownMenu } from 'bits-ui';
-	import { onMount, getContext, createEventDispatcher } from 'svelte';
+	import { onMount, createEventDispatcher } from 'svelte';
 	import { flyAndScale } from '$lib/utils/transitions';
-	import { knowledge } from '$lib/stores';
 	import Dropdown from '$lib/components/common/Dropdown.svelte';
 	import Search from '$lib/components/icons/Search.svelte';
 	const dispatch = createEventDispatcher();

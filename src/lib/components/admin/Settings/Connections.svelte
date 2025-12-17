@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
-	import { createEventDispatcher, onMount, getContext, tick } from 'svelte';
-
-	const dispatch = createEventDispatcher();
+	import { onMount } from 'svelte';
 
 	import { getOpenAIConfig, updateOpenAIConfig, getOpenAIModels } from '$lib/apis/openai';
 	import { getModels as _getModels, getBackendConfig } from '$lib/apis';
@@ -136,7 +134,7 @@
 					if (!(OPENAI_API_CONFIGS[idx]?.enable ?? true)) {
 						return;
 					}
-					const res = await getOpenAIModels(localStorage.token, idx);
+					await getOpenAIModels(localStorage.token, idx);
 				});
 			}
 		}
@@ -144,8 +142,6 @@
 
 	const submitHandler = async () => {
 		updateOpenAIHandler();
-
-		dispatch('save');
 
 		await config.set(await getBackendConfig());
 	};
@@ -200,7 +196,7 @@
 								</div>
 
 								<div class="flex flex-col gap-1.5 mt-1.5">
-									{#each OPENAI_API_BASE_URLS as url, idx}
+									{#each OPENAI_API_BASE_URLS as _, idx}
 										<OpenAIConnection
 											bind:url={OPENAI_API_BASE_URLS[idx]}
 											bind:key={OPENAI_API_KEYS[idx]}

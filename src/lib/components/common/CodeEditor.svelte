@@ -11,11 +11,10 @@
 
 	import { oneDark } from '@codemirror/theme-one-dark';
 
-	import { onMount, createEventDispatcher, getContext, tick } from 'svelte';
+	import { onMount, createEventDispatcher, tick } from 'svelte';
 
 	import { formatPythonCode } from '$lib/apis/utils';
 	import { toast } from 'svelte-sonner';
-	import { user } from '$lib/stores';
 
 	const dispatch = createEventDispatcher();
 	export let boilerplate = '';

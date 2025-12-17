@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { LinkPreview } from 'bits-ui';
-	import { getContext } from 'svelte';
-	import UserStatus from './UserStatus.svelte';
 	import UserStatusLinkPreview from './UserStatusLinkPreview.svelte';
 
 	export let user = null;

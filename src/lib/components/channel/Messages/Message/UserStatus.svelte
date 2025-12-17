@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
-	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
+	import { WEBUI_API_BASE_URL } from '$lib/constants';
 
 	export let user = null;
 </script>
