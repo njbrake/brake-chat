@@ -168,7 +168,6 @@
 										</div>
 									</div>
 
-
 									<div class=" shrink-0">
 										<Switch
 											state={selectedFilterIds.includes(filter.id)}
