@@ -347,7 +347,6 @@ from open_webui.routers import (
     memories,
     models,
     openai,
-    pipelines,
     prompts,
     retrieval,
     scim,
@@ -1125,7 +1124,6 @@ app.mount("/ws", socket_app)
 app.include_router(openai.router, prefix="/openai", tags=["openai"])
 
 
-app.include_router(pipelines.router, prefix="/api/v1/pipelines", tags=["pipelines"])
 app.include_router(tasks.router, prefix="/api/v1/tasks", tags=["tasks"])
 app.include_router(images.router, prefix="/api/v1/images", tags=["images"])
 
@@ -1188,10 +1186,6 @@ async def get_models(request: Request, refresh: bool = False, user=Depends(get_v
 
     models = []
     for model in all_models:
-        # Filter out filter pipelines
-        if "pipeline" in model and model["pipeline"].get("type", None) == "filter":
-            continue
-
         # Remove profile image URL to reduce payload size
         if model.get("info", {}).get("meta", {}).get("profile_image_url"):
             model["info"]["meta"].pop("profile_image_url", None)
