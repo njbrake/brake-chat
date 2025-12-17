@@ -275,27 +275,6 @@
 								</div>
 							</div>
 
-							{#if tools[toolId]?.has_user_valves}
-								<div class=" shrink-0">
-									<Tooltip content={'Valves'}>
-										<button
-											class="self-center w-fit text-sm text-gray-600 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition rounded-full"
-											type="button"
-											on:click={(e) => {
-												e.stopPropagation();
-												e.preventDefault();
-												onShowValves({
-													type: 'tool',
-													id: toolId
-												});
-											}}
-										>
-											<Knobs />
-										</button>
-									</Tooltip>
-								</div>
-							{/if}
-
 							<div class=" shrink-0">
 								<Switch state={tools[toolId].enabled} />
 							</div>
