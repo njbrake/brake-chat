@@ -8,17 +8,7 @@
 	import {
 		getFunctionValvesById,
 		getFunctionValvesSpecById,
-		updateFunctionValvesById
-	} from '$lib/apis/functions';
-	import { getToolValvesById, getToolValvesSpecById, updateToolValvesById } from '$lib/apis/tools';
-
-	import {
-		getUserValvesSpecById as getToolUserValvesSpecById,
-		getUserValvesById as getToolUserValvesById,
-		updateUserValvesById as updateToolUserValvesById,
-		getTools
-	} from '$lib/apis/tools';
-	import {
+		updateFunctionValvesById,
 		getUserValvesSpecById as getFunctionUserValvesSpecById,
 		getUserValvesById as getFunctionUserValvesById,
 		updateUserValvesById as updateFunctionUserValvesById,
@@ -33,7 +23,7 @@
 
 	export let show = false;
 
-	export let type = 'tool';
+	export let type = 'function';
 	export let id = null;
 	export let userValves = false;
 
@@ -64,27 +54,13 @@
 			let res = null;
 
 			if (userValves) {
-				if (type === 'tool') {
-					res = await updateToolUserValvesById(localStorage.token, id, valves).catch((error) => {
-						toast.error(`${error}`);
-					});
-				} else if (type === 'function') {
-					res = await updateFunctionUserValvesById(localStorage.token, id, valves).catch(
-						(error) => {
-							toast.error(`${error}`);
-						}
-					);
-				}
+				res = await updateFunctionUserValvesById(localStorage.token, id, valves).catch((error) => {
+					toast.error(`${error}`);
+				});
 			} else {
-				if (type === 'tool') {
-					res = await updateToolValvesById(localStorage.token, id, valves).catch((error) => {
-						toast.error(`${error}`);
-					});
-				} else if (type === 'function') {
-					res = await updateFunctionValvesById(localStorage.token, id, valves).catch((error) => {
-						toast.error(`${error}`);
-					});
-				}
+				res = await updateFunctionValvesById(localStorage.token, id, valves).catch((error) => {
+					toast.error(`${error}`);
+				});
 			}
 
 			if (res) {
@@ -103,21 +79,11 @@
 
 		try {
 			if (userValves) {
-				if (type === 'tool') {
-					valves = await getToolUserValvesById(localStorage.token, id);
-					valvesSpec = await getToolUserValvesSpecById(localStorage.token, id);
-				} else if (type === 'function') {
-					valves = await getFunctionUserValvesById(localStorage.token, id);
-					valvesSpec = await getFunctionUserValvesSpecById(localStorage.token, id);
-				}
+				valves = await getFunctionUserValvesById(localStorage.token, id);
+				valvesSpec = await getFunctionUserValvesSpecById(localStorage.token, id);
 			} else {
-				if (type === 'tool') {
-					valves = await getToolValvesById(localStorage.token, id);
-					valvesSpec = await getToolValvesSpecById(localStorage.token, id);
-				} else if (type === 'function') {
-					valves = await getFunctionValvesById(localStorage.token, id);
-					valvesSpec = await getFunctionValvesSpecById(localStorage.token, id);
-				}
+				valves = await getFunctionValvesById(localStorage.token, id);
+				valvesSpec = await getFunctionValvesSpecById(localStorage.token, id);
 			}
 
 			if (!valves) {
@@ -202,25 +168,3 @@
 		</div>
 	</div>
 </Modal>
-
-<style>
-	input::-webkit-outer-spin-button,
-	input::-webkit-inner-spin-button {
-		/* display: none; <- Crashes Chrome on hover */
-		-webkit-appearance: none;
-		margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-	}
-
-	.tabs::-webkit-scrollbar {
-		display: none; /* for Chrome, Safari and Opera */
-	}
-
-	.tabs {
-		-ms-overflow-style: none; /* IE and Edge */
-		scrollbar-width: none; /* Firefox */
-	}
-
-	input[type='number'] {
-		-moz-appearance: textfield; /* Firefox */
-	}
-</style>
