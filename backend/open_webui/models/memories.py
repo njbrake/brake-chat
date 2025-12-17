@@ -1,9 +1,14 @@
+import logging
 import time
 import uuid
 
+from open_webui.env import SRC_LOG_LEVELS
 from open_webui.internal.db import Base, get_db
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import BigInteger, Column, String, Text
+
+log = logging.getLogger(__name__)
+log.setLevel(SRC_LOG_LEVELS["MODELS"])
 
 ####################
 # Memory DB Schema
@@ -77,6 +82,7 @@ class MemoriesTable:
                 db.commit()
                 return self.get_memory_by_id(id)
             except Exception:
+                log.exception(f"Error updating memory id={id} for user_id={user_id}")
                 return None
 
     def get_memories(self) -> list[MemoryModel]:
@@ -85,6 +91,7 @@ class MemoriesTable:
                 memories = db.query(Memory).all()
                 return [MemoryModel.model_validate(memory) for memory in memories]
             except Exception:
+                log.exception("Error retrieving all memories")
                 return None
 
     def get_memories_by_user_id(self, user_id: str) -> list[MemoryModel]:
@@ -93,6 +100,7 @@ class MemoriesTable:
                 memories = db.query(Memory).filter_by(user_id=user_id).all()
                 return [MemoryModel.model_validate(memory) for memory in memories]
             except Exception:
+                log.exception(f"Error retrieving memories for user_id={user_id}")
                 return None
 
     def get_memory_by_id(self, id: str) -> MemoryModel | None:
@@ -101,6 +109,7 @@ class MemoriesTable:
                 memory = db.get(Memory, id)
                 return MemoryModel.model_validate(memory)
             except Exception:
+                log.exception(f"Error retrieving memory by id={id}")
                 return None
 
     def delete_memory_by_id(self, id: str) -> bool:
@@ -112,6 +121,7 @@ class MemoriesTable:
                 return True
 
             except Exception:
+                log.exception(f"Error deleting memory id={id}")
                 return False
 
     def delete_memories_by_user_id(self, user_id: str) -> bool:
@@ -122,6 +132,7 @@ class MemoriesTable:
 
                 return True
             except Exception:
+                log.exception(f"Error deleting memories for user_id={user_id}")
                 return False
 
     def delete_memory_by_id_and_user_id(self, id: str, user_id: str) -> bool:
@@ -137,6 +148,7 @@ class MemoriesTable:
 
                 return True
             except Exception:
+                log.exception(f"Error deleting memory id={id} for user_id={user_id}")
                 return False
 
 

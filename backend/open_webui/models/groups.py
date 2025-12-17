@@ -128,6 +128,7 @@ class GroupTable:
                 return None
 
             except Exception:
+                log.exception(f"Error inserting new group name={form_data.name}")
                 return None
 
     def get_groups(self) -> list[GroupModel]:
@@ -153,6 +154,7 @@ class GroupTable:
                 group = db.query(Group).filter_by(id=id).first()
                 return GroupModel.model_validate(group) if group else None
         except Exception:
+            log.exception(f"Error retrieving group by id={id}")
             return None
 
     def get_group_user_ids_by_id(self, id: str) -> list[str] | None:
@@ -225,6 +227,7 @@ class GroupTable:
                 db.commit()
                 return True
         except Exception:
+            log.exception(f"Error deleting group id={id}")
             return False
 
     def delete_all_groups(self) -> bool:
@@ -235,6 +238,7 @@ class GroupTable:
 
                 return True
             except Exception:
+                log.exception("Error deleting all groups")
                 return False
 
     def remove_user_from_all_groups(self, user_id: str) -> bool:
@@ -260,6 +264,7 @@ class GroupTable:
                 return True
 
             except Exception:
+                log.exception(f"Error removing user_id={user_id} from all groups")
                 db.rollback()
                 return False
 

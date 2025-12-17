@@ -134,6 +134,7 @@ class FilesTable:
                 file = db.get(File, id)
                 return FileModel.model_validate(file)
             except Exception:
+                log.exception(f"Error retrieving file by id={id}")
                 return None
 
     def get_file_by_id_and_user_id(self, id: str, user_id: str) -> FileModel | None:
@@ -144,6 +145,7 @@ class FilesTable:
                     return FileModel.model_validate(file)
                 return None
             except Exception:
+                log.exception(f"Error retrieving file id={id} for user_id={user_id}")
                 return None
 
     def get_file_metadata_by_id(self, id: str) -> FileMetadataResponse | None:
@@ -158,6 +160,7 @@ class FilesTable:
                     updated_at=file.updated_at,
                 )
             except Exception:
+                log.exception(f"Error retrieving file metadata by id={id}")
                 return None
 
     def get_files(self) -> list[FileModel]:
@@ -230,6 +233,7 @@ class FilesTable:
 
                 return FileModel.model_validate(file)
             except Exception:
+                log.exception(f"Error updating hash for file id={id}")
                 return None
 
     def update_file_data_by_id(self, id: str, data: dict) -> FileModel | None:
@@ -240,6 +244,7 @@ class FilesTable:
                 db.commit()
                 return FileModel.model_validate(file)
             except Exception:
+                log.exception(f"Error updating data for file id={id}")
                 return None
 
     def update_file_metadata_by_id(self, id: str, meta: dict) -> FileModel | None:
@@ -250,6 +255,7 @@ class FilesTable:
                 db.commit()
                 return FileModel.model_validate(file)
             except Exception:
+                log.exception(f"Error updating metadata for file id={id}")
                 return None
 
     def delete_file_by_id(self, id: str) -> bool:
@@ -260,6 +266,7 @@ class FilesTable:
 
                 return True
             except Exception:
+                log.exception(f"Error deleting file id={id}")
                 return False
 
     def delete_all_files(self) -> bool:
@@ -270,6 +277,7 @@ class FilesTable:
 
                 return True
             except Exception:
+                log.exception("Error deleting all files")
                 return False
 
 

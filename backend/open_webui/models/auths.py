@@ -131,6 +131,7 @@ class AuthsTable:
                     return None
                 return None
         except Exception:
+            log.exception(f"Error authenticating user email={email}")
             return None
 
     def authenticate_user_by_api_key(self, api_key: str) -> UserModel | None:
@@ -143,6 +144,7 @@ class AuthsTable:
             user = Users.get_user_by_api_key(api_key)
             return user if user else None
         except Exception:
+            log.exception("Error authenticating user by api_key")
             return False
 
     def authenticate_user_by_email(self, email: str) -> UserModel | None:
@@ -154,6 +156,7 @@ class AuthsTable:
                     user = Users.get_user_by_id(auth.id)
                     return user
         except Exception:
+            log.exception(f"Error authenticating user by email={email}")
             return None
 
     def update_user_password_by_id(self, id: str, new_password: str) -> bool:
@@ -163,6 +166,7 @@ class AuthsTable:
                 db.commit()
                 return True if result == 1 else False
         except Exception:
+            log.exception(f"Error updating password for user id={id}")
             return False
 
     def update_email_by_id(self, id: str, email: str) -> bool:
@@ -172,6 +176,7 @@ class AuthsTable:
                 db.commit()
                 return True if result == 1 else False
         except Exception:
+            log.exception(f"Error updating email for user id={id}")
             return False
 
     def delete_auth_by_id(self, id: str) -> bool:
@@ -187,6 +192,7 @@ class AuthsTable:
                     return True
                 return False
         except Exception:
+            log.exception(f"Error deleting auth for user id={id}")
             return False
 
 

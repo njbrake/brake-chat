@@ -146,6 +146,7 @@ class FeedbackTable:
                     return None
                 return FeedbackModel.model_validate(feedback)
         except Exception:
+            log.exception(f"Error retrieving feedback by id={id}")
             return None
 
     def get_feedback_by_id_and_user_id(self, id: str, user_id: str) -> FeedbackModel | None:
@@ -156,6 +157,7 @@ class FeedbackTable:
                     return None
                 return FeedbackModel.model_validate(feedback)
         except Exception:
+            log.exception(f"Error retrieving feedback id={id} for user_id={user_id}")
             return None
 
     def get_feedback_items(self, filter: dict = {}, skip: int = 0, limit: int = 30) -> FeedbackListResponse:
