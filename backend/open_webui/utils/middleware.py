@@ -1,11 +1,9 @@
 import ast
 import asyncio
-import html
 import json
 import logging
 import re
 import sys
-import time
 from uuid import uuid4
 
 from fastapi import HTTPException, Request
@@ -66,6 +64,18 @@ from open_webui.utils.misc import (
     is_string_allowed,
 )
 from open_webui.utils.payload import apply_system_prompt_to_body
+from open_webui.utils.response_handling import (
+    ContentBlockManager,
+    ReasoningConfig,
+    ReasoningHandler,
+    TagDefinition,
+)
+from open_webui.utils.response_handling import (
+    serialize_content_blocks as serialize_content_blocks_new,
+)
+from open_webui.utils.response_handling.serialization import (
+    convert_content_blocks_to_messages as convert_content_blocks_to_messages_new,
+)
 from open_webui.utils.task import (
     get_task_model_id,
     rag_template,
@@ -1585,283 +1595,6 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
 
         # Handle as a background task
         async def response_handler(response, events):
-            def serialize_content_blocks(content_blocks, raw=False):
-                content = ""
-
-                for block in content_blocks:
-                    if block["type"] == "text":
-                        block_content = block["content"].strip()
-                        if block_content:
-                            content = f"{content}{block_content}\n"
-                    elif block["type"] == "tool_calls":
-                        tool_calls = block.get("content", [])
-                        results = block.get("results", [])
-
-                        if content and not content.endswith("\n"):
-                            content += "\n"
-
-                        if results:
-                            tool_calls_display_content = ""
-                            for tool_call in tool_calls:
-                                tool_call_id = tool_call.get("id", "")
-                                tool_name = tool_call.get("function", {}).get("name", "")
-                                tool_arguments = tool_call.get("function", {}).get("arguments", "")
-
-                                tool_result = None
-                                tool_result_files = None
-                                for result in results:
-                                    if tool_call_id == result.get("tool_call_id", ""):
-                                        tool_result = result.get("content", None)
-                                        tool_result_files = result.get("files", None)
-                                        break
-
-                                if tool_result is not None:
-                                    tool_result_embeds = result.get("embeds", "")
-                                    tool_calls_display_content = f'{tool_calls_display_content}<details type="tool_calls" done="true" id="{tool_call_id}" name="{tool_name}" arguments="{html.escape(json.dumps(tool_arguments))}" result="{html.escape(json.dumps(tool_result, ensure_ascii=False))}" files="{html.escape(json.dumps(tool_result_files)) if tool_result_files else ""}" embeds="{html.escape(json.dumps(tool_result_embeds))}">\n<summary>Tool Executed</summary>\n</details>\n'
-                                else:
-                                    tool_calls_display_content = f'{tool_calls_display_content}<details type="tool_calls" done="false" id="{tool_call_id}" name="{tool_name}" arguments="{html.escape(json.dumps(tool_arguments))}">\n<summary>Executing...</summary>\n</details>\n'
-
-                            if not raw:
-                                content = f"{content}{tool_calls_display_content}"
-                        else:
-                            tool_calls_display_content = ""
-
-                            for tool_call in tool_calls:
-                                tool_call_id = tool_call.get("id", "")
-                                tool_name = tool_call.get("function", {}).get("name", "")
-                                tool_arguments = tool_call.get("function", {}).get("arguments", "")
-
-                                tool_calls_display_content = f'{tool_calls_display_content}\n<details type="tool_calls" done="false" id="{tool_call_id}" name="{tool_name}" arguments="{html.escape(json.dumps(tool_arguments))}">\n<summary>Executing...</summary>\n</details>\n'
-
-                            if not raw:
-                                content = f"{content}{tool_calls_display_content}"
-
-                    elif block["type"] == "reasoning":
-                        reasoning_display_content = html.escape(
-                            "\n".join(
-                                (f"> {line}" if not line.startswith(">") else line)
-                                for line in block["content"].splitlines()
-                            )
-                        )
-
-                        reasoning_duration = block.get("duration", None)
-
-                        start_tag = block.get("start_tag", "")
-                        end_tag = block.get("end_tag", "")
-
-                        if content and not content.endswith("\n"):
-                            content += "\n"
-
-                        if reasoning_duration is not None:
-                            if raw:
-                                content = f"{content}{start_tag}{block['content']}{end_tag}\n"
-                            else:
-                                content = f'{content}<details type="reasoning" done="true" duration="{reasoning_duration}">\n<summary>Thought for {reasoning_duration} seconds</summary>\n{reasoning_display_content}\n</details>\n'
-                        else:
-                            if raw:
-                                content = f"{content}{start_tag}{block['content']}{end_tag}\n"
-                            else:
-                                content = f'{content}<details type="reasoning" done="false">\n<summary>Thinking…</summary>\n{reasoning_display_content}\n</details>\n'
-
-                    else:
-                        block_content = str(block["content"]).strip()
-                        if block_content:
-                            content = f"{content}{block['type']}: {block_content}\n"
-
-                return content.strip()
-
-            def convert_content_blocks_to_messages(content_blocks, raw=False):
-                messages = []
-
-                temp_blocks = []
-                for idx, block in enumerate(content_blocks):
-                    if block["type"] == "tool_calls":
-                        messages.append(
-                            {
-                                "role": "assistant",
-                                "content": serialize_content_blocks(temp_blocks, raw),
-                                "tool_calls": block.get("content"),
-                            }
-                        )
-
-                        results = block.get("results", [])
-
-                        for result in results:
-                            messages.append(
-                                {
-                                    "role": "tool",
-                                    "tool_call_id": result["tool_call_id"],
-                                    "content": result.get("content", "") or "",
-                                }
-                            )
-                        temp_blocks = []
-                    else:
-                        temp_blocks.append(block)
-
-                if temp_blocks:
-                    content = serialize_content_blocks(temp_blocks, raw)
-                    if content:
-                        messages.append(
-                            {
-                                "role": "assistant",
-                                "content": content,
-                            }
-                        )
-
-                return messages
-
-            def tag_content_handler(content_type, tags, content, content_blocks):
-                end_flag = False
-
-                def extract_attributes(tag_content):
-                    """Extract attributes from a tag if they exist."""
-                    attributes = {}
-                    if not tag_content:  # Ensure tag_content is not None
-                        return attributes
-                    # Match attributes in the format: key="value" (ignores single quotes for simplicity)
-                    matches = re.findall(r'(\w+)\s*=\s*"([^"]+)"', tag_content)
-                    for key, value in matches:
-                        attributes[key] = value
-                    return attributes
-
-                if content_blocks[-1]["type"] == "text":
-                    for start_tag, end_tag in tags:
-                        start_tag_pattern = rf"{re.escape(start_tag)}"
-                        if start_tag.startswith("<") and start_tag.endswith(">"):
-                            # Match start tag e.g., <tag> or <tag attr="value">
-                            # remove both '<' and '>' from start_tag
-                            # Match start tag with attributes
-                            start_tag_pattern = rf"<{re.escape(start_tag[1:-1])}(\s.*?)?>"
-
-                        match = re.search(start_tag_pattern, content)
-                        if match:
-                            try:
-                                attr_content = match.group(1) if match.group(1) else ""  # Ensure it's not None
-                            except:
-                                attr_content = ""
-
-                            attributes = extract_attributes(attr_content)  # Extract attributes safely
-
-                            # Capture everything before and after the matched tag
-                            before_tag = content[: match.start()]  # Content before opening tag
-                            after_tag = content[match.end() :]  # Content after opening tag
-
-                            # Remove the start tag and after from the currently handling text block
-                            content_blocks[-1]["content"] = content_blocks[-1]["content"].replace(
-                                match.group(0) + after_tag, ""
-                            )
-
-                            if before_tag:
-                                content_blocks[-1]["content"] = before_tag
-
-                            if not content_blocks[-1]["content"]:
-                                content_blocks.pop()
-
-                            # Append the new block
-                            content_blocks.append(
-                                {
-                                    "type": content_type,
-                                    "start_tag": start_tag,
-                                    "end_tag": end_tag,
-                                    "attributes": attributes,
-                                    "content": "",
-                                    "started_at": time.time(),
-                                }
-                            )
-
-                            if after_tag:
-                                content_blocks[-1]["content"] = after_tag
-                                tag_content_handler(content_type, tags, after_tag, content_blocks)
-
-                            break
-                elif content_blocks[-1]["type"] == content_type:
-                    start_tag = content_blocks[-1]["start_tag"]
-                    end_tag = content_blocks[-1]["end_tag"]
-
-                    if end_tag.startswith("<") and end_tag.endswith(">"):
-                        # Match end tag e.g., </tag>
-                        end_tag_pattern = rf"{re.escape(end_tag)}"
-                    else:
-                        # Handle cases where end_tag is just a tag name
-                        end_tag_pattern = rf"{re.escape(end_tag)}"
-
-                    # Check if the content has the end tag
-                    if re.search(end_tag_pattern, content):
-                        end_flag = True
-
-                        block_content = content_blocks[-1]["content"]
-                        # Strip start and end tags from the content
-                        start_tag_pattern = rf"<{re.escape(start_tag)}(.*?)>"
-                        block_content = re.sub(start_tag_pattern, "", block_content).strip()
-
-                        end_tag_regex = re.compile(end_tag_pattern, re.DOTALL)
-                        split_content = end_tag_regex.split(block_content, maxsplit=1)
-
-                        # Content inside the tag
-                        block_content = split_content[0].strip() if split_content else ""
-
-                        # Leftover content (everything after `</tag>`)
-                        leftover_content = split_content[1].strip() if len(split_content) > 1 else ""
-
-                        if block_content:
-                            content_blocks[-1]["content"] = block_content
-                            content_blocks[-1]["ended_at"] = time.time()
-                            content_blocks[-1]["duration"] = int(
-                                content_blocks[-1]["ended_at"] - content_blocks[-1]["started_at"]
-                            )
-
-                            # Reset the content_blocks by appending a new text block
-                            if leftover_content:
-                                content_blocks.append(
-                                    {
-                                        "type": "text",
-                                        "content": leftover_content,
-                                    }
-                                )
-                            else:
-                                content_blocks.append(
-                                    {
-                                        "type": "text",
-                                        "content": "",
-                                    }
-                                )
-
-                        else:
-                            # Remove the block if content is empty
-                            content_blocks.pop()
-
-                            if leftover_content:
-                                content_blocks.append(
-                                    {
-                                        "type": "text",
-                                        "content": leftover_content,
-                                    }
-                                )
-                            else:
-                                content_blocks.append(
-                                    {
-                                        "type": "text",
-                                        "content": "",
-                                    }
-                                )
-
-                        # Clean processed content
-                        start_tag_pattern = rf"{re.escape(start_tag)}"
-                        if start_tag.startswith("<") and start_tag.endswith(">"):
-                            # Match start tag e.g., <tag> or <tag attr="value">
-                            # remove both '<' and '>' from start_tag
-                            # Match start tag with attributes
-                            start_tag_pattern = rf"<{re.escape(start_tag[1:-1])}(\s.*?)?>"
-
-                        content = re.sub(
-                            rf"{start_tag_pattern}(.|\n)*?{re.escape(end_tag)}",
-                            "",
-                            content,
-                            flags=re.DOTALL,
-                        )
-
-                return content, content_blocks, end_flag
-
             message = Chats.get_message_by_id_and_message_id(metadata["chat_id"], metadata["message_id"])
 
             tool_calls = []
@@ -1877,22 +1610,25 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                 message.get("content", "") if message else last_assistant_message if last_assistant_message else ""
             )
 
-            content_blocks = [
-                {
-                    "type": "text",
-                    "content": content,
-                }
-            ]
-
             reasoning_tags_param = metadata.get("params", {}).get("reasoning_tags")
             DETECT_REASONING_TAGS = reasoning_tags_param is not False
 
-            reasoning_tags = []
+            reasoning_tags_list: list[TagDefinition] = []
             if DETECT_REASONING_TAGS:
                 if isinstance(reasoning_tags_param, list) and len(reasoning_tags_param) == 2:
-                    reasoning_tags = [(reasoning_tags_param[0], reasoning_tags_param[1])]
+                    reasoning_tags_list = [TagDefinition(reasoning_tags_param[0], reasoning_tags_param[1])]
                 else:
-                    reasoning_tags = DEFAULT_REASONING_TAGS
+                    reasoning_tags_list = [TagDefinition(t[0], t[1]) for t in DEFAULT_REASONING_TAGS]
+
+            block_manager = ContentBlockManager(content)
+            reasoning_handler = ReasoningHandler(
+                ReasoningConfig(
+                    enabled=DETECT_REASONING_TAGS,
+                    tags=reasoning_tags_list if reasoning_tags_list else None,
+                ),
+                block_manager,
+            )
+            content_blocks = block_manager.to_list()
 
             try:
                 for event in events:
@@ -1915,6 +1651,8 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                 async def stream_body_handler(response, form_data):
                     nonlocal content
                     nonlocal content_blocks
+                    nonlocal block_manager
+                    nonlocal reasoning_handler
 
                     response_tool_calls = []
 
@@ -2064,85 +1802,30 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                                         or delta.get("thinking")
                                     )
                                     if reasoning_content:
-                                        if not content_blocks or content_blocks[-1]["type"] != "reasoning":
-                                            reasoning_block = {
-                                                "type": "reasoning",
-                                                "start_tag": "<think>",
-                                                "end_tag": "</think>",
-                                                "attributes": {"type": "reasoning_content"},
-                                                "content": "",
-                                                "started_at": time.time(),
-                                            }
-                                            content_blocks.append(reasoning_block)
-                                        else:
-                                            reasoning_block = content_blocks[-1]
-
-                                        reasoning_block["content"] += reasoning_content
-
-                                        data = {"content": serialize_content_blocks(content_blocks)}
+                                        reasoning_handler.handle_api_reasoning(reasoning_content)
+                                        content_blocks = block_manager.to_list()
+                                        data = {"content": serialize_content_blocks_new(content_blocks)}
 
                                     if value:
-                                        if (
-                                            content_blocks
-                                            and content_blocks[-1]["type"] == "reasoning"
-                                            and content_blocks[-1].get("attributes", {}).get("type")
-                                            == "reasoning_content"
-                                        ):
-                                            reasoning_block = content_blocks[-1]
-                                            reasoning_block["ended_at"] = time.time()
-                                            reasoning_block["duration"] = int(
-                                                reasoning_block["ended_at"] - reasoning_block["started_at"]
-                                            )
-
-                                            content_blocks.append(
-                                                {
-                                                    "type": "text",
-                                                    "content": "",
-                                                }
-                                            )
-
                                         if ENABLE_CHAT_RESPONSE_BASE64_IMAGE_URL_CONVERSION:
                                             value = convert_markdown_base64_images(request, value, metadata, user)
 
                                         content = f"{content}{value}"
-                                        if not content_blocks:
-                                            content_blocks.append(
-                                                {
-                                                    "type": "text",
-                                                    "content": "",
-                                                }
-                                            )
-
-                                        content_blocks[-1]["content"] = content_blocks[-1]["content"] + value
-
-                                        if DETECT_REASONING_TAGS:
-                                            content, content_blocks, _ = tag_content_handler(
-                                                "reasoning",
-                                                reasoning_tags,
-                                                content,
-                                                content_blocks,
-                                            )
-
-                                            content, content_blocks, _ = tag_content_handler(
-                                                "solution",
-                                                DEFAULT_SOLUTION_TAGS,
-                                                content,
-                                                content_blocks,
-                                            )
+                                        reasoning_handler.handle_text_content(value)
+                                        content_blocks = block_manager.to_list()
 
                                         if ENABLE_REALTIME_CHAT_SAVE:
-                                            # Save message in the database
                                             Chats.upsert_message_to_chat_by_id_and_message_id(
                                                 metadata["chat_id"],
                                                 metadata["message_id"],
                                                 {
-                                                    "content": serialize_content_blocks(content_blocks),
+                                                    "content": serialize_content_blocks_new(content_blocks),
                                                     "content_blocks": content_blocks,
                                                 },
                                             )
                                         else:
                                             data = {
-                                                "content": serialize_content_blocks(content_blocks),
+                                                "content": serialize_content_blocks_new(content_blocks),
                                                 "content_blocks": content_blocks,
                                             }
 
@@ -2167,29 +1850,11 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                                 continue
                     await flush_pending_delta_data()
 
-                    if content_blocks:
-                        # Clean up the last text block
-                        if content_blocks[-1]["type"] == "text":
-                            content_blocks[-1]["content"] = content_blocks[-1]["content"].strip()
+                    reasoning_handler.finalize()
+                    content_blocks = block_manager.to_list()
 
-                            if not content_blocks[-1]["content"]:
-                                content_blocks.pop()
-
-                                if not content_blocks:
-                                    content_blocks.append(
-                                        {
-                                            "type": "text",
-                                            "content": "",
-                                        }
-                                    )
-
-                        if content_blocks[-1]["type"] == "reasoning":
-                            reasoning_block = content_blocks[-1]
-                            if reasoning_block.get("ended_at") is None:
-                                reasoning_block["ended_at"] = time.time()
-                                reasoning_block["duration"] = int(
-                                    reasoning_block["ended_at"] - reasoning_block["started_at"]
-                                )
+                    if not content_blocks:
+                        content_blocks = [{"type": "text", "content": ""}]
 
                     if response_tool_calls:
                         # Validate and fix incomplete JSON in tool calls before processing
@@ -2228,18 +1893,14 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
 
                     response_tool_calls = tool_calls.pop(0)
 
-                    content_blocks.append(
-                        {
-                            "type": "tool_calls",
-                            "content": response_tool_calls,
-                        }
-                    )
+                    tool_calls_block = block_manager.start_tool_calls(response_tool_calls)
+                    content_blocks = block_manager.to_list()
 
                     await event_emitter(
                         {
                             "type": "chat:completion",
                             "data": {
-                                "content": serialize_content_blocks(content_blocks),
+                                "content": serialize_content_blocks_new(content_blocks),
                                 "content_blocks": content_blocks,
                             },
                         }
@@ -2344,19 +2005,15 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                             }
                         )
 
-                    content_blocks[-1]["results"] = results
-                    content_blocks.append(
-                        {
-                            "type": "text",
-                            "content": "",
-                        }
-                    )
+                    tool_calls_block.results = results
+                    block_manager.ensure_text_block()
+                    content_blocks = block_manager.to_list()
 
                     await event_emitter(
                         {
                             "type": "chat:completion",
                             "data": {
-                                "content": serialize_content_blocks(content_blocks),
+                                "content": serialize_content_blocks_new(content_blocks),
                                 "content_blocks": content_blocks,
                             },
                         }
@@ -2369,7 +2026,7 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                             "stream": True,
                             "messages": [
                                 *form_data["messages"],
-                                *convert_content_blocks_to_messages(content_blocks, True),
+                                *convert_content_blocks_to_messages_new(content_blocks, True),
                             ],
                         }
 
@@ -2390,7 +2047,7 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                 title = Chats.get_chat_title_by_id(metadata["chat_id"])
                 data = {
                     "done": True,
-                    "content": serialize_content_blocks(content_blocks),
+                    "content": serialize_content_blocks_new(content_blocks),
                     "title": title,
                 }
 
@@ -2399,7 +2056,7 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                         metadata["chat_id"],
                         metadata["message_id"],
                         {
-                            "content": serialize_content_blocks(content_blocks),
+                            "content": serialize_content_blocks_new(content_blocks),
                             "content_blocks": content_blocks,
                         },
                     )
@@ -2437,7 +2094,7 @@ async def process_chat_response(request, response, form_data, user, metadata, mo
                         metadata["chat_id"],
                         metadata["message_id"],
                         {
-                            "content": serialize_content_blocks(content_blocks),
+                            "content": serialize_content_blocks_new(content_blocks),
                             "content_blocks": content_blocks,
                         },
                     )
