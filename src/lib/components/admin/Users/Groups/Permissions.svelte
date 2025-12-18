@@ -1,0 +1,737 @@
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import Switch from '$lib/components/common/Switch.svelte';
+	import Tooltip from '$lib/components/common/Tooltip.svelte';
+
+	// Default values for permissions
+	const DEFAULT_PERMISSIONS = {
+		workspace: {
+			models: false,
+			knowledge: false,
+			prompts: false,
+			tools: false,
+			models_import: false,
+			models_export: false,
+			prompts_import: false,
+			prompts_export: false,
+			tools_import: false,
+			tools_export: false
+		},
+		sharing: {
+			models: false,
+			public_models: false,
+			knowledge: false,
+			public_knowledge: false,
+			prompts: false,
+			public_prompts: false,
+			tools: false,
+			public_tools: false,
+			notes: false,
+			public_notes: false
+		},
+		chat: {
+			controls: true,
+			system_prompt: true,
+			params: true,
+			file_upload: true,
+			delete: true,
+			delete_message: true,
+			continue_response: true,
+			regenerate_response: true,
+			rate_response: true,
+			edit: true,
+			share: true,
+			export: true,
+			stt: true,
+			tts: true,
+			call: true,
+			multiple_models: true,
+			temporary: true,
+			temporary_enforced: false
+		},
+		features: {
+			api_keys: false,
+			direct_tool_servers: false,
+			image_generation: true,
+			notes: true
+		}
+	};
+
+	export let permissions = {};
+	export let defaultPermissions = {};
+
+	// Reactive statement to ensure all fields are present in `permissions`
+	$: {
+		permissions = fillMissingProperties(permissions, DEFAULT_PERMISSIONS);
+	}
+
+	function fillMissingProperties(obj: any, defaults: any) {
+		return {
+			...defaults,
+			...obj,
+			workspace: { ...defaults.workspace, ...obj.workspace },
+			sharing: { ...defaults.sharing, ...obj.sharing },
+			chat: { ...defaults.chat, ...obj.chat },
+			features: { ...defaults.features, ...obj.features }
+		};
+	}
+
+	onMount(() => {
+		permissions = fillMissingProperties(permissions, DEFAULT_PERMISSIONS);
+	});
+</script>
+
+<div class="space-y-2">
+	<!-- {'Default Model'}
+	{'Model Filtering'}
+	{'Model Permissions'}
+	{'No model IDs'} -->
+
+	<div>
+		<div class=" mb-2 text-sm font-medium">{'Workspace Permissions'}</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Models Access'}
+				</div>
+				<Switch bind:state={permissions.workspace.models} />
+			</div>
+
+			{#if permissions.workspace.models}
+				<div class="ml-2 flex flex-col gap-2 pt-0.5 pb-1">
+					<div class="flex w-full justify-between">
+						<div class="self-center text-xs">
+							{'Import Models'}
+						</div>
+						<Switch bind:state={permissions.workspace.models_import} />
+					</div>
+					<div class="flex w-full justify-between">
+						<div class="self-center text-xs">
+							{'Export Models'}
+						</div>
+						<Switch bind:state={permissions.workspace.models_export} />
+					</div>
+				</div>
+			{:else if defaultPermissions?.workspace?.models}
+				<div class="pb-0.5">
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Knowledge Access'}
+				</div>
+				<Switch bind:state={permissions.workspace.knowledge} />
+			</div>
+			{#if defaultPermissions?.workspace?.knowledge && !permissions.workspace.knowledge}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Prompts Access'}
+				</div>
+				<Switch bind:state={permissions.workspace.prompts} />
+			</div>
+
+			{#if permissions.workspace.prompts}
+				<div class="ml-2 flex flex-col gap-2 pt-0.5 pb-1">
+					<div class="flex w-full justify-between">
+						<div class="self-center text-xs">
+							{'Import Prompts'}
+						</div>
+						<Switch bind:state={permissions.workspace.prompts_import} />
+					</div>
+					<div class="flex w-full justify-between">
+						<div class="self-center text-xs">
+							{'Export Prompts'}
+						</div>
+						<Switch bind:state={permissions.workspace.prompts_export} />
+					</div>
+				</div>
+			{:else if defaultPermissions?.workspace?.prompts}
+				<div class="pb-0.5">
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<Tooltip
+				className="flex w-full justify-between my-1"
+				content={'Warning: Enabling this will allow users to upload arbitrary code on the server.'}
+				placement="top-start"
+			>
+				<div class=" self-center text-xs font-medium">
+					{'Tools Access'}
+				</div>
+				<Switch bind:state={permissions.workspace.tools} />
+			</Tooltip>
+
+			{#if permissions.workspace.tools}
+				<div class="ml-2 flex flex-col gap-2 pt-0.5 pb-1">
+					<div class="flex w-full justify-between">
+						<div class="self-center text-xs">
+							{'Import Tools'}
+						</div>
+						<Switch bind:state={permissions.workspace.tools_import} />
+					</div>
+					<div class="flex w-full justify-between">
+						<div class="self-center text-xs">
+							{'Export Tools'}
+						</div>
+						<Switch bind:state={permissions.workspace.tools_export} />
+					</div>
+				</div>
+			{:else if defaultPermissions?.workspace?.tools}
+				<div class="pb-0.5">
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+	</div>
+
+	<hr class=" border-gray-100 dark:border-gray-850" />
+
+	<div>
+		<div class=" mb-2 text-sm font-medium">{'Sharing Permissions'}</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Models Sharing'}
+				</div>
+				<Switch bind:state={permissions.sharing.models} />
+			</div>
+			{#if defaultPermissions?.sharing?.models && !permissions.sharing.models}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		{#if permissions.sharing.models}
+			<div class="flex flex-col w-full">
+				<div class="flex w-full justify-between my-1">
+					<div class=" self-center text-xs font-medium">
+						{'Models Public Sharing'}
+					</div>
+					<Switch bind:state={permissions.sharing.public_models} />
+				</div>
+				{#if defaultPermissions?.sharing?.public_models && !permissions.sharing.public_models}
+					<div>
+						<div class="text-xs text-gray-500">
+							{'This is a default user permission and will remain enabled.'}
+						</div>
+					</div>
+				{/if}
+			</div>
+		{/if}
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Knowledge Sharing'}
+				</div>
+				<Switch bind:state={permissions.sharing.knowledge} />
+			</div>
+			{#if defaultPermissions?.sharing?.knowledge && !permissions.sharing.knowledge}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		{#if permissions.sharing.knowledge}
+			<div class="flex flex-col w-full">
+				<div class="flex w-full justify-between my-1">
+					<div class=" self-center text-xs font-medium">
+						{'Knowledge Public Sharing'}
+					</div>
+					<Switch bind:state={permissions.sharing.public_knowledge} />
+				</div>
+				{#if defaultPermissions?.sharing?.public_knowledge && !permissions.sharing.public_knowledge}
+					<div>
+						<div class="text-xs text-gray-500">
+							{'This is a default user permission and will remain enabled.'}
+						</div>
+					</div>
+				{/if}
+			</div>
+		{/if}
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Prompts Sharing'}
+				</div>
+				<Switch bind:state={permissions.sharing.prompts} />
+			</div>
+			{#if defaultPermissions?.sharing?.prompts && !permissions.sharing.prompts}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		{#if permissions.sharing.prompts}
+			<div class="flex flex-col w-full">
+				<div class="flex w-full justify-between my-1">
+					<div class=" self-center text-xs font-medium">
+						{'Prompts Public Sharing'}
+					</div>
+					<Switch bind:state={permissions.sharing.public_prompts} />
+				</div>
+				{#if defaultPermissions?.sharing?.public_prompts && !permissions.sharing.public_prompts}
+					<div>
+						<div class="text-xs text-gray-500">
+							{'This is a default user permission and will remain enabled.'}
+						</div>
+					</div>
+				{/if}
+			</div>
+		{/if}
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Tools Sharing'}
+				</div>
+				<Switch bind:state={permissions.sharing.tools} />
+			</div>
+			{#if defaultPermissions?.sharing?.tools && !permissions.sharing.tools}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		{#if permissions.sharing.tools}
+			<div class="flex flex-col w-full">
+				<div class="flex w-full justify-between my-1">
+					<div class=" self-center text-xs font-medium">
+						{'Tools Public Sharing'}
+					</div>
+					<Switch bind:state={permissions.sharing.public_tools} />
+				</div>
+				{#if defaultPermissions?.sharing?.public_tools && !permissions.sharing.public_tools}
+					<div>
+						<div class="text-xs text-gray-500">
+							{'This is a default user permission and will remain enabled.'}
+						</div>
+					</div>
+				{/if}
+			</div>
+		{/if}
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Notes Sharing'}
+				</div>
+				<Switch bind:state={permissions.sharing.notes} />
+			</div>
+			{#if defaultPermissions?.sharing?.notes && !permissions.sharing.notes}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		{#if permissions.sharing.notes}
+			<div class="flex flex-col w-full">
+				<div class="flex w-full justify-between my-1">
+					<div class=" self-center text-xs font-medium">
+						{'Notes Public Sharing'}
+					</div>
+					<Switch bind:state={permissions.sharing.public_notes} />
+				</div>
+				{#if defaultPermissions?.sharing?.public_notes && !permissions.sharing.public_notes}
+					<div>
+						<div class="text-xs text-gray-500">
+							{'This is a default user permission and will remain enabled.'}
+						</div>
+					</div>
+				{/if}
+			</div>
+		{/if}
+	</div>
+
+	<hr class=" border-gray-100 dark:border-gray-850" />
+
+	<div>
+		<div class=" mb-2 text-sm font-medium">{'Chat Permissions'}</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow File Upload'}
+				</div>
+				<Switch bind:state={permissions.chat.file_upload} />
+			</div>
+			{#if defaultPermissions?.chat?.file_upload && !permissions.chat.file_upload}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Chat Controls'}
+				</div>
+				<Switch bind:state={permissions.chat.controls} />
+			</div>
+			{#if defaultPermissions?.chat?.controls && !permissions.chat.controls}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		{#if permissions.chat.controls}
+			<div class="flex flex-col w-full">
+				<div class="flex w-full justify-between my-1">
+					<div class=" self-center text-xs font-medium">
+						{'Allow Chat System Prompt'}
+					</div>
+					<Switch bind:state={permissions.chat.system_prompt} />
+				</div>
+				{#if defaultPermissions?.chat?.system_prompt && !permissions.chat.system_prompt}
+					<div>
+						<div class="text-xs text-gray-500">
+							{'This is a default user permission and will remain enabled.'}
+						</div>
+					</div>
+				{/if}
+			</div>
+
+			<div class="flex flex-col w-full">
+				<div class="flex w-full justify-between my-1">
+					<div class=" self-center text-xs font-medium">
+						{'Allow Chat Params'}
+					</div>
+					<Switch bind:state={permissions.chat.params} />
+				</div>
+				{#if defaultPermissions?.chat?.params && !permissions.chat.params}
+					<div>
+						<div class="text-xs text-gray-500">
+							{'This is a default user permission and will remain enabled.'}
+						</div>
+					</div>
+				{/if}
+			</div>
+		{/if}
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Chat Edit'}
+				</div>
+				<Switch bind:state={permissions.chat.edit} />
+			</div>
+			{#if defaultPermissions?.chat?.edit && !permissions.chat.edit}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Chat Delete'}
+				</div>
+				<Switch bind:state={permissions.chat.delete} />
+			</div>
+			{#if defaultPermissions?.chat?.delete && !permissions.chat.delete}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Delete Messages'}
+				</div>
+				<Switch bind:state={permissions.chat.delete_message} />
+			</div>
+			{#if defaultPermissions?.chat?.delete_message && !permissions.chat.delete_message}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Continue Response'}
+				</div>
+				<Switch bind:state={permissions.chat.continue_response} />
+			</div>
+			{#if defaultPermissions?.chat?.continue_response && !permissions.chat.continue_response}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Regenerate Response'}
+				</div>
+				<Switch bind:state={permissions.chat.regenerate_response} />
+			</div>
+			{#if defaultPermissions?.chat?.regenerate_response && !permissions.chat.regenerate_response}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Rate Response'}
+				</div>
+				<Switch bind:state={permissions.chat.rate_response} />
+			</div>
+			{#if defaultPermissions?.chat?.rate_response && !permissions.chat.rate_response}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Chat Share'}
+				</div>
+				<Switch bind:state={permissions.chat.share} />
+			</div>
+			{#if defaultPermissions?.chat?.share && !permissions.chat.share}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Chat Export'}
+				</div>
+				<Switch bind:state={permissions.chat.export} />
+			</div>
+			{#if defaultPermissions?.chat?.export && !permissions.chat.export}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Speech to Text'}
+				</div>
+				<Switch bind:state={permissions.chat.stt} />
+			</div>
+			{#if defaultPermissions?.chat?.stt && !permissions.chat.stt}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Text to Speech'}
+				</div>
+				<Switch bind:state={permissions.chat.tts} />
+			</div>
+			{#if defaultPermissions?.chat?.tts && !permissions.chat.tts}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Call'}
+				</div>
+				<Switch bind:state={permissions.chat.call} />
+			</div>
+			{#if defaultPermissions?.chat?.call && !permissions.chat.call}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Multiple Models in Chat'}
+				</div>
+				<Switch bind:state={permissions.chat.multiple_models} />
+			</div>
+			{#if defaultPermissions?.chat?.multiple_models && !permissions.chat.multiple_models}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Allow Temporary Chat'}
+				</div>
+				<Switch bind:state={permissions.chat.temporary} />
+			</div>
+			{#if defaultPermissions?.chat?.temporary && !permissions.chat.temporary}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		{#if permissions.chat.temporary}
+			<div class="flex flex-col w-full">
+				<div class="flex w-full justify-between my-1">
+					<div class=" self-center text-xs font-medium">
+						{'Enforce Temporary Chat'}
+					</div>
+					<Switch bind:state={permissions.chat.temporary_enforced} />
+				</div>
+				{#if defaultPermissions?.chat?.temporary_enforced && !permissions.chat.temporary_enforced}
+					<div>
+						<div class="text-xs text-gray-500">
+							{'This is a default user permission and will remain enabled.'}
+						</div>
+					</div>
+				{/if}
+			</div>
+		{/if}
+	</div>
+
+	<hr class=" border-gray-100 dark:border-gray-850" />
+
+	<div>
+		<div class=" mb-2 text-sm font-medium">{'Features Permissions'}</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'API Keys'}
+				</div>
+				<Switch bind:state={permissions.features.api_keys} />
+			</div>
+			{#if defaultPermissions?.features?.api_keys && !permissions.features.api_keys}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Direct Tool Servers'}
+				</div>
+				<Switch bind:state={permissions.features.direct_tool_servers} />
+			</div>
+			{#if defaultPermissions?.features?.direct_tool_servers && !permissions.features.direct_tool_servers}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+
+		<div class="flex flex-col w-full">
+			<div class="flex w-full justify-between my-1">
+				<div class=" self-center text-xs font-medium">
+					{'Image Generation'}
+				</div>
+				<Switch bind:state={permissions.features.image_generation} />
+			</div>
+			{#if defaultPermissions?.features?.image_generation && !permissions.features.image_generation}
+				<div>
+					<div class="text-xs text-gray-500">
+						{'This is a default user permission and will remain enabled.'}
+					</div>
+				</div>
+			{/if}
+		</div>
+	</div>
+</div>

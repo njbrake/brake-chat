@@ -1,0 +1,226 @@
+import asyncio
+import json
+import logging
+import random
+import sys
+import uuid
+from typing import Any
+
+from fastapi import Request
+from open_webui.env import BYPASS_MODEL_ACCESS_CONTROL, GLOBAL_LOG_LEVEL, SRC_LOG_LEVELS
+from open_webui.routers.openai import (
+    generate_chat_completion as generate_openai_chat_completion,
+)
+from open_webui.socket.main import (
+    get_event_call,
+    sio,
+)
+from open_webui.utils.models import check_model_access, get_all_models
+from starlette.responses import StreamingResponse
+
+logging.basicConfig(stream=sys.stdout, level=GLOBAL_LOG_LEVEL)
+log = logging.getLogger(__name__)
+log.setLevel(SRC_LOG_LEVELS["MAIN"])
+
+
+async def generate_direct_chat_completion(
+    request: Request,
+    form_data: dict,
+    user: Any,
+    models: dict,
+):
+    log.info("generate_direct_chat_completion")
+
+    metadata = form_data.pop("metadata", {})
+
+    user_id = metadata.get("user_id")
+    session_id = metadata.get("session_id")
+    request_id = str(uuid.uuid4())  # Generate a unique request ID
+
+    event_caller = get_event_call(metadata)
+
+    channel = f"{user_id}:{session_id}:{request_id}"
+    logging.info(f"WebSocket channel: {channel}")
+
+    if form_data.get("stream"):
+        q = asyncio.Queue()
+
+        async def message_listener(sid, data):
+            """Handle received socket messages and push them into the queue."""
+            await q.put(data)
+
+        # Register the listener
+        sio.on(channel, message_listener)
+
+        # Start processing chat completion in background
+        res = await event_caller(
+            {
+                "type": "request:chat:completion",
+                "data": {
+                    "form_data": form_data,
+                    "model": models[form_data["model"]],
+                    "channel": channel,
+                    "session_id": session_id,
+                },
+            }
+        )
+
+        log.info(f"res: {res}")
+
+        if res.get("status", False):
+            # Define a generator to stream responses
+            async def event_generator():
+                nonlocal q
+                try:
+                    while True:
+                        data = await q.get()  # Wait for new messages
+                        if isinstance(data, dict):
+                            if data.get("done"):
+                                break  # Stop streaming when 'done' is received
+
+                            yield f"data: {json.dumps(data)}\n\n"
+                        elif isinstance(data, str):
+                            if "data:" in data:
+                                yield f"{data}\n\n"
+                            else:
+                                yield f"data: {data}\n\n"
+                except Exception as e:
+                    log.debug(f"Error in event generator: {e}")
+
+            # Define a background task to run the event generator
+            async def background():
+                try:
+                    del sio.handlers["/"][channel]
+                except Exception:
+                    pass
+
+            # Return the streaming response
+            return StreamingResponse(event_generator(), media_type="text/event-stream", background=background)
+        raise Exception(str(res))
+    res = await event_caller(
+        {
+            "type": "request:chat:completion",
+            "data": {
+                "form_data": form_data,
+                "model": models[form_data["model"]],
+                "channel": channel,
+                "session_id": session_id,
+            },
+        }
+    )
+
+    if res.get("error"):
+        raise Exception(res["error"])
+
+    return res
+
+
+async def generate_chat_completion(
+    request: Request,
+    form_data: dict,
+    user: Any,
+    bypass_filter: bool = False,
+):
+    log.debug(f"generate_chat_completion: {form_data}")
+    if BYPASS_MODEL_ACCESS_CONTROL:
+        bypass_filter = True
+
+    if hasattr(request.state, "metadata"):
+        if "metadata" not in form_data:
+            form_data["metadata"] = request.state.metadata
+        else:
+            form_data["metadata"] = {
+                **form_data["metadata"],
+                **request.state.metadata,
+            }
+
+    if getattr(request.state, "direct", False) and hasattr(request.state, "model"):
+        models = {
+            request.state.model["id"]: request.state.model,
+        }
+        log.debug(f"direct connection to model: {models}")
+    else:
+        models = request.app.state.MODELS
+
+    model_id = form_data["model"]
+    if model_id not in models:
+        raise Exception("Model not found")
+
+    model = models[model_id]
+
+    if getattr(request.state, "direct", False):
+        return await generate_direct_chat_completion(request, form_data, user=user, models=models)
+    # Check if user has access to the model
+    if not bypass_filter and user.role == "user":
+        try:
+            check_model_access(user, model)
+        except Exception as e:
+            raise e
+
+    if model.get("owned_by") == "arena":
+        model_ids = model.get("info", {}).get("meta", {}).get("model_ids")
+        filter_mode = model.get("info", {}).get("meta", {}).get("filter_mode")
+        if model_ids and filter_mode == "exclude":
+            model_ids = [
+                model["id"]
+                for model in list(request.app.state.MODELS.values())
+                if model.get("owned_by") != "arena" and model["id"] not in model_ids
+            ]
+
+        selected_model_id = None
+        if isinstance(model_ids, list) and model_ids:
+            selected_model_id = random.choice(model_ids)
+        else:
+            model_ids = [
+                model["id"] for model in list(request.app.state.MODELS.values()) if model.get("owned_by") != "arena"
+            ]
+            selected_model_id = random.choice(model_ids)
+
+        form_data["model"] = selected_model_id
+
+        if form_data.get("stream") == True:
+
+            async def stream_wrapper(stream):
+                yield f"data: {json.dumps({'selected_model_id': selected_model_id})}\n\n"
+                async for chunk in stream:
+                    yield chunk
+
+            response = await generate_chat_completion(request, form_data, user, bypass_filter=True)
+            return StreamingResponse(
+                stream_wrapper(response.body_iterator),
+                media_type="text/event-stream",
+                background=response.background,
+            )
+        return {
+            **(await generate_chat_completion(request, form_data, user, bypass_filter=True)),
+            "selected_model_id": selected_model_id,
+        }
+
+    return await generate_openai_chat_completion(
+        request=request,
+        form_data=form_data,
+        user=user,
+        bypass_filter=bypass_filter,
+    )
+
+
+chat_completion = generate_chat_completion
+
+
+async def chat_completed(request: Request, form_data: dict, user: Any):
+    if not request.app.state.MODELS:
+        await get_all_models(request, user=user)
+
+    if getattr(request.state, "direct", False) and hasattr(request.state, "model"):
+        models = {
+            request.state.model["id"]: request.state.model,
+        }
+    else:
+        models = request.app.state.MODELS
+
+    data = form_data
+    model_id = data["model"]
+    if model_id not in models:
+        raise Exception("Model not found")
+
+    return data
