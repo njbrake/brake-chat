@@ -3,8 +3,6 @@ pnpm-lock.yaml
 package-lock.json
 yarn.lock
 
-kubernetes/
-
 # Copy of .gitignore
 .DS_Store
 node_modules
@@ -306,10 +304,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-
-# cypress artifacts
-cypress/videos
-cypress/screenshots
 
 
 

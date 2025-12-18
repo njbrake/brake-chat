@@ -1349,11 +1349,11 @@ class OAuthManager:
 
             # Clean up any existing sessions for this user/provider first
             sessions = OAuthSessions.get_sessions_by_user_id(user.id)
-            for session in sessions:
-                if session.provider == provider:
-                    OAuthSessions.delete_session_by_id(session.id)
+            for oauth_session in sessions:
+                if oauth_session.provider == provider:
+                    OAuthSessions.delete_session_by_id(oauth_session.id)
 
-            session = OAuthSessions.create_session(
+            oauth_session = OAuthSessions.create_session(
                 user_id=user.id,
                 provider=provider,
                 token=token,
@@ -1361,7 +1361,7 @@ class OAuthManager:
 
             response.set_cookie(
                 key="oauth_session_id",
-                value=session.id,
+                value=oauth_session.id,
                 httponly=True,
                 samesite=WEBUI_AUTH_COOKIE_SAME_SITE,
                 secure=WEBUI_AUTH_COOKIE_SECURE,

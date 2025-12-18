@@ -1,6 +1,0 @@
-resources:
-  - open-webui.yaml
-  - webui-deployment.yaml
-  - webui-service.yaml
-  - webui-ingress.yaml
-  - webui-pvc.yaml

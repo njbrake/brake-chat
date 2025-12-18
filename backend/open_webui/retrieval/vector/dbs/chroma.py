@@ -102,9 +102,9 @@ class ChromaClient(VectorDBBase):
                 )
 
                 return GetResult(
-                    ids=[result["ids"]],
-                    documents=[result["documents"]],
-                    metadatas=[result["metadatas"]],
+                    ids=[result["ids"]] if result["ids"] is not None else None,
+                    documents=[result["documents"]] if result["documents"] is not None else None,
+                    metadatas=[result["metadatas"]] if result["metadatas"] is not None else None,
                 )
             return None
         except:
@@ -116,9 +116,9 @@ class ChromaClient(VectorDBBase):
         if collection:
             result = collection.get()
             return GetResult(
-                ids=[result["ids"]],
-                documents=[result["documents"]],
-                metadatas=[result["metadatas"]],
+                ids=[result["ids"]] if result["ids"] is not None else None,
+                documents=[result["documents"]] if result["documents"] is not None else None,
+                metadatas=[result["metadatas"]] if result["metadatas"] is not None else None,
             )
         return None
 
@@ -133,10 +133,10 @@ class ChromaClient(VectorDBBase):
 
         for batch in create_batches(
             api=self.client,
-            documents=documents,
-            embeddings=embeddings,
-            ids=ids,
-            metadatas=metadatas,
+            documents=documents or [],
+            embeddings=embeddings or [],
+            ids=ids or [],
+            metadatas=metadatas or [],
         ):
             collection.add(*batch)
 
@@ -149,7 +149,12 @@ class ChromaClient(VectorDBBase):
         embeddings = [item["vector"] for item in items]
         metadatas = [process_metadata(item["metadata"]) for item in items]
 
-        collection.upsert(ids=ids, documents=documents, embeddings=embeddings, metadatas=metadatas)
+        collection.upsert(
+            ids=ids or [],
+            documents=documents or [],
+            embeddings=embeddings or [],
+            metadatas=metadatas or [],
+        )
 
     def delete(
         self,

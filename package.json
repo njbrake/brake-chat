@@ -16,7 +16,6 @@
 		"lint:backend": "pylint backend/",
 		"format": "prettier --plugin-search-dir --write \"**/*.{js,ts,svelte,css,md,html,json}\"",
 		"format:backend": "uv run ruff format backend/",
-		"cy:open": "cypress open",
 		"test:frontend": "vitest --passWithNoTests"
 	},
 	"devDependencies": {
@@ -29,10 +28,8 @@
 		"@tailwindcss/typography": "^0.5.13",
 		"@typescript-eslint/eslint-plugin": "^8.31.1",
 		"@typescript-eslint/parser": "^8.31.1",
-		"cypress": "^13.15.0",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-cypress": "^3.4.0",
 		"eslint-plugin-svelte": "^2.45.1",
 		"eslint-plugin-unused-imports": "^4.3.0",
 		"postcss": "^8.4.31",

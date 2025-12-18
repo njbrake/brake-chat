@@ -172,10 +172,6 @@ class PersistentConfig(Generic[T]):
     def __str__(self):
         return str(self.value)
 
-    @property
-    def __dict__(self):
-        raise TypeError("PersistentConfig object cannot be converted to dict, use config_get or .value instead.")
-
     def __getattribute__(self, item):
         if item == "__dict__":
             raise TypeError("PersistentConfig object cannot be converted to dict, use config_get or .value instead.")
