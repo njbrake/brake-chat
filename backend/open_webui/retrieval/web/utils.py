@@ -2,10 +2,11 @@ import asyncio
 import logging
 import socket
 import ssl
+import time as time_module
 import urllib.parse
 import urllib.request
 from collections.abc import AsyncIterator, Iterator, Sequence
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 from typing import (
     Any,
     Literal,
@@ -131,6 +132,9 @@ def verify_ssl_cert(url: str) -> bool:
 
 
 class RateLimitMixin:
+    requests_per_second: float | None
+    last_request_time: datetime | None
+
     async def _wait_for_rate_limit(self):
         """Wait to respect the rate limit if specified."""
         if self.requests_per_second and self.last_request_time:
@@ -146,7 +150,7 @@ class RateLimitMixin:
             min_interval = timedelta(seconds=1.0 / self.requests_per_second)
             time_since_last = datetime.now() - self.last_request_time
             if time_since_last < min_interval:
-                time.sleep((min_interval - time_since_last).total_seconds())
+                time_module.sleep((min_interval - time_since_last).total_seconds())
         self.last_request_time = datetime.now()
 
 
