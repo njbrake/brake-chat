@@ -35,7 +35,7 @@ class SentinelRedisProxy:
         if self._async_mode:
 
             async def _wrapped(*args, **kwargs):
-                for i in range(REDIS_SENTINEL_MAX_RETRY_COUNT):
+                for i in range(int(REDIS_SENTINEL_MAX_RETRY_COUNT)):
                     try:
                         method = getattr(self._master(), item)
                         result = method(*args, **kwargs)
@@ -64,7 +64,7 @@ class SentinelRedisProxy:
             return _wrapped
 
         def _wrapped(*args, **kwargs):
-            for i in range(REDIS_SENTINEL_MAX_RETRY_COUNT):
+            for i in range(int(REDIS_SENTINEL_MAX_RETRY_COUNT)):
                 try:
                     method = getattr(self._master(), item)
                     return method(*args, **kwargs)

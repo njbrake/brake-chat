@@ -265,7 +265,7 @@ class MistralLoader:
 
             # Add file part with streaming
             file_part = writer.append_payload(
-                aiohttp.streams.FilePayload(
+                aiohttp.FilePayload(
                     self.file_path,
                     filename=self.file_name,
                     content_type="application/pdf",
