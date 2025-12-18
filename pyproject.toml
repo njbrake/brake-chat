@@ -146,7 +146,7 @@ all = [
     "moto[s3]>=5.0.26",
     "gcp-storage-emulator>=2024.8.3",
     "docker~=7.1.0",
-    "pytest~=8.3.2",
+    "pytest~=8.4.1",
     "pytest-docker~=3.1.1",
     "playwright==1.49.1",
     "elasticsearch==9.1.0",
