@@ -59,6 +59,7 @@ class ReasoningBlock:
             "started_at": self.started_at,
             "ended_at": self.ended_at,
             "duration": self.duration,
+            "source": self.source,
         }
 
 
