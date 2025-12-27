@@ -14,8 +14,8 @@ class CustomBuildHook(BuildHookInterface):
         if npm is None:
             raise RuntimeError("NodeJS `npm` is required for building Open Webui but it was not found")
         stderr.write("### npm install\n")
-        subprocess.run([npm, "install", "--force"], check=True)
-        subprocess.run([npm, "install", "--force", "--prefix", "next-app"], check=True)
+        subprocess.run([npm, "install"], check=True)
+        subprocess.run([npm, "install", "--prefix", "next-app"], check=True)
         stderr.write("\n### npm run build\n")
         os.environ["APP_BUILD_HASH"] = version
         subprocess.run([npm, "run", "build"], check=True)

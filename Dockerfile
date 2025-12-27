@@ -33,7 +33,7 @@ COPY package.json package-lock.json ./
 RUN mkdir -p next-app
 COPY next-app/package.json next-app/package-lock.json ./next-app/
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --force
+    npm ci
 
 COPY . .
 ENV APP_BUILD_HASH=${BUILD_HASH}
