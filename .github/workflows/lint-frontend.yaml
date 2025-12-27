@@ -11,12 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Use Bun
-        uses: oven-sh/setup-bun@v1
-      - run: bun --version
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
       - name: Install frontend dependencies
-        run: bun install --frozen-lockfile
-      - run: bun run lint:frontend
+        run: npm ci --prefix next-app
+      - run: npm run lint --prefix next-app
       # Not yet ready to enable this because there are a LOT of errors
       # - run: bun run lint:types
       #   if: success() || failure()

@@ -910,6 +910,7 @@ async def process_chat_payload(request, form_data, user, metadata, model):
                     {
                         "id": item.get("collection_name"),
                         "name": item.get("name"),
+                        "type": "collection",
                         "legacy": True,
                     }
                 )
@@ -957,9 +958,6 @@ async def process_chat_payload(request, form_data, user, metadata, model):
     #     urls = extract_urls(prompt)
 
     if files:
-        if not files:
-            files = []
-
         for file_item in files:
             if file_item.get("type", "file") == "folder":
                 # Get folder files

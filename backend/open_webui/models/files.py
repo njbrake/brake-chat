@@ -117,7 +117,7 @@ class FilesTable:
             )
 
             try:
-                result = File(**file.model_dump())
+                result = File(**file.model_dump(exclude={"content"}))
                 db.add(result)
                 db.commit()
                 db.refresh(result)
