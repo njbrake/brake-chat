@@ -1,23 +1,23 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import { APP_NAME } from "@/lib/constants";
+import type { Metadata } from 'next';
+import './globals.css';
+import { APP_NAME } from '@/lib/constants';
 
 export const metadata: Metadata = {
-  title: APP_NAME,
-  description: "AI Chat Interface",
+	title: APP_NAME,
+	description: 'AI Chat Interface'
 };
 
 export default function RootLayout({
-  children,
+	children
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<head>
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `
               (function() {
                 try {
                   const theme = localStorage.getItem('brake-chat-settings');
@@ -32,13 +32,11 @@ export default function RootLayout({
                   }
                 } catch (e) {}
               })();
-            `,
-          }}
-        />
-      </head>
-      <body className="antialiased">
-        {children}
-      </body>
-    </html>
-  );
+            `
+					}}
+				/>
+			</head>
+			<body className="antialiased">{children}</body>
+		</html>
+	);
 }

@@ -4,11 +4,11 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminPage() {
-  const router = useRouter();
+	const router = useRouter();
 
-  useEffect(() => {
-    router.push('/admin/users');
-  }, [router]);
+	useEffect(() => {
+		router.push('/admin/users');
+	}, [router]);
 
-  return null;
+	return null;
 }

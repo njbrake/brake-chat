@@ -177,7 +177,7 @@ force-include = { build = "open_webui/frontend" }
 skip = '.git*,*.svg,package-lock.json,*.lock,*.css,*-bundle.js,locales,example-doc.txt,emoji-shortcodes.json'
 check-hidden = true
 # ignore-regex = ''
-ignore-words-list = 'ans'
+ignore-words-list = 'ans,mappin'
 
 [dependency-groups]
 dev = [

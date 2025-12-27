@@ -42,14 +42,13 @@ repos:
     hooks:
       - id: prettier
         args: ['--log-level=error']
-        types_or: [javascript, jsx, ts, tsx, json, svelte, css, markdown, html]
+        types_or: [javascript, jsx, ts, tsx, json, css, markdown, html]
         exclude: '^(package-lock\.json|.*\.lock)$'
         additional_dependencies:
           - prettier@3.3.3
-          - prettier-plugin-svelte@3.2.6
 
   - repo: https://github.com/codespell-project/codespell
     rev: "v2.4.1"
     hooks:
       - id: codespell
-        exclude: '^(CODE_OF_CONDUCT\.md|.*\.lock|.*\.css|.*-bundle\.js|locales/.*|emoji-shortcodes\.json)$'
+        exclude: '^(CODE_OF_CONDUCT\.md|.*\.lock|.*package-lock\.json|.*\.css|.*-bundle\.js|next-app/.*\.lock|locales/.*|emoji-shortcodes\.json)$'

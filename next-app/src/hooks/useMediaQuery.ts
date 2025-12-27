@@ -3,29 +3,29 @@
 import { useState, useEffect } from 'react';
 
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false);
+	const [matches, setMatches] = useState(false);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+	useEffect(() => {
+		if (typeof window === 'undefined') return;
 
-    const media = window.matchMedia(query);
-    setMatches(media.matches);
+		const media = window.matchMedia(query);
+		setMatches(media.matches);
 
-    const listener = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
+		const listener = (event: MediaQueryListEvent) => {
+			setMatches(event.matches);
+		};
 
-    media.addEventListener('change', listener);
-    return () => media.removeEventListener('change', listener);
-  }, [query]);
+		media.addEventListener('change', listener);
+		return () => media.removeEventListener('change', listener);
+	}, [query]);
 
-  return matches;
+	return matches;
 }
 
 export function useIsMobile(): boolean {
-  return useMediaQuery('(max-width: 768px)');
+	return useMediaQuery('(max-width: 768px)');
 }
 
 export function usePrefersDarkMode(): boolean {
-  return useMediaQuery('(prefers-color-scheme: dark)');
+	return useMediaQuery('(prefers-color-scheme: dark)');
 }
