@@ -7,8 +7,9 @@
 		"build": "npm run build --prefix next-app",
 		"start": "npm run start --prefix next-app",
 		"lint": "npm run lint:frontend ; npm run lint:backend",
-		"lint:frontend": "npm run lint --prefix next-app",
+		"lint:frontend": "cd next-app && bun run lint",
 		"lint:backend": "pylint backend/",
+		"format": "prettier --write next-app/src",
 		"format:backend": "uv run ruff format backend/",
 		"test:frontend": "npm run test --prefix next-app"
 	},
