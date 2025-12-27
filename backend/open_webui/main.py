@@ -1260,10 +1260,7 @@ async def chat_completion(
 
             # Check if user has access to the model
             if not BYPASS_MODEL_ACCESS_CONTROL and (user.role != "admin" or not BYPASS_ADMIN_ACCESS_CONTROL):
-                try:
-                    check_model_access(user, model)
-                except Exception as e:
-                    raise e
+                check_model_access(user, model)
         else:
             model = model_item
             model_info = None
@@ -1894,13 +1891,13 @@ async def get_manifest_json():
         "background_color": "#343541",
         "icons": [
             {
-                "src": "/static/logo.png",
+                "src": "/logo.png",
                 "type": "image/png",
                 "sizes": "500x500",
                 "purpose": "any",
             },
             {
-                "src": "/static/logo.png",
+                "src": "/logo.png",
                 "type": "image/png",
                 "sizes": "500x500",
                 "purpose": "maskable",
@@ -1921,7 +1918,7 @@ async def get_opensearch_xml():
     <ShortName>{app.state.WEBUI_NAME}</ShortName>
     <Description>Search {app.state.WEBUI_NAME}</Description>
     <InputEncoding>UTF-8</InputEncoding>
-    <Image width="16" height="16" type="image/x-icon">{app.state.config.WEBUI_URL}/static/favicon.png</Image>
+    <Image width="16" height="16" type="image/x-icon">{app.state.config.WEBUI_URL}/favicon.png</Image>
     <Url type="text/html" method="get" template="{app.state.config.WEBUI_URL}/?q={"{searchTerms}"}"/>
     <moz:SearchForm>{app.state.config.WEBUI_URL}</moz:SearchForm>
     </OpenSearchDescription>

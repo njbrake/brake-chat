@@ -27,6 +27,7 @@ dependencies = [
     "httpx[socks,http2,zstd,cli,brotli]==0.28.1",
     "starsessions[redis]==2.2.1",
     "sqlalchemy==2.0.38",
+    "psycopg2-binary==2.9.10",
     "alembic==1.14.0",
     "pycrdt==0.12.25",
     "redis",
@@ -68,16 +69,8 @@ dependencies = [
     "google-cloud-storage==2.19.0",
     "azure-identity==1.25.0",
     "azure-storage-blob==12.24.1",
-    "azure-search-documents==11.6.0",
-    "pymongo",
-    "psycopg2-binary==2.9.10",
-    "playwright==1.49.1",
     "av==14.0.1",
-    "docker~=7.1.0",
-    "pytest~=8.4.1",
-    "pytest-docker~=3.1.1",
     "ldap3==2.9.1",
-    "firecrawl-py==4.5.0",
     "opentelemetry-api==1.37.0",
     "opentelemetry-sdk==1.37.0",
     "opentelemetry-exporter-otlp==1.37.0",
@@ -116,25 +109,18 @@ google = [
 ]
 
 all = [
-    "pymongo",
-    "psycopg2-binary==2.9.10",
-    "pgvector==0.4.1",
-    "moto[s3]>=5.0.26",
-    "gcp-storage-emulator>=2024.8.3",
-    "docker~=7.1.0",
-    "pytest~=8.4.1",
-    "pytest-docker~=3.1.1",
-    "playwright==1.49.1",
+    "azure-search-documents==11.6.0",
     "elasticsearch==9.1.0",
-
+    "firecrawl-py==4.5.0",
+    "gcp-storage-emulator>=2024.8.3",
+    "moto[s3]>=5.0.26",
+    "oracledb==3.2.0",
+    "pinecone==6.0.2",
+    "playwright==1.49.1",
+    "pymilvus==2.6.2",
+    "pymongo",
     "qdrant-client==1.14.3",
     "weaviate-client==4.17.0",
-    "pymilvus==2.6.2",
-    "pinecone==6.0.2",
-    "oracledb==3.2.0",
-
-    "firecrawl-py==4.5.0",
-    "azure-search-documents==11.6.0",
 ]
 
 [project.scripts]
@@ -181,7 +167,10 @@ ignore-words-list = 'ans,mappin'
 
 [dependency-groups]
 dev = [
+    "docker~=7.1.0",
+    "pytest~=8.4.1",
     "pytest-asyncio>=1.0.0",
+    "pytest-docker~=3.1.1",
     "ruff==0.14.9",
 ]
 

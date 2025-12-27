@@ -648,7 +648,7 @@ def get_embedding_function(
     if embedding_engine == "":
         if embedding_function is None:
 
-            async def async_embedding_function(_query, _prefix=None, _user=None):
+            async def async_embedding_function(query, prefix=None, user=None):
                 raise ValueError(
                     "Internal embedding engine is unavailable (sentence-transformers/torch removed). "
                     "Configure RAG_EMBEDDING_ENGINE to 'openai' or 'azure_openai'."
