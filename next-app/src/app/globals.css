@@ -1,0 +1,259 @@
+@import "tailwindcss";
+
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/container-queries";
+
+@theme {
+  --color-gray-50: var(--color-gray-50-val, #f9f9f9);
+  --color-gray-100: var(--color-gray-100-val, #ececec);
+  --color-gray-200: var(--color-gray-200-val, #e3e3e3);
+  --color-gray-300: var(--color-gray-300-val, #cdcdcd);
+  --color-gray-400: var(--color-gray-400-val, #b4b4b4);
+  --color-gray-500: var(--color-gray-500-val, #9b9b9b);
+  --color-gray-600: var(--color-gray-600-val, #676767);
+  --color-gray-700: var(--color-gray-700-val, #4e4e4e);
+  --color-gray-800: var(--color-gray-800-val, #333);
+  --color-gray-850: #262626;
+  --color-gray-900: var(--color-gray-900-val, #171717);
+  --color-gray-950: var(--color-gray-950-val, #0d0d0d);
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/assets/fonts/Inter-Variable.ttf');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('/assets/fonts/Archivo-Variable.ttf');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Mona Sans';
+  src: url('/assets/fonts/Mona-Sans.woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'InstrumentSerif';
+  src: url('/assets/fonts/InstrumentSerif-Regular.ttf');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/assets/fonts/Vazirmatn-Variable.ttf');
+  font-display: swap;
+}
+
+:root {
+  --app-text-scale: 1;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  html,
+  pre {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Vazirmatn', ui-sans-serif, system-ui,
+      'Segoe UI', Roboto, Ubuntu, Cantarell, 'Noto Sans', sans-serif, 'Helvetica Neue', Arial,
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  }
+
+  html {
+    word-break: break-word;
+    font-size: calc(1rem * var(--app-text-scale, 1));
+  }
+
+  pre {
+    white-space: pre-wrap;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
+
+  input[type='checkbox'] {
+    @apply appearance-none size-3.5 align-middle bg-white border border-gray-300 rounded transition cursor-pointer focus:ring-2 focus:ring-blue-500 focus:outline-none dark:bg-gray-800 dark:border-gray-600 self-center;
+    display: inline-block;
+    position: relative;
+  }
+  input[type='checkbox']:checked {
+    @apply bg-blue-600 border-blue-600;
+  }
+  input[type='checkbox']:after {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.2s;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 8l3 3l5-5"/></svg>')
+      center/80% no-repeat;
+  }
+  input[type='checkbox']:checked:after {
+    opacity: 1;
+  }
+}
+
+@custom-variant hover (&:hover);
+
+code {
+  overflow-x: auto;
+  width: auto;
+}
+
+.font-secondary {
+  font-family: 'InstrumentSerif', sans-serif;
+}
+
+.font-primary {
+  font-family: 'Archivo', 'Vazirmatn', sans-serif;
+}
+
+.marked a {
+  @apply underline;
+}
+
+math {
+  margin-top: 1rem;
+}
+
+.hljs {
+  @apply rounded-lg;
+}
+
+input::placeholder {
+  direction: auto;
+}
+
+textarea::placeholder {
+  direction: auto;
+}
+
+.markdown-prose {
+  @apply prose dark:prose-invert prose-blockquote:border-s-gray-100 prose-blockquote:dark:border-gray-800 prose-blockquote:border-s-2 prose-blockquote:not-italic prose-blockquote:font-normal prose-headings:font-semibold prose-hr:my-4 prose-hr:border-gray-50 prose-hr:dark:border-gray-850 prose-p:my-0 prose-img:my-1 prose-headings:my-1 prose-pre:my-0 prose-table:my-0 prose-blockquote:my-0 prose-ul:-my-0 prose-ol:-my-0 prose-li:-my-0 whitespace-pre-line;
+}
+
+.codespan {
+  color: #eb5757;
+  border-width: 0px;
+  padding: 3px 8px;
+  font-size: 0.8em;
+  font-weight: 600;
+  @apply rounded-md dark:bg-gray-800 bg-gray-100 mx-0.5;
+}
+
+::-webkit-scrollbar-thumb {
+  --tw-border-opacity: 1;
+  background-color: rgba(215, 215, 215, 0.6);
+  border-color: rgba(255, 255, 255, var(--tw-border-opacity));
+  border-radius: 9999px;
+  border-width: 1px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(67, 67, 67, 0.6);
+  border-color: rgba(0, 0, 0, var(--tw-border-opacity));
+}
+
+::-webkit-scrollbar {
+  height: 0.45rem;
+  width: 0.45rem;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 9999px;
+}
+
+.scrollbar-hidden:active::-webkit-scrollbar-thumb,
+.scrollbar-hidden:focus::-webkit-scrollbar-thumb,
+.scrollbar-hidden:hover::-webkit-scrollbar-thumb {
+  visibility: visible;
+}
+.scrollbar-hidden::-webkit-scrollbar-thumb {
+  visibility: hidden;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.katex-display {
+  @apply overflow-y-hidden overflow-x-auto max-w-full;
+}
+
+.katex-mathml {
+  display: none;
+}
+
+body {
+  background: #fff;
+  color: #000;
+}
+
+.dark body {
+  background: #171717;
+  color: #eee;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #9a9b9e 25%, #2a2929 50%, #9a9b9e 75%);
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+  color: #818286;
+}
+
+.dark .shimmer {
+  background: linear-gradient(90deg, #818286 25%, #eae5e5 50%, #818286 75%);
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+  color: #a1a3a7;
+}
