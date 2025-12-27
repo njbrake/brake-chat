@@ -42,4 +42,4 @@ jobs:
             ${{ runner.os }}-mypy-
 
       - name: pre-commit
-        run: uv run pre-commit run --all-files --verbose
+        run: uv run --no-install-project pre-commit run --all-files --verbose
