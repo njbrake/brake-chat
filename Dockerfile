@@ -30,6 +30,8 @@ WORKDIR /app
 RUN apk add --no-cache git
 
 COPY package.json package-lock.json ./
+RUN mkdir -p next-app
+COPY next-app/package.json next-app/package-lock.json ./next-app/
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --force
 
