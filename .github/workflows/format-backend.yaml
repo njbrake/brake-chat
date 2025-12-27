@@ -43,7 +43,7 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync --group lint
+        run: uv sync --group lint --no-install-project
 
       - name: Format backend
         run: npm run format:backend
